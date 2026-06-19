@@ -1,0 +1,3 @@
+# Ideation
+
+Ideation workspace.
