@@ -31,7 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A bilingual "what changed and why" panel renders from `normGapNotes[]` and `photoAdvice` — no additional API call required
   4. A prominent zero-retention statement appears above the CV textarea before the user submits
   5. User can copy the Lebenslauf output to clipboard
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 01-01-PLAN.md — Walking skeleton: Node 20.9 pre-flight + thinnest paste→parse→render slice (Wave 1)
+- [ ] 01-02-PLAN.md — Backend grounding-safe schema + prompt upgrade: categorized skills, German language levels, concise norm-gap notes (Wave 2)
+- [ ] 01-03-PLAN.md — WYSIWYG editor core: inline edit, add/remove/reorder entries+sections, date soft-format, copy, start over (Wave 3)
+- [ ] 01-04-PLAN.md — Categorized skill chips + language dropdown + collapsible norm-gap panel + optional-photo callout (Wave 4)
 **UI hint**: yes
 
 ### Phase 2: Cover Letter Flow
@@ -88,7 +92,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pre-flight + Parse Flow | 0/TBD | Not started | - |
+| 1. Pre-flight + Parse Flow | 0/4 | Planned | - |
 | 2. Cover Letter Flow | 0/TBD | Not started | - |
 | 3. Analytics + Security Guards | 0/TBD | Not started | - |
 | 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
