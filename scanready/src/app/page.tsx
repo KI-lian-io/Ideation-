@@ -1,16 +1,26 @@
 'use client'
-import React, { useReducer, useState } from 'react'
+import React, { useReducer, useState, useRef, useEffect } from 'react'
 import type { Lebenslauf } from '@/lib/schema'
 import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
+import { PERSONALIZATION_QUESTIONS } from '@/lib/prompts'
 
 // ---------------------------------------------------------------------------
 // State machine types
 // ---------------------------------------------------------------------------
 
-type AppPhase = 'input' | 'loading' | 'result' | 'error' | 'junk'
+type AppPhase =
+  | 'input'
+  | 'loading'
+  | 'result'
+  | 'error'
+  | 'junk'
+  | 'cover_letter_input'
+  | 'cover_letter_streaming'
+  | 'cover_letter_result'
+  | 'cover_letter_error'
 
 type AppState = {
   phase: AppPhase
@@ -18,6 +28,8 @@ type AppState = {
   lebenslauf: Lebenslauf | null
   sectionOrder: string[]
   errorMessage: string | null
+  jobPosting: string
+  answers: { question: string; answer: string }[]
 }
 
 // AppAction union: page lifecycle actions + all Lebenslauf editor actions
@@ -28,6 +40,13 @@ type AppAction =
   | { type: 'PARSE_ERROR'; payload: string }
   | { type: 'PARSE_JUNK' }
   | { type: 'RESET' }
+  | { type: 'START_COVER_LETTER' }
+  | { type: 'SET_JOB_POSTING'; payload: string }
+  | { type: 'SET_ANSWER'; payload: { index: number; answer: string } }
+  | { type: 'COVER_LETTER_STREAMING' }
+  | { type: 'COVER_LETTER_DONE' }
+  | { type: 'COVER_LETTER_ERROR'; payload: string }
+  | { type: 'COVER_LETTER_REGENERATE' }
   | LebenslaufAction
 
 // Static, deterministic — no Date.now, Math.random, or window (hydration safety)
@@ -37,6 +56,8 @@ const initialState: AppState = {
   lebenslauf: null,
   sectionOrder: ['personal', 'experience', 'education', 'skills', 'languages'],
   errorMessage: null,
+  jobPosting: '',
+  answers: PERSONALIZATION_QUESTIONS.map((q) => ({ question: q, answer: '' })),
 }
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -280,6 +301,28 @@ function reducer(state: AppState, action: AppAction): AppState {
     case 'REORDER_SECTION':
       return { ...state, sectionOrder: reorder(state.sectionOrder, action.from, action.to) }
 
+    // -------------------------------------------------------------------------
+    // Cover letter sub-flow
+    // -------------------------------------------------------------------------
+    case 'START_COVER_LETTER':
+      return { ...state, phase: 'cover_letter_input' }
+    case 'SET_JOB_POSTING':
+      return { ...state, jobPosting: action.payload }
+    case 'SET_ANSWER': {
+      const answers = state.answers.map((a, i) =>
+        i === action.payload.index ? { ...a, answer: action.payload.answer } : a
+      )
+      return { ...state, answers }
+    }
+    case 'COVER_LETTER_STREAMING':
+      return { ...state, phase: 'cover_letter_streaming', errorMessage: null }
+    case 'COVER_LETTER_DONE':
+      return { ...state, phase: 'cover_letter_result' }
+    case 'COVER_LETTER_ERROR':
+      return { ...state, phase: 'cover_letter_error', errorMessage: action.payload }
+    case 'COVER_LETTER_REGENERATE':
+      return { ...state, phase: 'cover_letter_streaming', errorMessage: null }
+
     default:
       return state
   }
@@ -390,11 +433,13 @@ function ResultView({
   sectionOrder,
   dispatch,
   onReset,
+  onStartCoverLetter,
 }: {
   lebenslauf: Lebenslauf
   sectionOrder: string[]
   dispatch: React.Dispatch<AppAction>
   onReset: () => void
+  onStartCoverLetter: () => void
 }) {
   // Copy button state — local, not in reducer (D-04 / UI-SPEC)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -454,6 +499,23 @@ function ResultView({
 
       {/* Collapsible bilingual norm-gap panel (D-05 / LL-02) — below the editor so CV stays hero */}
       <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
+
+      {/* Cover letter CTA — next step in the flow */}
+      <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-700 dark:bg-zinc-900">
+        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-1">
+          Anschreiben schreiben
+        </p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+          Generate an authentic German cover letter grounded in your Lebenslauf. You will answer
+          3–5 short questions so the letter sounds like you, not generic AI prose.
+        </p>
+        <button
+          onClick={onStartCoverLetter}
+          className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          Write Anschreiben →
+        </button>
+      </div>
     </div>
   )
 }
@@ -528,11 +590,234 @@ function JunkView({
 }
 
 // ---------------------------------------------------------------------------
+// Cover letter views
+// ---------------------------------------------------------------------------
+
+function CoverLetterInputView({
+  jobPosting,
+  answers,
+  onJobPostingChange,
+  onAnswerChange,
+  onSubmit,
+  onBack,
+}: {
+  jobPosting: string
+  answers: { question: string; answer: string }[]
+  onJobPostingChange: (v: string) => void
+  onAnswerChange: (index: number, v: string) => void
+  onSubmit: () => void
+  onBack: () => void
+}) {
+  const canSubmit = jobPosting.trim().length > 0
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-1">
+          Anschreiben
+        </h2>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Paste the job posting and answer the questions below. The letter is grounded strictly in
+          your Lebenslauf facts and your own words.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Job posting <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={jobPosting}
+          onChange={(e) => onJobPostingChange(e.target.value)}
+          placeholder="Paste the full job posting here…"
+          rows={8}
+          className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
+          aria-label="Job posting"
+        />
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          A few quick questions — so the letter sounds like you, not generic AI prose:
+        </p>
+        {answers.map((a, i) => (
+          <div key={i} className="flex flex-col gap-1">
+            <label className="text-sm text-zinc-600 dark:text-zinc-400">{a.question}</label>
+            <textarea
+              value={a.answer}
+              onChange={(e) => onAnswerChange(i, e.target.value)}
+              rows={2}
+              className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
+              aria-label={`Answer to question ${i + 1}`}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Native-speaker nudge (D-09 moved from prompt to UI) */}
+      <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-950/20">
+        <p className="text-sm text-amber-700 dark:text-amber-400">
+          Native-quality German is the goal — but before sending to a real recruiter, have a native
+          German speaker review the final letter.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onSubmit}
+          disabled={!canSubmit}
+          className="rounded-lg bg-zinc-900 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          Anschreiben schreiben
+        </button>
+        <button
+          onClick={onBack}
+          className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+        >
+          Back to Lebenslauf
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function CoverLetterStreamingView({ letterText }: { letterText: string }) {
+  return (
+    <div className="flex flex-col gap-4" role="status" aria-label="Generating Anschreiben">
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Anschreiben</p>
+      {letterText ? (
+        // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
+        <pre className="whitespace-pre-wrap font-sans text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
+          {letterText}
+        </pre>
+      ) : (
+        <div className="animate-pulse flex flex-col gap-3">
+          <div className="h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
+          <div className="h-4 w-2/3 rounded bg-zinc-200 dark:bg-zinc-700" />
+          <div className="h-4 w-1/2 rounded bg-zinc-200 dark:bg-zinc-700" />
+          <div className="mt-3 h-4 w-4/5 rounded bg-zinc-200 dark:bg-zinc-700" />
+          <div className="h-4 w-3/5 rounded bg-zinc-200 dark:bg-zinc-700" />
+        </div>
+      )}
+      <p className="text-sm text-zinc-400 dark:text-zinc-500">Generating Anschreiben…</p>
+    </div>
+  )
+}
+
+function CoverLetterResultView({
+  letterText,
+  onRegenerate,
+  onReset,
+}: {
+  letterText: string
+  onRegenerate: () => void
+  onReset: () => void
+}) {
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(letterText)
+      setCopyState('copied')
+      setTimeout(() => setCopyState('idle'), 1500)
+    } catch {
+      setCopyState('error')
+      setTimeout(() => setCopyState('idle'), 3000)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Anschreiben</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleCopy}
+            aria-label="Anschreiben in Zwischenablage kopieren"
+            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
+          </button>
+          <button
+            onClick={onRegenerate}
+            className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+          >
+            Regenerate
+          </button>
+          <button
+            onClick={onReset}
+            className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+          >
+            Start over
+          </button>
+        </div>
+      </div>
+
+      {copyState === 'error' && (
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Kopieren fehlgeschlagen — bitte manuell auswählen.
+        </p>
+      )}
+
+      {/* No dangerouslySetInnerHTML — XSS guard (T-02-01) */}
+      <pre className="whitespace-pre-wrap font-sans text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
+        {letterText}
+      </pre>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Main page component
 // ---------------------------------------------------------------------------
 
 export default function Home() {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const [letterText, setLetterText] = useState('')
+  const abortRef = useRef<AbortController | null>(null)
+
+  // Abort any in-flight cover-letter request on unmount
+  useEffect(() => {
+    return () => abortRef.current?.abort()
+  }, [])
+
+  async function handleGenerateLetter() {
+    const cvText = toPlainText(state.lebenslauf!, state.sectionOrder)
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    dispatch({ type: 'COVER_LETTER_STREAMING' })
+    setLetterText('')
+    try {
+      const res = await fetch('/api/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cvText, jobPosting: state.jobPosting, answers: state.answers }),
+        signal: controller.signal,
+      })
+      if (!res.ok || !res.body) {
+        const msg = await res.text().catch(() => 'Generation failed.')
+        dispatch({ type: 'COVER_LETTER_ERROR', payload: msg })
+        return
+      }
+      const reader = res.body.getReader()
+      // stream:true is MANDATORY — prevents umlaut corruption (ä/ö/ü split across chunks)
+      const decoder = new TextDecoder('utf-8', { fatal: false })
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        if (chunk) setLetterText((prev) => prev + chunk)
+      }
+      // Flush any remaining bytes buffered by the streaming decoder
+      const tail = decoder.decode()
+      if (tail) setLetterText((prev) => prev + tail)
+      dispatch({ type: 'COVER_LETTER_DONE' })
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return
+      dispatch({ type: 'COVER_LETTER_ERROR', payload: 'Network error — please try again.' })
+    }
+  }
 
   async function handleSubmit() {
     dispatch({ type: 'SUBMIT' })
@@ -630,6 +915,7 @@ export default function Home() {
             sectionOrder={state.sectionOrder}
             dispatch={dispatch}
             onReset={() => dispatch({ type: 'RESET' })}
+            onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
           />
         )}
 
@@ -647,6 +933,56 @@ export default function Home() {
             onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
             onRetry={handleRetry}
           />
+        )}
+
+        {state.phase === 'cover_letter_input' && (
+          <CoverLetterInputView
+            jobPosting={state.jobPosting}
+            answers={state.answers}
+            onJobPostingChange={(v) => dispatch({ type: 'SET_JOB_POSTING', payload: v })}
+            onAnswerChange={(i, v) => dispatch({ type: 'SET_ANSWER', payload: { index: i, answer: v } })}
+            onSubmit={handleGenerateLetter}
+            onBack={() => dispatch({ type: 'PARSE_SUCCESS', payload: state.lebenslauf! })}
+          />
+        )}
+
+        {state.phase === 'cover_letter_streaming' && (
+          <CoverLetterStreamingView letterText={letterText} />
+        )}
+
+        {state.phase === 'cover_letter_result' && (
+          <CoverLetterResultView
+            letterText={letterText}
+            onRegenerate={handleGenerateLetter}
+            onReset={() => dispatch({ type: 'RESET' })}
+          />
+        )}
+
+        {state.phase === 'cover_letter_error' && (
+          <div className="flex flex-col gap-4">
+            <div className="rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/20">
+              <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                Cover letter generation failed
+              </p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-500">
+                {state.errorMessage ?? 'An unexpected error occurred.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleGenerateLetter}
+                className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              >
+                Try again
+              </button>
+              <button
+                onClick={() => dispatch({ type: 'START_COVER_LETTER' })}
+                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+              >
+                Edit inputs
+              </button>
+            </div>
+          </div>
         )}
       </main>
     </div>
