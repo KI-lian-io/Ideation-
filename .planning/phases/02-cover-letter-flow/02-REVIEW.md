@@ -58,6 +58,8 @@ If Haiku is a deliberate, approved decision, update both `CLAUDE.md` constraint 
 
 ### WR-01: Raw server response text is surfaced directly as the user-facing error message
 
+**Disposition:** RESOLVED — fixed in 02-REVIEW-FIX.md (iteration 1). Do NOT re-apply.
+
 **File:** `scanready/src/app/page.tsx:854-857`
 **Issue:** On a non-OK cover-letter response, the code does `const msg = await res.text()` and dispatches it straight into `COVER_LETTER_ERROR`, which renders verbatim in `ErrorView`. The `/api/cover-letter` route returns plain-text error bodies (e.g. `"cvText, jobPosting and answers are required"`), but any upstream proxy/5xx error (HTML error pages, stack-trace-ish text, gateway messages) would also be rendered raw to the end user. This is inconsistent with the `/api/parse` handler, which returns a controlled `{ error }` JSON shape, and it can leak unhelpful or confusing internals into the UI.
 **Fix:** Map to a controlled message and only use server text when it is a known-safe contract:
@@ -70,6 +72,8 @@ if (!res.ok || !res.body) {
 Or have the route return JSON `{ error }` like `/api/parse` and parse it defensively.
 
 ### WR-02: Mid-stream errors leave the UI stuck on the streaming view with no error state
+
+**Disposition:** RESOLVED — fixed in 02-REVIEW-FIX.md (iteration 1). Do NOT re-apply.
 
 **File:** `scanready/src/app/page.tsx:862-871` (client) / `scanready/src/app/api/cover-letter/route.ts:43-47` (server)
 **Issue:** If the Anthropic stream throws *after* the response headers/body have started (the route calls `controller.error(err)`), the client `reader.read()` rejects with a non-Abort error. That lands in the outer `catch`, which only handles `AbortError` specially and otherwise dispatches `COVER_LETTER_ERROR` — which is correct. However, any text already streamed into `letterText` is **not** cleared, and on the *next* successful generation the reader appends to a fresh `setLetterText('')`, so that path is fine. The real gap: a stream that ends *cleanly but empty* (e.g. model emits only thinking blocks, or `max_tokens`/refusal with zero text deltas) reaches `done` with `letterText === ''`, then dispatches `COVER_LETTER_DONE` and renders `CoverLetterResultView` with an empty editable textarea and no error. The user sees a blank "successful" letter.
@@ -87,17 +91,23 @@ dispatch({ type: 'COVER_LETTER_DONE' })
 
 ### WR-03: `COVER_LETTER_REGENERATE` action is dead code; regenerate path never dispatches it
 
+**Disposition:** RESOLVED — fixed in 02-REVIEW-FIX.md (iteration 1). Do NOT re-apply.
+
 **File:** `scanready/src/app/page.tsx:49,323-324,805-811,1013`
 **Issue:** The reducer defines `COVER_LETTER_REGENERATE` (identical body to `COVER_LETTER_STREAMING`), and the action is in the `AppAction` union, but the only "Regenerieren" button wires `onRegenerate={handleGenerateLetter}`, which dispatches `COVER_LETTER_STREAMING` — never `COVER_LETTER_REGENERATE`. The action is unreachable. Dead reducer branches invite confusion about intended behavior and rot over time.
 **Fix:** Remove the `COVER_LETTER_REGENERATE` action from the union and the reducer case, since `handleGenerateLetter` already drives both initial generation and regeneration via `COVER_LETTER_STREAMING`.
 
 ### WR-04: `handleSubmit` and `handleRetry` are near-identical duplicated logic
 
+**Disposition:** RESOLVED — fixed in 02-REVIEW-FIX.md (iteration 1). Do NOT re-apply.
+
 **File:** `scanready/src/app/page.tsx:878-916` and `918-953`
 **Issue:** The two handlers are byte-for-byte identical except for two error fallback strings (`'Failed to parse CV. Please try again.'` vs `'Failed to parse CV.'` and the network-error copy). This is ~35 lines of duplicated fetch/parse/dispatch logic. Divergence risk: a future fix to one (e.g. the 422 handling or empty-Lebenslauf guard) will silently miss the other. The error-copy difference is itself almost certainly unintentional.
 **Fix:** Extract a single `runParse()` helper and have both `handleSubmit` and `handleRetry` call it; both already `dispatch({ type: 'SUBMIT' })` first, so the bodies are interchangeable.
 
 ### WR-05: Stale `letterText` closure makes the empty-stream / done logic fragile
+
+**Disposition:** RESOLVED — fixed in 02-REVIEW-FIX.md (iteration 1). Do NOT re-apply.
 
 **File:** `scanready/src/app/page.tsx:862-871`
 **Issue:** Inside `handleGenerateLetter`, all reads of the streamed content go through `setLetterText((prev) => prev + chunk)` (correct, functional update). But there is no local mirror of the accumulated text, so the function body itself cannot inspect what was streamed (needed for WR-02's empty-output guard, and for any "did we actually get a letter?" decision). Relying on the `letterText` React state here would read the stale initial value. This is a latent foot-gun for the next person who adds post-stream logic.
