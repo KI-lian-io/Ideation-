@@ -46,7 +46,6 @@ type AppAction =
   | { type: 'COVER_LETTER_STREAMING' }
   | { type: 'COVER_LETTER_DONE' }
   | { type: 'COVER_LETTER_ERROR'; payload: string }
-  | { type: 'COVER_LETTER_REGENERATE' }
   | LebenslaufAction
 
 // Static, deterministic — no Date.now, Math.random, or window (hydration safety)
@@ -320,8 +319,6 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, phase: 'cover_letter_result' }
     case 'COVER_LETTER_ERROR':
       return { ...state, phase: 'cover_letter_error', errorMessage: action.payload }
-    case 'COVER_LETTER_REGENERATE':
-      return { ...state, phase: 'cover_letter_streaming', errorMessage: null }
 
     default:
       return state
