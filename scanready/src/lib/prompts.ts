@@ -51,10 +51,8 @@ GERMAN ANSCHREIBEN NORMS:
   company, with concrete, CV-grounded achievements + the applicant's stated motivation),
   close (availability, "Ich freue mich auf ...", signature line).
 - Address the specific job posting. No superlatives, no English-style hype.
-- End with a short note (in [brackets]) reminding the user to have a native German
-  speaker review before sending.
 
-Write only the letter (plus the bracketed review note). No preamble.`;
+Write only the letter. No preamble.`;
 
 export function buildParseUser(resumeText: string): string {
   return `Here is the applicant's current resume. Convert it to a German Lebenslauf following the rules.\n\n---RESUME---\n${resumeText}\n---END---`;

@@ -15,4 +15,4 @@ export const anthropic = new Anthropic({
 });
 
 export const GENERATION_MODEL = "claude-opus-4-8";
-export const PARSE_MODEL = "claude-opus-4-8"; // cost lever: "claude-sonnet-4-6"
+export const PARSE_MODEL = "claude-haiku-4-5"; // cost lever: "claude-sonnet-4-6"
