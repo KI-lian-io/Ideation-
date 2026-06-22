@@ -840,7 +840,11 @@ export default function Home() {
   }, [])
 
   async function handleGenerateLetter() {
-    const cvText = toPlainText(state.lebenslauf!, state.sectionOrder)
+    // Explicit guard instead of a non-null assertion: this path is only reachable
+    // after PARSE_SUCCESS today, but the invariant is implicit and a future phase-graph
+    // refactor could make lebenslauf null here and crash toPlainText(null) (IN-02).
+    if (!state.lebenslauf) return
+    const cvText = toPlainText(state.lebenslauf, state.sectionOrder)
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
