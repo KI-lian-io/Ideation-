@@ -849,8 +849,13 @@ export default function Home() {
         signal: controller.signal,
       })
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => 'Generation failed.')
-        dispatch({ type: 'COVER_LETTER_ERROR', payload: msg })
+        // Surface a controlled message — never render the raw server body, which
+        // could be an HTML error page, gateway text, or stack-trace-ish output
+        // from an upstream proxy/5xx (WR-01).
+        dispatch({
+          type: 'COVER_LETTER_ERROR',
+          payload: 'Generation failed — please try again.',
+        })
         return
       }
       const reader = res.body.getReader()
