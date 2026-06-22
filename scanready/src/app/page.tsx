@@ -46,6 +46,7 @@ type AppAction =
   | { type: 'COVER_LETTER_STREAMING' }
   | { type: 'COVER_LETTER_DONE' }
   | { type: 'COVER_LETTER_ERROR'; payload: string }
+  | { type: 'BACK_TO_RESULT' }
   | LebenslaufAction
 
 // Static, deterministic — no Date.now, Math.random, or window (hydration safety)
@@ -319,6 +320,10 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, phase: 'cover_letter_result' }
     case 'COVER_LETTER_ERROR':
       return { ...state, phase: 'cover_letter_error', errorMessage: action.payload }
+    case 'BACK_TO_RESULT':
+      // Dedicated navigation action — clearer than overloading PARSE_SUCCESS and
+      // avoids a non-null assertion on state.lebenslauf (IN-01).
+      return { ...state, phase: 'result' }
 
     default:
       return state
@@ -994,7 +999,7 @@ export default function Home() {
             onJobPostingChange={(v) => dispatch({ type: 'SET_JOB_POSTING', payload: v })}
             onAnswerChange={(i, v) => dispatch({ type: 'SET_ANSWER', payload: { index: i, answer: v } })}
             onSubmit={handleGenerateLetter}
-            onBack={() => dispatch({ type: 'PARSE_SUCCESS', payload: state.lebenslauf! })}
+            onBack={() => dispatch({ type: 'BACK_TO_RESULT' })}
           />
         )}
 
