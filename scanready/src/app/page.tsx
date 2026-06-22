@@ -1,7 +1,9 @@
 'use client'
-import { useReducer } from 'react'
+import React, { useReducer, useState } from 'react'
 import type { Lebenslauf } from '@/lib/schema'
-import { isLebenslaufBasicallyEmpty } from '@/lib/lebenslauf-utils'
+import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
+import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
+import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -17,7 +19,7 @@ type AppState = {
   errorMessage: string | null
 }
 
-// Actions for this plan (Plans 02-04 extend this union with edit/add/remove/reorder)
+// AppAction union: page lifecycle actions + all Lebenslauf editor actions
 type AppAction =
   | { type: 'SET_RESUME_TEXT'; payload: string }
   | { type: 'SUBMIT' }
@@ -25,6 +27,7 @@ type AppAction =
   | { type: 'PARSE_ERROR'; payload: string }
   | { type: 'PARSE_JUNK' }
   | { type: 'RESET' }
+  | LebenslaufAction
 
 // Static, deterministic — no Date.now, Math.random, or window (hydration safety)
 const initialState: AppState = {
@@ -37,6 +40,9 @@ const initialState: AppState = {
 
 function reducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    // -------------------------------------------------------------------------
+    // Page lifecycle
+    // -------------------------------------------------------------------------
     case 'SET_RESUME_TEXT':
       return { ...state, resumeText: action.payload }
     case 'SUBMIT':
@@ -50,6 +56,171 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, phase: 'junk' }
     case 'RESET':
       return initialState
+
+    // -------------------------------------------------------------------------
+    // Personal data
+    // -------------------------------------------------------------------------
+    case 'UPDATE_PERSONAL': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          personal: { ...state.lebenslauf.personal, [action.field]: action.value },
+        },
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Experience
+    // -------------------------------------------------------------------------
+    case 'UPDATE_EXPERIENCE': {
+      if (!state.lebenslauf) return state
+      const exp = state.lebenslauf.experience.map((e, i) =>
+        i === action.index ? { ...e, [action.field]: action.value } : e
+      )
+      return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
+    }
+    case 'ADD_EXPERIENCE': {
+      if (!state.lebenslauf) return state
+      const blank = { role: '', company: '', location: null, start: null, end: null, bullets: [] }
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          experience: [...state.lebenslauf.experience, blank],
+        },
+      }
+    }
+    case 'REMOVE_EXPERIENCE': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          experience: state.lebenslauf.experience.filter((_, i) => i !== action.index),
+        },
+      }
+    }
+    case 'REORDER_EXPERIENCE': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          experience: reorder(state.lebenslauf.experience, action.from, action.to),
+        },
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Bullets
+    // -------------------------------------------------------------------------
+    case 'UPDATE_BULLET': {
+      if (!state.lebenslauf) return state
+      const exp = state.lebenslauf.experience.map((e, i) => {
+        if (i !== action.expIndex) return e
+        const bullets = e.bullets.map((b, bi) => (bi === action.bulletIndex ? action.value : b))
+        return { ...e, bullets }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
+    }
+    case 'ADD_BULLET': {
+      if (!state.lebenslauf) return state
+      const exp = state.lebenslauf.experience.map((e, i) => {
+        if (i !== action.expIndex) return e
+        return { ...e, bullets: [...e.bullets, ''] }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
+    }
+    case 'REMOVE_BULLET': {
+      if (!state.lebenslauf) return state
+      const exp = state.lebenslauf.experience.map((e, i) => {
+        if (i !== action.expIndex) return e
+        return { ...e, bullets: e.bullets.filter((_, bi) => bi !== action.bulletIndex) }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
+    }
+
+    // -------------------------------------------------------------------------
+    // Education
+    // -------------------------------------------------------------------------
+    case 'UPDATE_EDUCATION': {
+      if (!state.lebenslauf) return state
+      const edu = state.lebenslauf.education.map((e, i) =>
+        i === action.index ? { ...e, [action.field]: action.value } : e
+      )
+      return { ...state, lebenslauf: { ...state.lebenslauf, education: edu } }
+    }
+    case 'ADD_EDUCATION': {
+      if (!state.lebenslauf) return state
+      const blank = { qualification: '', institution: '', location: null, start: null, end: null }
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          education: [...state.lebenslauf.education, blank],
+        },
+      }
+    }
+    case 'REMOVE_EDUCATION': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          education: state.lebenslauf.education.filter((_, i) => i !== action.index),
+        },
+      }
+    }
+    case 'REORDER_EDUCATION': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          education: reorder(state.lebenslauf.education, action.from, action.to),
+        },
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Languages
+    // -------------------------------------------------------------------------
+    case 'UPDATE_LANGUAGE': {
+      if (!state.lebenslauf) return state
+      const langs = state.lebenslauf.languages.map((l, i) =>
+        i === action.index ? { ...l, [action.field]: action.value } : l
+      )
+      return { ...state, lebenslauf: { ...state.lebenslauf, languages: langs } }
+    }
+    case 'ADD_LANGUAGE': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          languages: [...state.lebenslauf.languages, { language: '', level: null }],
+        },
+      }
+    }
+    case 'REMOVE_LANGUAGE': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          languages: state.lebenslauf.languages.filter((_, i) => i !== action.index),
+        },
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Section order (D-12)
+    // -------------------------------------------------------------------------
+    case 'REORDER_SECTION':
+      return { ...state, sectionOrder: reorder(state.sectionOrder, action.from, action.to) }
+
     default:
       return state
   }
@@ -105,7 +276,7 @@ function InputView({
       </div>
 
       {/* Zero-retention reassurance — calm inline line with lock icon (D-14 / INPUT-02) */}
-      <p className="flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
         <LockIcon />
         Your CV is never stored or used for training — processing is stateless and zero-retention.
       </p>
@@ -122,7 +293,7 @@ function InputView({
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="self-end rounded-lg bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="self-end rounded-lg bg-zinc-900 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         Convert to Lebenslauf
       </button>
@@ -157,45 +328,69 @@ function LoadingView() {
 
 function ResultView({
   lebenslauf,
+  sectionOrder,
+  dispatch,
   onReset,
 }: {
   lebenslauf: Lebenslauf
+  sectionOrder: string[]
+  dispatch: React.Dispatch<AppAction>
   onReset: () => void
 }) {
-  const firstExp = lebenslauf.experience[0]
+  // Copy button state — local, not in reducer (D-04 / UI-SPEC)
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+
+  async function handleCopy() {
+    const text = toPlainText(lebenslauf, sectionOrder)
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopyState('copied')
+      setTimeout(() => setCopyState('idle'), 1500)
+    } catch {
+      setCopyState('error')
+      setTimeout(() => setCopyState('idle'), 3000)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-1">
-            Lebenslauf
-          </p>
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-            {lebenslauf.personal.fullName}
-          </h2>
+      {/* Header: label + action buttons */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+          Lebenslauf
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Copy button — D-04 / LL-04 */}
+          <button
+            onClick={handleCopy}
+            aria-label="Lebenslauf in Zwischenablage kopieren"
+            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            {copyState === 'copied' ? 'Kopiert ✓' : 'Lebenslauf kopieren'}
+          </button>
+          {/* Start over — D-16 */}
+          <button
+            onClick={onReset}
+            className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+          >
+            Start over / paste a new CV
+          </button>
         </div>
-        <button
-          onClick={onReset}
-          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-        >
-          Start over / paste a new CV
-        </button>
       </div>
 
-      {firstExp && (
-        <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">
-            Berufserfahrung (erste Stelle)
-          </p>
-          <p className="font-medium text-zinc-900 dark:text-zinc-100">{firstExp.role}</p>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">{firstExp.company}</p>
-        </div>
+      {/* Inline copy error (transient 3000ms) */}
+      {copyState === 'error' && (
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Kopieren fehlgeschlagen — bitte manuell auswählen.
+        </p>
       )}
 
-      <p className="text-sm text-zinc-400 dark:text-zinc-500">
-        Full editor, norm-gap notes, and cover letter coming in the next steps.
-      </p>
+      {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) */}
+      <LebenslaufEditor
+        lebenslauf={lebenslauf}
+        sectionOrder={sectionOrder}
+        dispatch={dispatch}
+      />
     </div>
   )
 }
@@ -212,7 +407,7 @@ function ErrorView({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/20">
-        <p className="text-sm font-medium text-red-700 dark:text-red-400">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-400">
           Something went wrong
         </p>
         <p className="mt-1 text-sm text-red-600 dark:text-red-500">{message}</p>
@@ -220,7 +415,7 @@ function ErrorView({
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         Try again
       </button>
@@ -240,7 +435,7 @@ function JunkView({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-950/20">
-        <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+        <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
           That did not look like a CV
         </p>
         <p className="mt-1 text-sm text-amber-600 dark:text-amber-500">
@@ -261,7 +456,7 @@ function JunkView({
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         Try again
       </button>
@@ -369,6 +564,8 @@ export default function Home() {
         {state.phase === 'result' && state.lebenslauf && (
           <ResultView
             lebenslauf={state.lebenslauf}
+            sectionOrder={state.sectionOrder}
+            dispatch={dispatch}
             onReset={() => dispatch({ type: 'RESET' })}
           />
         )}
