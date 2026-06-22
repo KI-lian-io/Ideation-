@@ -861,15 +861,34 @@ export default function Home() {
       const reader = res.body.getReader()
       // stream:true is MANDATORY — prevents umlaut corruption (ä/ö/ü split across chunks)
       const decoder = new TextDecoder('utf-8', { fatal: false })
+      // Local mirror of the streamed text — the `letterText` React state is stale
+      // inside this closure, so post-stream decisions must read `acc` (WR-05).
+      let acc = ''
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = decoder.decode(value, { stream: true })
-        if (chunk) setLetterText((prev) => prev + chunk)
+        if (chunk) {
+          acc += chunk
+          setLetterText((prev) => prev + chunk)
+        }
       }
       // Flush any remaining bytes buffered by the streaming decoder
       const tail = decoder.decode()
-      if (tail) setLetterText((prev) => prev + tail)
+      if (tail) {
+        acc += tail
+        setLetterText((prev) => prev + tail)
+      }
+      // A stream can end cleanly but empty (thinking-only output, refusal, or a
+      // max_tokens cut with zero text deltas). Guard the done transition on
+      // non-empty content so the user never sees a blank "successful" letter (WR-02).
+      if (acc.trim().length === 0) {
+        dispatch({
+          type: 'COVER_LETTER_ERROR',
+          payload: 'No letter was generated — please try again.',
+        })
+        return
+      }
       dispatch({ type: 'COVER_LETTER_DONE' })
     } catch (err) {
       if ((err as Error).name === 'AbortError') return
