@@ -9,21 +9,21 @@
 
 ### Pre-flight (PRE)
 
-- [ ] **PRE-01**: App runs on Node ≥ 20.9 — `engines` pinned in package.json + `.nvmrc` committed (Next 16 hard requirement; local env is 18.14.0)
-- [ ] **PRE-02**: Anthropic SDK call shapes (`messages.parse` + `output_config`, `messages.stream`) confirmed against installed `@anthropic-ai/sdk@0.105` before UI is built on them
-- [ ] **PRE-03**: `.env.local` setup documented + `.env.example` tracked (`ANTHROPIC_API_KEY`)
+- [x] **PRE-01**: App runs on Node ≥ 20.9 — `engines` pinned in package.json + `.nvmrc` committed (Next 16 hard requirement; local env is 18.14.0)
+- [x] **PRE-02**: Anthropic SDK call shapes (`messages.parse` + `output_config`, `messages.stream`) confirmed against installed `@anthropic-ai/sdk@0.105` before UI is built on them
+- [x] **PRE-03**: `.env.local` setup documented + `.env.example` tracked (`ANTHROPIC_API_KEY`)
 
 ### CV Input & Parse (INPUT)
 
-- [ ] **INPUT-01**: User can paste résumé text and submit it for conversion
-- [ ] **INPUT-02**: User sees a prominent zero-retention / "nothing is stored" statement above the CV field before submitting
-- [ ] **INPUT-03**: User sees a clear loading state while the CV is parsed, and a readable error if parsing fails
+- [x] **INPUT-01**: User can paste résumé text and submit it for conversion
+- [x] **INPUT-02**: User sees a prominent zero-retention / "nothing is stored" statement above the CV field before submitting
+- [x] **INPUT-03**: User sees a clear loading state while the CV is parsed, and a readable error if parsing fails
 
 ### Lebenslauf Output (LL)
 
 - [x] **LL-01**: User sees their CV restructured as a German Lebenslauf — reverse-chronological, DIN-style sections, `DD.MM.YYYY` dates, personal-data block, signature placeholder
-- [ ] **LL-02**: User sees a bilingual "what changed and why" panel — English explanations rendered from `normGapNotes[]` (pure client-side; no API change)
-- [ ] **LL-03**: User sees nuanced photo guidance from `photoAdvice` (optional per AGG, expected in practice) — never mandated
+- [x] **LL-02**: User sees a bilingual "what changed and why" panel — English explanations rendered from `normGapNotes[]` (pure client-side; no API change)
+- [x] **LL-03**: User sees nuanced photo guidance from `photoAdvice` (optional per AGG, expected in practice) — never mandated
 - [x] **LL-04**: User can copy the Lebenslauf output to clipboard
 
 ### Anschreiben Flow (CL)
@@ -100,15 +100,15 @@ Each v1 requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PRE-01 | Phase 1 | Pending |
-| PRE-02 | Phase 1 | Pending |
-| PRE-03 | Phase 1 | Pending |
-| INPUT-01 | Phase 1 | Pending |
-| INPUT-02 | Phase 1 | Pending |
-| INPUT-03 | Phase 1 | Pending |
+| PRE-01 | Phase 1 | Complete |
+| PRE-02 | Phase 1 | Complete |
+| PRE-03 | Phase 1 | Complete |
+| INPUT-01 | Phase 1 | Complete |
+| INPUT-02 | Phase 1 | Complete |
+| INPUT-03 | Phase 1 | Complete |
 | LL-01 | Phase 1 | Complete |
-| LL-02 | Phase 1 | Pending |
-| LL-03 | Phase 1 | Pending |
+| LL-02 | Phase 1 | Complete |
+| LL-03 | Phase 1 | Complete |
 | LL-04 | Phase 1 | Complete |
 | CL-01 | Phase 2 | Pending |
 | CL-02 | Phase 2 | Pending |
