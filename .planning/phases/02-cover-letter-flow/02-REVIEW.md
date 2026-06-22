@@ -36,6 +36,8 @@ Several robustness gaps in the streaming reader and error handling round out the
 
 ### CR-01: `PARSE_MODEL` silently downgraded to a model that violates the documented constraint
 
+**Disposition:** DEFERRED — user decision (2026-06-22): leave `PARSE_MODEL` as-is for now; to be handled separately when parse quality is confirmed. **Do NOT auto-fix.**
+
 **File:** `scanready/src/lib/anthropic.ts:18`
 **Issue:** The diff changes `PARSE_MODEL` from `claude-opus-4-8` to `claude-haiku-4-5`. Both project `CLAUDE.md` files explicitly state the constraint: `PARSE_MODEL = claude-opus-4-8` by default, and the **only** sanctioned cost lever is switching to `claude-sonnet-4-6` "once parse quality is confirmed." Haiku is never mentioned as an option. Two concrete problems:
 
