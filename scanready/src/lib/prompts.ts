@@ -63,7 +63,11 @@ export function buildCoverLetterUser(input: {
   jobPosting: string;
   answers: { question: string; answer: string }[];
 }): string {
+  // Filter out blank answers (all five are initialized to "") so we never emit
+  // dangling "N. <question>\n   -> " lines. Empty Q/A noise could subtly nudge
+  // the model to invent content — at odds with the anti-fabrication guardrail (IN-04).
   const qa = input.answers
+    .filter((a) => a.answer.trim().length > 0)
     .map((a, i) => `${i + 1}. ${a.question}\n   -> ${a.answer}`)
     .join("\n");
   return `APPLICANT CV (facts to ground in):\n${input.cvText}\n\nJOB POSTING:\n${input.jobPosting}\n\nAPPLICANT'S OWN ANSWERS (use these for authentic voice & motivation):\n${qa}\n\nWrite the Anschreiben now.`;
