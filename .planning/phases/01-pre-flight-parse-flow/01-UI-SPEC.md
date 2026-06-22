@@ -1,10 +1,11 @@
 ---
 phase: 01
 slug: pre-flight-parse-flow
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-22
+reviewed_at: 2026-06-22
 ---
 
 # Phase 01 — UI Design Contract
@@ -37,8 +38,8 @@ Tailwind v4 utility values in use. All values are multiples of 4.
 
 | Token | Tailwind | Value | Usage |
 |-------|----------|-------|-------|
-| xs | `gap-1` / `px-0.5` | 4px | Icon-to-text gaps, chip remove button padding, EditableField hover padding (`px-0.5`) |
-| sm | `gap-1.5` / `p-1.5` / `gap-2` | 6–8px | Zero-retention line icon gap (`gap-1.5`), inline control spacing |
+| xs | `gap-1` / `px-1` | 4px | Icon-to-text gaps, chip remove button padding, EditableField hover padding (`px-1`) |
+| sm | `gap-2` / `p-2` | 8px | Zero-retention line icon gap (`gap-2`), inline control spacing |
 | md | `gap-4` / `px-4 py-3` | 16px | Form element internal padding (textarea, input), section gaps in editor |
 | lg | `gap-6` / `p-4` | 16–24px | Card/callout internal padding (`p-4`), result-view vertical gap (`gap-6`) |
 | xl | `py-12 px-6` / `sm:px-12` | 24–48px | Page outer padding (existing in `page.tsx` line 358) |
@@ -56,13 +57,13 @@ Three sizes, two weights. Extend nothing beyond this set for Phase 1.
 | Role | Size | Tailwind | Weight | Tailwind | Line Height | Usage |
 |------|------|----------|--------|----------|-------------|-------|
 | Body / field text | 14px | `text-sm` | 400 (regular) | `font-normal` | 1.5 | CV field content, norm-gap notes, photo advice copy, skeleton status text |
-| Label / meta | 12px | `text-xs` | 500 (medium) | `font-medium` | 1.4 | Section headings in uppercase (`tracking-widest uppercase text-zinc-400`), skill category labels, language level dropdown label |
+| Label / meta | 12px | `text-xs` | 600 (semibold) | `font-semibold` | 1.4 | Section headings in uppercase (`tracking-widest uppercase text-zinc-400`), skill category labels, language level dropdown label |
 | Heading | 24px | `text-2xl` | 600 (semibold) | `font-semibold` | 1.2 | Page-level h1 ("Convert your CV…") and Lebenslauf name display — already set in `page.tsx` lines 98–99 and 174–176 |
-| CTA / button | 14px | `text-sm` | 500 (medium) | `font-medium` | — (button, single line) | All buttons: primary CTA, secondary "Start over", "Try again", chip controls |
+| CTA / button | 14px | `text-sm` | 600 (semibold) | `font-semibold` | — (button, single line) | All buttons: primary CTA, secondary "Start over", "Try again", chip controls |
 
 **Hard constraints (must not add):**
 - No `text-lg`, `text-xl`, `text-3xl`, or any size outside the three declared sizes.
-- No `font-bold` (700) anywhere in Phase 1 UI. Two weights only: 400 and medium/semibold (500–600).
+- No `font-bold` (700) and no `font-medium` (500) anywhere in Phase 1 UI. Two weights only: 400 (`font-normal`) for body and 600 (`font-semibold`) for all emphasis — labels, buttons, headings.
 - Date fields rendered with mono font for readability: add `font-mono` to `EditableField` when `onBlurFormat={softFormatDate}` is passed.
 
 ---
@@ -105,7 +106,7 @@ Source: `globals.css` + `page.tsx` Tailwind usage. Zinc neutral scale is the sur
 Components this phase produces. Each must follow the class conventions above exactly.
 
 ### `EditableField`
-- **Display state:** `<span className="cursor-pointer hover:bg-blue-50 rounded px-0.5 {className}">`. Value rendered as a text node. Null value renders placeholder in `text-zinc-400 italic`.
+- **Display state:** `<span className="cursor-pointer hover:bg-blue-50 rounded px-1 {className}">`. Value rendered as a text node. Null value renders placeholder in `text-zinc-400 italic`.
 - **Active (editing) state:** `<input>` or `<textarea>` with `border-b border-blue-400 outline-none bg-transparent w-full {className}`. No box border — bottom border only signals edit mode.
 - **Date variant:** add `font-mono` class to both states.
 - **Commit triggers:** blur and Enter (single-line), blur only (multiline).
@@ -115,9 +116,9 @@ Components this phase produces. Each must follow the class conventions above exa
 
 ### `LebenslaufEditor` — section-level layout
 - Max width: inherits `max-w-3xl` from page container — no additional max-width.
-- Section header: `<p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">` — matches existing `page.tsx` line 190.
+- Section header: `<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2">` — matches existing `page.tsx` line 190.
 - Section card (experience/education entry): `rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900` — matches existing `page.tsx` line 187.
-- On-hover controls (×, ↑, ↓): `opacity-0 group-hover:opacity-100 transition-opacity` on a container that carries `className="group relative"`. Buttons: `text-zinc-400 hover:text-zinc-700 text-sm px-1.5 py-1` — minimum 24px rendered, touch target expanded via padding.
+- On-hover controls (×, ↑, ↓): `opacity-0 group-hover:opacity-100 transition-opacity` on a container that carries `className="group relative"`. Buttons: `text-zinc-400 hover:text-zinc-700 text-sm px-2 py-1` — minimum 24px rendered, touch target expanded via padding.
 - Add affordance ("+ add experience", "+ Kenntnis hinzufügen"): `text-sm text-zinc-400 hover:text-zinc-600 cursor-pointer` inline link-style button.
 - Section ↑/↓ reorder buttons: `text-xs text-zinc-400 hover:text-zinc-700` — appear at section edge, always visible (not hover-gated), because section reorder is a deliberate navigation action.
 
@@ -125,15 +126,15 @@ Components this phase produces. Each must follow the class conventions above exa
 - Chip wrapper: `flex flex-wrap gap-2`.
 - Individual chip: `flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-800` — the EditableField inside the chip is `text-sm font-normal`.
 - Remove button on chip: `text-zinc-400 hover:text-zinc-700 text-xs ml-1` with `aria-label="Kenntnis entfernen"`.
-- Category label: `text-xs font-medium uppercase tracking-widest text-zinc-500 mt-4 mb-1` — mirrors section header style.
+- Category label: `text-xs font-semibold uppercase tracking-widest text-zinc-500 mt-4 mb-1` — mirrors section header style.
 - Language level `<select>`: `border-0 bg-transparent text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none cursor-pointer`. Default option: "— Niveau wählen —" with value `""`. Five options: Muttersprache, Verhandlungssicher, Fließend, Gute Kenntnisse, Grundkenntnisse.
 
 ### `NormGapPanel`
 - Container: rendered below `LebenslaufEditor` in `page.tsx`, separated by `mt-8 border-t border-zinc-100 dark:border-zinc-800 pt-6`.
-- Collapsible: use native `<details>`/`<summary>` — no library, no custom state. `<summary className="cursor-pointer text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 list-none flex items-center justify-between">`.
+- Collapsible: use native `<details>`/`<summary>` — no library, no custom state. `<summary className="cursor-pointer text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 list-none flex items-center justify-between">`.
 - Summary text: "Was hat sich geändert & warum? ({n} Hinweise)" — German label, English note count for scannability.
-- Notes list: `<ul className="mt-3 space-y-1.5 text-sm text-zinc-600 dark:text-zinc-400">` — each note as `<li>` text node. No HTML injection.
-- Photo callout: **outside** `NormGapPanel`, placed inside `LebenslaufEditor` adjacent to the personal-data section. `<div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">`. Label: `<p className="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-1">Foto (optional)</p>`. Body: `text-sm text-zinc-600 dark:text-zinc-400`. Content must frame photo as optional under AGG, expected in practice — user's choice. Never mandate; never imply upload/processing.
+- Notes list: `<ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-400">` — each note as `<li>` text node. No HTML injection.
+- Photo callout: **outside** `NormGapPanel`, placed inside `LebenslaufEditor` adjacent to the personal-data section. `<div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">`. Label: `<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">Foto (optional)</p>`. Body: `text-sm text-zinc-600 dark:text-zinc-400`. Content must frame photo as optional under AGG, expected in practice — user's choice. Never mandate; never imply upload/processing.
 
 ### Loading skeleton (`LoadingView` — already in `page.tsx`)
 - Pattern locked by D-15: `animate-pulse` pulsing blocks in zinc-200/zinc-700. Already implemented at `page.tsx` lines 136–156.
@@ -272,14 +273,14 @@ No new packages introduced in Phase 1 (per CLAUDE.md "What NOT to Add" and RESEA
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (2026-06-22, revision 1) — non-blocking note: "Try again" retry copy is single-word but unambiguous and already locked in page.tsx.
 
 ---
 
