@@ -706,14 +706,18 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
 
 function CoverLetterResultView({
   letterText,
+  setLetterText,
   onRegenerate,
   onReset,
 }: {
   letterText: string
+  setLetterText: (text: string) => void
   onRegenerate: () => void
   onReset: () => void
 }) {
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+  // One-shot edit hint — dismissed on first interaction (D-06)
+  const [showEditHint, setShowEditHint] = useState(true)
 
   async function handleCopy() {
     try {
@@ -726,43 +730,95 @@ function CoverLetterResultView({
     }
   }
 
+  function handleDownload() {
+    const blob = new Blob([letterText], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'anschreiben.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Anschreiben</p>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleCopy}
-            aria-label="Anschreiben in Zwischenablage kopieren"
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
-            {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
-          </button>
-          <button
-            onClick={onRegenerate}
-            className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-          >
-            Regenerate
-          </button>
-          <button
-            onClick={onReset}
-            className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-          >
-            Start over
-          </button>
-        </div>
+      {/* Header: section label */}
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Anschreiben</p>
+
+      {/* One-shot click-to-edit hint — hidden after first interaction */}
+      {showEditHint && (
+        <p className="text-sm text-zinc-400">Klicken zum Bearbeiten</p>
+      )}
+
+      {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
+          Letter is read-only during streaming; editing available only here in cover_letter_result (D-06)
+          No dangerouslySetInnerHTML — XSS guard (T-02-05) */}
+      <textarea
+        value={letterText}
+        onChange={(e) => {
+          setLetterText(e.target.value)
+          if (showEditHint) setShowEditHint(false)
+        }}
+        onFocus={() => { if (showEditHint) setShowEditHint(false) }}
+        rows={18}
+        className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
+        aria-label="Anschreiben"
+      />
+
+      {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
+          This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
+      <div className="rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">Hinweis</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          Bitte lassen Sie dieses Anschreiben von einem Muttersprachler prüfen, bevor Sie es absenden.
+        </p>
       </div>
 
+      {/* Inline copy error (transient 3000ms) */}
       {copyState === 'error' && (
         <p className="text-sm text-red-600 dark:text-red-400">
           Kopieren fehlgeschlagen — bitte manuell auswählen.
         </p>
       )}
 
-      {/* No dangerouslySetInnerHTML — XSS guard (T-02-01) */}
-      <pre className="whitespace-pre-wrap font-sans text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
-        {letterText}
-      </pre>
+      {/* Action row — flex, gap-3, wraps on mobile (CL-06 / D-07) */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Copy — primary button (CL-06) */}
+        <button
+          onClick={handleCopy}
+          aria-label="Anschreiben in Zwischenablage kopieren"
+          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
+        </button>
+
+        {/* Download .txt — browser-native Blob, no server round-trip (D-07) */}
+        <button
+          onClick={handleDownload}
+          aria-label="Anschreiben als .txt herunterladen"
+          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+        >
+          .txt herunterladen
+        </button>
+
+        {/* Regenerieren — re-runs same jobPosting + answers from reducer state */}
+        <button
+          onClick={onRegenerate}
+          aria-label="Anschreiben neu generieren"
+          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+        >
+          Regenerieren
+        </button>
+
+        {/* Start over — dispatches RESET; no confirmation (D-06 / D-16) */}
+        <button
+          onClick={onReset}
+          aria-label="Zurücksetzen und neues Lebenslauf einfügen"
+          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+        >
+          Start over
+        </button>
+      </div>
     </div>
   )
 }
@@ -953,36 +1009,20 @@ export default function Home() {
         {state.phase === 'cover_letter_result' && (
           <CoverLetterResultView
             letterText={letterText}
+            setLetterText={setLetterText}
             onRegenerate={handleGenerateLetter}
             onReset={() => dispatch({ type: 'RESET' })}
           />
         )}
 
+        {/* cover_letter_error: reuse ErrorView — onRetry re-runs same inputs losslessly
+            (jobPosting + answers persist in reducer through streaming/error phases) */}
         {state.phase === 'cover_letter_error' && (
-          <div className="flex flex-col gap-4">
-            <div className="rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/20">
-              <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                Cover letter generation failed
-              </p>
-              <p className="mt-1 text-sm text-red-600 dark:text-red-500">
-                {state.errorMessage ?? 'An unexpected error occurred.'}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleGenerateLetter}
-                className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-              >
-                Try again
-              </button>
-              <button
-                onClick={() => dispatch({ type: 'START_COVER_LETTER' })}
-                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-              >
-                Edit inputs
-              </button>
-            </div>
-          </div>
+          <ErrorView
+            message={state.errorMessage ?? 'Cover letter generation failed.'}
+            resumeText={state.jobPosting}
+            onRetry={handleGenerateLetter}
+          />
         )}
       </main>
     </div>
