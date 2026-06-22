@@ -727,22 +727,24 @@ const initialState: AppState = {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All three were answered inline below and the recommendations are implemented by the Phase 1 plans (unconstrained `category: z.string()`, simple pulsing skeleton, minimal partial-date pass-through).
 
 1. **D-09: Are exactly 3 skill categories always enough?**
    - What we know: German CVs conventionally use IT-Kenntnisse, Fachkenntnisse, and Sonstige Kenntnisse.
    - What's unclear: Some source CVs may have unusual skills that don't fit these three (e.g. creative skills, industry-specific certifications).
-   - Recommendation: Allow the model to create additional categories with free-form names — the schema uses `category: z.string()` which is unconstrained. The PARSE_SYSTEM instruction says "use [these three] for [these purposes]" but does not forbid other categories. The UI chips render any category name.
+   - RESOLVED: Allow the model to create additional categories with free-form names — the schema uses `category: z.string()` which is unconstrained. The PARSE_SYSTEM instruction says "use [these three] for [these purposes]" but does not forbid other categories. The UI chips render any category name.
 
 2. **D-15: Lebenslauf skeleton — how detailed?**
    - What we know: The skeleton must fill the result area during a ~10–60s parse.
    - What's unclear: Should it be a pixel-accurate skeleton (matching the real layout blocks) or a simpler pulsing gray card?
-   - Recommendation: A simple pulsing three-section skeleton (header block + two content blocks) is sufficient for v1. Pixel-accurate skeleton is Phase 4 polish.
+   - RESOLVED: A simple pulsing three-section skeleton (header block + two content blocks) is sufficient for v1. Pixel-accurate skeleton is Phase 4 polish.
 
 3. **D-11: Date format for partial dates (year-only, month-year)?**
    - What we know: `softFormatDate` handles `YYYY-MM-DD` and `MM/DD/YYYY`.
    - What's unclear: Many CVs have "September 2020" or "2020" as a date.
-   - Recommendation: Pass through unchanged if not matching the 3 supported patterns. German convention also accepts `MM/YYYY` and `YYYY`. Keep the regex list minimal per D-11.
+   - RESOLVED: Pass through unchanged if not matching the 3 supported patterns. German convention also accepts `MM/YYYY` and `YYYY`. Keep the regex list minimal per D-11.
 
 ---
 
