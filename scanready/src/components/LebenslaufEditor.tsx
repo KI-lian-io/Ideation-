@@ -61,6 +61,9 @@ interface LebenslaufEditorProps {
   lebenslauf: Lebenslauf
   sectionOrder: string[]
   dispatch: React.Dispatch<LebenslaufAction>
+  /** Model-produced photo guidance (verbatim). Rendered near the personal-data block.
+   * Optional — when missing the callout is omitted. */
+  photoAdvice?: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -81,9 +84,11 @@ const SECTION_LABELS: Record<string, string> = {
 function PersonalSection({
   personal,
   dispatch,
+  photoAdvice,
 }: {
   personal: Lebenslauf['personal']
   dispatch: React.Dispatch<LebenslaufAction>
+  photoAdvice?: string | null
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -123,6 +128,19 @@ function PersonalSection({
           onBlurFormat={softFormatDate}
         />
       </div>
+
+      {/* Optional photo callout (D-06 / LL-03) — rendered verbatim from model output.
+          Framed as legally optional under the AGG; user's choice; never mandated.
+          The tool does NOT accept, upload, or process photos (zero-retention / T-01-11). */}
+      {photoAdvice && (
+        <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">
+            Foto (optional)
+          </p>
+          {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">{photoAdvice}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -402,6 +420,7 @@ export function LebenslaufEditor({
   lebenslauf,
   sectionOrder,
   dispatch,
+  photoAdvice,
 }: LebenslaufEditorProps) {
   const renderSection = (key: string) => {
     switch (key) {
@@ -410,6 +429,7 @@ export function LebenslaufEditor({
           <PersonalSection
             personal={lebenslauf.personal}
             dispatch={dispatch}
+            photoAdvice={photoAdvice}
           />
         )
       case 'experience':

@@ -4,6 +4,7 @@ import type { Lebenslauf } from '@/lib/schema'
 import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
+import { NormGapPanel } from '@/components/NormGapPanel'
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -448,7 +449,11 @@ function ResultView({
         lebenslauf={lebenslauf}
         sectionOrder={sectionOrder}
         dispatch={dispatch}
+        photoAdvice={lebenslauf.photoAdvice}
       />
+
+      {/* Collapsible bilingual norm-gap panel (D-05 / LL-02) — below the editor so CV stays hero */}
+      <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
     </div>
   )
 }
