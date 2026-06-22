@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A prominent zero-retention statement appears above the CV textarea before the user submits
   5. User can copy the Lebenslauf output to clipboard
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking skeleton: Node 20.9 pre-flight + thinnest paste→parse→render slice (Wave 1)
@@ -46,7 +46,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — WYSIWYG editor core: inline edit, add/remove/reorder entries+sections, date soft-format, copy, start over (Wave 3)
+- [x] 01-03-PLAN.md — WYSIWYG editor core: inline edit, add/remove/reorder entries+sections, date soft-format, copy, start over (Wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -120,7 +120,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pre-flight + Parse Flow | 2/4 | In Progress|  |
+| 1. Pre-flight + Parse Flow | 3/4 | In Progress|  |
 | 2. Cover Letter Flow | 0/TBD | Not started | - |
 | 3. Analytics + Security Guards | 0/TBD | Not started | - |
 | 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |

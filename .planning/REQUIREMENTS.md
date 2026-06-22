@@ -21,10 +21,10 @@
 
 ### Lebenslauf Output (LL)
 
-- [ ] **LL-01**: User sees their CV restructured as a German Lebenslauf — reverse-chronological, DIN-style sections, `DD.MM.YYYY` dates, personal-data block, signature placeholder
+- [x] **LL-01**: User sees their CV restructured as a German Lebenslauf — reverse-chronological, DIN-style sections, `DD.MM.YYYY` dates, personal-data block, signature placeholder
 - [ ] **LL-02**: User sees a bilingual "what changed and why" panel — English explanations rendered from `normGapNotes[]` (pure client-side; no API change)
 - [ ] **LL-03**: User sees nuanced photo guidance from `photoAdvice` (optional per AGG, expected in practice) — never mandated
-- [ ] **LL-04**: User can copy the Lebenslauf output to clipboard
+- [x] **LL-04**: User can copy the Lebenslauf output to clipboard
 
 ### Anschreiben Flow (CL)
 
@@ -106,10 +106,10 @@ Each v1 requirement maps to exactly one phase.
 | INPUT-01 | Phase 1 | Pending |
 | INPUT-02 | Phase 1 | Pending |
 | INPUT-03 | Phase 1 | Pending |
-| LL-01 | Phase 1 | Pending |
+| LL-01 | Phase 1 | Complete |
 | LL-02 | Phase 1 | Pending |
 | LL-03 | Phase 1 | Pending |
-| LL-04 | Phase 1 | Pending |
+| LL-04 | Phase 1 | Complete |
 | CL-01 | Phase 2 | Pending |
 | CL-02 | Phase 2 | Pending |
 | CL-03 | Phase 2 | Pending |
@@ -129,6 +129,7 @@ Each v1 requirement maps to exactly one phase.
 | GTM-03 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 24 total
 - Mapped to phases: 24 ✓
 - Unmapped: 0 ✓
