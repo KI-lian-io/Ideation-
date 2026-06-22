@@ -875,7 +875,11 @@ export default function Home() {
     }
   }
 
-  async function handleSubmit() {
+  // Shared CV-parse driver used by both the initial submit and the retry paths.
+  // Both entry points dispatch SUBMIT first, then run identical fetch/parse/dispatch
+  // logic — extracted here so the 422 / empty-Lebenslauf / error handling can never
+  // silently diverge between the two callers.
+  async function runParse() {
     dispatch({ type: 'SUBMIT' })
 
     try {
@@ -915,41 +919,12 @@ export default function Home() {
     }
   }
 
+  async function handleSubmit() {
+    await runParse()
+  }
+
   async function handleRetry() {
-    dispatch({ type: 'SUBMIT' })
-
-    try {
-      const res = await fetch('/api/parse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeText: state.resumeText }),
-      })
-
-      if (res.status === 422) {
-        dispatch({ type: 'PARSE_JUNK' })
-        return
-      }
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        dispatch({
-          type: 'PARSE_ERROR',
-          payload: (body as { error?: string }).error ?? 'Failed to parse CV.',
-        })
-        return
-      }
-
-      const data = (await res.json()) as { lebenslauf: Lebenslauf }
-
-      if (isLebenslaufBasicallyEmpty(data.lebenslauf)) {
-        dispatch({ type: 'PARSE_JUNK' })
-        return
-      }
-
-      dispatch({ type: 'PARSE_SUCCESS', payload: data.lebenslauf })
-    } catch {
-      dispatch({ type: 'PARSE_ERROR', payload: 'Network error — please try again.' })
-    }
+    await runParse()
   }
 
   return (
