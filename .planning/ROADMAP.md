@@ -13,7 +13,7 @@ ScanReady starts from a working backend and ships a complete, dogfoodable produc
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Pre-flight + Parse Flow** - Upgrade Node, confirm SDK shapes, and deliver the end-to-end CV paste → Lebenslauf + bilingual norm-gap display
+- [x] **Phase 1: Pre-flight + Parse Flow** - Upgrade Node, confirm SDK shapes, and deliver the end-to-end CV paste → Lebenslauf + bilingual norm-gap display (completed 2026-06-22)
 - [ ] **Phase 2: Cover Letter Flow** - Add job posting input, personalization questions, and streamed Anschreiben with copy/download — product complete end-to-end
 - [ ] **Phase 3: Analytics + Security Guards** - Wire PostHog funnel events (zero PII), add input-length guards — safe to put in front of real users
 - [ ] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A prominent zero-retention statement appears above the CV textarea before the user submits
   5. User can copy the Lebenslauf output to clipboard
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Walking skeleton: Node 20.9 pre-flight + thinnest paste→parse→render slice (Wave 1)
@@ -50,7 +50,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-04-PLAN.md — Categorized skill chips + language dropdown + collapsible norm-gap panel + optional-photo callout (Wave 4)
+- [x] 01-04-PLAN.md — Categorized skill chips + language dropdown + collapsible norm-gap panel + optional-photo callout (Wave 4)
 
 **UI hint**: yes
 
@@ -120,7 +120,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Pre-flight + Parse Flow | 3/4 | In Progress|  |
+| 1. Pre-flight + Parse Flow | 4/4 | Complete   | 2026-06-22 |
 | 2. Cover Letter Flow | 0/TBD | Not started | - |
 | 3. Analytics + Security Guards | 0/TBD | Not started | - |
 | 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
