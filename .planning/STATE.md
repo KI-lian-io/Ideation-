@@ -10,11 +10,11 @@ last_updated: "2026-06-22T22:23:43.089Z"
 last_activity: 2026-06-22
 last_activity_desc: Phase 02 execution started
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 2
   total_plans: 6
   completed_plans: 6
-  percent: 40
+  percent: 33
 ---
 
 # Project State
@@ -76,8 +76,8 @@ None yet.
 ### Blockers/Concerns
 
 - Local Node is 18.14.0 — Next 16 requires ≥20.9.0. Fix this before any `npm install` or `dev` run (PRE-01 is Phase 1 task 1).
-- Vercel plan tier must be confirmed before Phase 4 deploy — Hobby caps cover-letter stream at 60s.
-- Native-speaker quality gate required before Phase 4 goes public.
+- Vercel plan tier must be confirmed before Phase 5 deploy — Hobby caps cover-letter stream at 60s.
+- Native-speaker quality gate required before Phase 5 goes public.
 
 ## Deferred Items
 

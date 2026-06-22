@@ -13,7 +13,7 @@
 
 Mode: **mvp** (per ROADMAP). This is a small, backend-leaning phase: per-handler length checks + client-side char counters; no new product features.
 
-**⚠ ROADMAP RESTRUCTURE REQUIRED before planning** — the ROADMAP still lists this phase as "Analytics + Security Guards" with TRUST-02/OPS-01. Run `/gsd-phase` to (a) retitle Phase 3 → "Security Guards" with requirements TRUST-01 + TRUST-03, and (b) add an analytics phase (TRUST-02 + OPS-01) at/just-before deploy. Do NOT run `/gsd-plan-phase 3` until this is done, or the planner will pull the deferred analytics requirements back in.
+**✓ ROADMAP restructured (2026-06-23).** Phase 3 is now "Security Guards" (TRUST-01 + TRUST-03); analytics moved to a new **Phase 4 "Analytics (pre-launch)"** (TRUST-02 + OPS-01); Design/Deploy → Phase 5, Distribution → Phase 6. ROADMAP.md + REQUIREMENTS.md traceability are in sync — safe to `/gsd-plan-phase 3`.
 </domain>
 
 <decisions>
@@ -87,7 +87,7 @@ Limits confirmed: `resumeText`/`cvText` 30k · `jobPosting` 15k · `answer` 2k. 
 <deferred>
 ## Deferred Ideas
 
-- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — deferred out of this phase to a pre-launch / deploy-adjacent phase (recommend folding into or immediately before Phase 4 "Design Pass + Vercel Deploy" so the funnel is live at launch). Approach fully pre-locked in D-04 — that future phase implements, it does not re-decide.
+- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — moved out of this phase to the new **Phase 4 "Analytics (pre-launch)"** (Design/Deploy is now Phase 5), so the funnel is live the moment traffic starts. Approach fully pre-locked in D-04 — Phase 4 implements, it does not re-decide.
 - **Rate limiting / per-IP throttling** — a *different* abuse boundary than length (TRUST-03 is length-only) and awkward on stateless serverless without a store. Revisit only if real abuse appears post-launch.
 - **Server-side request logging / metrics** — intentionally NOT added; would conflict with zero-retention (and D-05's no-rejection-logging rule).
 

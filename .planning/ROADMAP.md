@@ -2,7 +2,7 @@
 
 ## Overview
 
-ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 wires analytics and security guards before any public traffic. Phase 4 does the design pass and deploys to production. Phase 5 operationalizes distribution as a set of concrete deliverable artifacts.
+ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 adds input-length security guards. Phase 4 wires the analytics funnel before any public traffic. Phase 5 does the design pass and deploys to production. Phase 6 operationalizes distribution as a set of concrete deliverable artifacts.
 
 ## Phases
 
@@ -15,9 +15,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Pre-flight + Parse Flow** - Upgrade Node, confirm SDK shapes, and deliver the end-to-end CV paste → Lebenslauf + bilingual norm-gap display (completed 2026-06-22)
 - [x] **Phase 2: Cover Letter Flow** - Add job posting input, personalization questions, and streamed Anschreiben with copy/download — product complete end-to-end (completed 2026-06-22)
-- [ ] **Phase 3: Analytics + Security Guards** - Wire PostHog funnel events (zero PII), add input-length guards — safe to put in front of real users
-- [ ] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
-- [ ] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts
+- [ ] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users
+- [ ] **Phase 4: Analytics (pre-launch)** - Wire the PostHog funnel (zero PII, EU Cloud, cookieless) so user behavior is measurable the moment real traffic starts
+- [ ] **Phase 5: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
+- [ ] **Phase 6: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts
 
 ## Phase Details
 
@@ -79,26 +80,40 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
-### Phase 3: Analytics + Security Guards
+### Phase 3: Security Guards
 
-**Goal**: Funnel events fire in PostHog with zero CV/PII capture, and both API routes reject oversized input — the tool is safe for real users
+**Goal**: Both API routes reject oversized input and nothing is persisted server-side — the tool is safe for real traffic
 **Mode:** mvp
 **Depends on**: Phase 2
-**Requirements**: TRUST-01, TRUST-02, TRUST-03, OPS-01
+**Requirements**: TRUST-01, TRUST-03
 **Success Criteria** (what must be TRUE):
 
-  1. PostHog fires `start`, `parse_done`, `letter_done`, `copy`, and `download` events visible in the PostHog dashboard
-  2. PostHog is initialized with `autocapture: false`, `ip: false`, `person_profiles: 'identified_only'` — no CV text appears in the PostHog event stream
-  3. Submitting a CV or job posting over the length threshold returns a 400 error with a user-readable message
-  4. No user data is persisted server-side — confirmed by reviewing both API routes and the PostHog event stream
+  1. Submitting a CV (`resumeText`/`cvText`), job posting, or answer over its per-field length threshold returns a 400 with a user-readable German message
+  2. Both API routes (`/api/parse`, `/api/cover-letter`) enforce the per-field length limits before calling the model
+  3. A client-side character counter + disabled submit prevents oversized input in normal use
+  4. No user data is persisted server-side and guard rejections do not log rejected content — confirmed by reviewing both routes
 
 **Plans**: TBD
 
-### Phase 4: Design Pass + Vercel Deploy
+### Phase 4: Analytics (pre-launch)
+
+**Goal**: The PostHog funnel fires the five events with zero CV/PII capture — user behavior is measurable the moment real traffic starts
+**Mode:** mvp
+**Depends on**: Phase 3
+**Requirements**: TRUST-02, OPS-01
+**Success Criteria** (what must be TRUE):
+
+  1. PostHog fires `start`, `parse_done`, `letter_done`, `copy`, and `download` events, visible in the PostHog (EU Cloud) dashboard
+  2. PostHog is initialized cookieless (`persistence: 'memory'`) with `autocapture: false`, `ip: false`, `person_profiles: 'identified_only'` — no CV/PII text in the event stream and no consent banner required
+  3. Analytics fires only in production and degrades silently if the PostHog key is unset or PostHog is blocked — never breaking the core flow
+
+**Plans**: TBD
+
+### Phase 5: Design Pass + Vercel Deploy
 
 **Goal**: The landing page and tool UI are conversion-oriented and German-market-credible, and the app is publicly live on Vercel with streaming completing within the function time limit
 **Mode:** mvp
-**Depends on**: Phase 3
+**Depends on**: Phase 4
 **Requirements**: UI-01, UI-02, OPS-02, OPS-03
 **Success Criteria** (what must be TRUE):
 
@@ -110,11 +125,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 5: Distribution Operationalization
+### Phase 6: Distribution Operationalization
 
 **Goal**: Three concrete distribution artifacts exist — a build-in-public content plan, an SEO keyword list with cadence, and a paid-test spec — so distribution can start the moment the live tool is ready
 **Mode:** mvp
-**Depends on**: Phase 4
+**Depends on**: Phase 5
 **Requirements**: GTM-01, GTM-02, GTM-03
 **Success Criteria** (what must be TRUE):
 
@@ -130,6 +145,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 |-------|----------------|--------|-----------|
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
-| 3. Analytics + Security Guards | 0/TBD | Not started | - |
-| 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
-| 5. Distribution Operationalization | 0/TBD | Not started | - |
+| 3. Security Guards | 0/TBD | Not started | - |
+| 4. Analytics (pre-launch) | 0/TBD | Not started | - |
+| 5. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
+| 6. Distribution Operationalization | 0/TBD | Not started | - |
