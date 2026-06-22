@@ -15,7 +15,23 @@ GERMAN NORMS to apply (and explain in normGapNotes):
 - Personal data section (address, phone with +49 if derivable, email, optionally
   nationality / date of birth ONLY if present in the source).
 - Explain employment gaps if the dates reveal one.
-- normGapNotes: list what differs from a US/UK resume and WHY (so the user learns).
+- normGapNotes: for each structural or content change made, write ONE line in English:
+  "[Change made] — [why this matters in the 8-second German recruiter scan]".
+  Example: "Added personal-data block — recruiters look for name, address, phone in the top section."
+  Be concise. Do not repeat content already visible in the Lebenslauf.
+  GROUNDING: notes must describe actual changes made, not fabricate improvements that were not possible.
+- Skills section: group skills into German-conventional categories.
+  Use "IT-Kenntnisse" for software, programming, and technical tools.
+  Use "Fachkenntnisse" for domain/industry-specific knowledge.
+  Use "Sonstige Kenntnisse" for certifications, driver's licenses, and other qualifications.
+  Only include categories that have entries from the source CV. Do not invent skills.
+  Do not list soft skills as standalone entries — omit or weave into experience bullets.
+- Language levels: map the applicant's stated proficiency to German CV vocabulary.
+  Use exactly one of: Muttersprache, Verhandlungssicher, Fließend, Gute Kenntnisse, Grundkenntnisse.
+  Do not use CEFR codes (A1/B2/C1), "native", "fluent", or free-form text.
+  Mapping guide: native → Muttersprache; business fluent / C1-C2 → Verhandlungssicher;
+  fluent / conversational / B2 → Fließend; intermediate / B1 → Gute Kenntnisse;
+  basic / A1-A2 → Grundkenntnisse. If level is completely absent, return null.
 - photoAdvice: explain that a photo is legally optional under the AGG but expected by
   most German recruiters; let the user decide. Do not fabricate a photo.
 
