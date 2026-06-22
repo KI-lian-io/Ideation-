@@ -7,6 +7,17 @@ import { z } from "zod";
  * from the source CV. Unknown fields are null/empty — the model must NOT invent
  * employers, titles, dates, or skills. `photoAdvice` is guidance, not a claim.
  */
+
+/**
+ * A skill category for the German Kenntnisse section (D-09).
+ * `category` holds labels such as "IT-Kenntnisse", "Fachkenntnisse", "Sonstige Kenntnisse".
+ * `skills` lists entries from the source CV — never invented.
+ */
+export const SkillCategorySchema = z.object({
+  category: z.string(),
+  skills: z.array(z.string()),
+});
+
 export const LebenslaufSchema = z.object({
   personal: z.object({
     fullName: z.string(),
@@ -35,7 +46,7 @@ export const LebenslaufSchema = z.object({
       end: z.string().nullable(),
     })
   ),
-  skills: z.array(z.string()),
+  skills: z.array(SkillCategorySchema),
   languages: z.array(
     z.object({ language: z.string(), level: z.string().nullable() })
   ),
@@ -46,3 +57,4 @@ export const LebenslaufSchema = z.object({
 });
 
 export type Lebenslauf = z.infer<typeof LebenslaufSchema>;
+export type SkillCategory = z.infer<typeof SkillCategorySchema>;
