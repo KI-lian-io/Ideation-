@@ -185,6 +185,64 @@ function reducer(state: AppState, action: AppAction): AppState {
     }
 
     // -------------------------------------------------------------------------
+    // Skills — categorized (D-09)
+    // -------------------------------------------------------------------------
+    case 'UPDATE_SKILL': {
+      if (!state.lebenslauf) return state
+      const skills = state.lebenslauf.skills.map((cat, ci) => {
+        if (ci !== action.catIndex) return cat
+        return {
+          ...cat,
+          skills: cat.skills.map((s, si) => (si === action.skillIndex ? action.value : s)),
+        }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
+    }
+    case 'ADD_SKILL': {
+      if (!state.lebenslauf) return state
+      const skills = state.lebenslauf.skills.map((cat, ci) => {
+        if (ci !== action.catIndex) return cat
+        return { ...cat, skills: [...cat.skills, ''] }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
+    }
+    case 'REMOVE_SKILL': {
+      if (!state.lebenslauf) return state
+      const skills = state.lebenslauf.skills.map((cat, ci) => {
+        if (ci !== action.catIndex) return cat
+        return { ...cat, skills: cat.skills.filter((_, si) => si !== action.skillIndex) }
+      })
+      return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
+    }
+    case 'ADD_SKILL_CATEGORY': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          skills: [...state.lebenslauf.skills, { category: '', skills: [] }],
+        },
+      }
+    }
+    case 'REMOVE_SKILL_CATEGORY': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: {
+          ...state.lebenslauf,
+          skills: state.lebenslauf.skills.filter((_, ci) => ci !== action.catIndex),
+        },
+      }
+    }
+    case 'UPDATE_SKILL_CATEGORY_NAME': {
+      if (!state.lebenslauf) return state
+      const skills = state.lebenslauf.skills.map((cat, ci) =>
+        ci === action.catIndex ? { ...cat, category: action.value } : cat
+      )
+      return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
+    }
+
+    // -------------------------------------------------------------------------
     // Languages
     // -------------------------------------------------------------------------
     case 'UPDATE_LANGUAGE': {

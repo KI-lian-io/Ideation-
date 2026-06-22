@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { EditableField } from '@/components/EditableField'
+import { SkillChips, LanguageLevelSelect } from '@/components/SkillChips'
 import { softFormatDate } from '@/lib/lebenslauf-utils'
 import type { Lebenslauf } from '@/lib/schema'
 
@@ -27,6 +28,13 @@ export type LebenslaufAction =
   | { type: 'ADD_EDUCATION' }
   | { type: 'REMOVE_EDUCATION'; index: number }
   | { type: 'REORDER_EDUCATION'; from: number; to: number }
+  // Skills (categorized — D-09)
+  | { type: 'UPDATE_SKILL'; catIndex: number; skillIndex: number; value: string }
+  | { type: 'ADD_SKILL'; catIndex: number }
+  | { type: 'REMOVE_SKILL'; catIndex: number; skillIndex: number }
+  | { type: 'ADD_SKILL_CATEGORY' }
+  | { type: 'REMOVE_SKILL_CATEGORY'; catIndex: number }
+  | { type: 'UPDATE_SKILL_CATEGORY_NAME'; catIndex: number; value: string }
   // Languages
   | { type: 'UPDATE_LANGUAGE'; index: number; field: 'language' | 'level'; value: string }
   | { type: 'ADD_LANGUAGE' }
@@ -336,27 +344,8 @@ function SkillsSection({
   skills: Lebenslauf['skills']
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
-  // Plan 03: minimal plain-text render — skill chips and category editing arrive in Plan 04.
-  // Rendered as editable plain text per section (Plan 04 will convert to chip UI).
-  if (skills.length === 0) {
-    return (
-      <p className="text-sm text-zinc-400 italic">Keine Kenntnisse — Plan 04 fügt die Chip-Bearbeitung hinzu.</p>
-    )
-  }
-
   return (
-    <div className="flex flex-col gap-2">
-      {skills.map((cat, ci) => (
-        <div key={ci} className="flex flex-col gap-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-            {cat.category}
-          </p>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            {cat.skills.join(', ')}
-          </p>
-        </div>
-      ))}
-    </div>
+    <SkillChips skills={skills} dispatch={dispatch} />
   )
 }
 
@@ -371,6 +360,7 @@ function LanguagesSection({
     <div className="flex flex-col gap-2">
       {languages.map((lang, i) => (
         <div key={i} className="group flex items-center gap-2">
+          {/* Language name — free-text editable */}
           <EditableField
             value={lang.language}
             placeholder="+ Sprache hinzufügen"
@@ -378,11 +368,12 @@ function LanguagesSection({
             className="text-sm"
           />
           <span className="text-zinc-400 text-sm">—</span>
-          <EditableField
+          {/* Language level — German-convention dropdown (D-10) */}
+          <LanguageLevelSelect
             value={lang.level}
-            placeholder="+ Niveau"
-            onSave={(v) => dispatch({ type: 'UPDATE_LANGUAGE', index: i, field: 'level', value: v })}
-            className="text-sm text-zinc-500"
+            onChange={(level) =>
+              dispatch({ type: 'UPDATE_LANGUAGE', index: i, field: 'level', value: level })
+            }
           />
           <button
             onClick={() => dispatch({ type: 'REMOVE_LANGUAGE', index: i })}
