@@ -96,17 +96,43 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Populated during roadmap creation. Each v1 requirement maps to exactly one phase.
+Each v1 requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| _(to be filled by roadmapper)_ | — | Pending |
+| PRE-01 | Phase 1 | Pending |
+| PRE-02 | Phase 1 | Pending |
+| PRE-03 | Phase 1 | Pending |
+| INPUT-01 | Phase 1 | Pending |
+| INPUT-02 | Phase 1 | Pending |
+| INPUT-03 | Phase 1 | Pending |
+| LL-01 | Phase 1 | Pending |
+| LL-02 | Phase 1 | Pending |
+| LL-03 | Phase 1 | Pending |
+| LL-04 | Phase 1 | Pending |
+| CL-01 | Phase 2 | Pending |
+| CL-02 | Phase 2 | Pending |
+| CL-03 | Phase 2 | Pending |
+| CL-04 | Phase 2 | Pending |
+| CL-05 | Phase 2 | Pending |
+| CL-06 | Phase 2 | Pending |
+| TRUST-01 | Phase 3 | Pending |
+| TRUST-02 | Phase 3 | Pending |
+| TRUST-03 | Phase 3 | Pending |
+| OPS-01 | Phase 3 | Pending |
+| OPS-02 | Phase 4 | Pending |
+| OPS-03 | Phase 4 | Pending |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Pending |
+| GTM-01 | Phase 5 | Pending |
+| GTM-02 | Phase 5 | Pending |
+| GTM-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 24 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 24 ⚠️
+- Mapped to phases: 24 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-22*
-*Last updated: 2026-06-22 after initial definition*
+*Last updated: 2026-06-22 after roadmap creation (traceability populated)*
