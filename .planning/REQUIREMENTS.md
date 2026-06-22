@@ -28,10 +28,10 @@
 
 ### Anschreiben Flow (CL)
 
-- [ ] **CL-01**: User can paste a target job posting
-- [ ] **CL-02**: User answers the 3–5 personalization questions (from the `PERSONALIZATION_QUESTIONS` constant)
-- [ ] **CL-03**: User sees the Anschreiben stream live as it generates (consumed via `response.body.getReader()`, not EventSource)
-- [ ] **CL-04**: Generated Anschreiben is grounded only in CV facts + the user's answers — no fabrication _(backend exists; surfaced in UI copy)_
+- [x] **CL-01**: User can paste a target job posting
+- [x] **CL-02**: User answers the 3–5 personalization questions (from the `PERSONALIZATION_QUESTIONS` constant)
+- [x] **CL-03**: User sees the Anschreiben stream live as it generates (consumed via `response.body.getReader()`, not EventSource)
+- [x] **CL-04**: Generated Anschreiben is grounded only in CV facts + the user's answers — no fabrication _(backend exists; surfaced in UI copy)_
 - [ ] **CL-05**: User sees a "have a native German speaker review this" nudge on the finished letter
 - [ ] **CL-06**: User can copy the Anschreiben output to clipboard
 
@@ -110,10 +110,10 @@ Each v1 requirement maps to exactly one phase.
 | LL-02 | Phase 1 | Complete |
 | LL-03 | Phase 1 | Complete |
 | LL-04 | Phase 1 | Complete |
-| CL-01 | Phase 2 | Pending |
-| CL-02 | Phase 2 | Pending |
-| CL-03 | Phase 2 | Pending |
-| CL-04 | Phase 2 | Pending |
+| CL-01 | Phase 2 | Complete |
+| CL-02 | Phase 2 | Complete |
+| CL-03 | Phase 2 | Complete |
+| CL-04 | Phase 2 | Complete |
 | CL-05 | Phase 2 | Pending |
 | CL-06 | Phase 2 | Pending |
 | TRUST-01 | Phase 3 | Pending |

@@ -68,10 +68,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A "have a native German speaker review this" nudge appears on the finished letter
   5. User can copy the completed Anschreiben to clipboard
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Model restore + D-09 prompt edit + reducer extension + live-streaming slice (result → job-posting/question form → getReader stream → read-only letter) (Wave 1)
+- [x] 02-01-PLAN.md — Model restore + D-09 prompt edit + reducer extension + live-streaming slice (result → job-posting/question form → getReader stream → read-only letter) (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -129,7 +129,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
-| 2. Cover Letter Flow | 0/2 | Not started | - |
+| 2. Cover Letter Flow | 1/2 | In Progress|  |
 | 3. Analytics + Security Guards | 0/TBD | Not started | - |
 | 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
 | 5. Distribution Operationalization | 0/TBD | Not started | - |
