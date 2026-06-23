@@ -1,7 +1,7 @@
 # CLAUDE.md — Session Handoff & Where to Continue
 
 > Read this first. It's the map for picking up this project in a new session.
-> Owner: Kilian Hartmann. Branch: `claude/ecom-low-barrier-tools-zpyb10`. Open draft PR: **#1** (`KI-lian-io/Ideation-`).
+> Owner: Kilian Hartmann. Branch: `claude/ecom-low-barrier-tools-zpyb10`. Open draft PR: **#1** (`KI-lian-io/scanready`).
 
 ---
 
