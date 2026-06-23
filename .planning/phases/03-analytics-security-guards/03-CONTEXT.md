@@ -27,13 +27,8 @@ Mode: **mvp** (per ROADMAP). This is a small, backend-leaning phase: per-handler
 ### Statelessness (TRUST-01)
 - **D-05 — No-regression + no rejection logging:** This phase must introduce **zero** server-side persistence. Guard rejections must NOT log the rejected CV/job-posting/answer content (logging oversized input would itself be a retention leak). `02-SECURITY.md` is the current stateless baseline to preserve.
 
-### Analytics — deferred, approach pre-locked (TRUST-02 + OPS-01)
-- **D-04 — When analytics IS built (future phase), these are locked so it isn't re-litigated:**
-  - **PostHog EU Cloud** (`eu.i.posthog.com` / `eu.posthog.com`) — EU data residency (user-confirmed). Pin from day one.
-  - **Cookieless** — `persistence: 'memory'` (no cookies, no localStorage, no device IDs). Under GDPR/ePrivacy this needs **no consent banner**. Keeps the zero-retention brand intact. Trade-off accepted: per-session funnels only, no cross-session stitching (sufficient for the 5 events).
-  - PostHog init: `autocapture: false`, `ip: false`, `person_profiles: 'identified_only'` (TRUST-02), `capture_pageview` handled via the Suspense pattern.
-  - **5 client-side events** (resolves the ROADMAP-vs-CLAUDE.md discrepancy in favor of ROADMAP): `start`, `parse_done`, `letter_done`, `copy`, `download`. Bare or minimal **non-PII** properties only — never CV/job-posting/answer/letter text.
-  - Library `posthog-js ^1.391.0`, `instrumentation-client.ts` pattern (per `.claude/CLAUDE.md`); `posthog-node` NOT needed. Key in `NEXT_PUBLIC_POSTHOG_KEY`; app must **no-op gracefully** if the key is unset or PostHog is blocked (adblocker) — analytics never breaks the core flow. Fire **only in production** (skip localhost/dev).
+### Analytics (deferred to Phase 4 — not a Phase-3 decision)
+The PostHog funnel and its pre-locked approach (EU Cloud, cookieless, the 5 events, config flags, library) are **out of Phase-3 scope** and recorded in full under **Deferred Ideas** below — Phase 4 implements them. Intentionally not tracked as a Phase-3 `D-` decision.
 
 ### Claude's Discretion
 - Exact German message wording per field.
@@ -58,7 +53,7 @@ Mode: **mvp** (per ROADMAP). This is a small, backend-leaning phase: per-handler
 ### Guardrails & baselines
 - `.planning/PROJECT.md` — zero-retention / GDPR-as-a-feature core guardrail.
 - `.planning/phases/02-cover-letter-flow/02-SECURITY.md` — current statelessness baseline (TRUST-01) to preserve.
-- `.claude/CLAUDE.md` — locked PostHog tech decisions (for the future analytics phase, per D-04).
+- `.claude/CLAUDE.md` — locked PostHog tech decisions (for the future Phase-4 analytics — see Deferred Ideas).
 </canonical_refs>
 
 <code_context>
@@ -87,7 +82,7 @@ Limits confirmed: `resumeText`/`cvText` 30k · `jobPosting` 15k · `answer` 2k. 
 <deferred>
 ## Deferred Ideas
 
-- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — moved out of this phase to the new **Phase 4 "Analytics (pre-launch)"** (Design/Deploy is now Phase 5), so the funnel is live the moment traffic starts. Approach fully pre-locked in D-04 — Phase 4 implements, it does not re-decide.
+- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — moved to the new **Phase 4 "Analytics (pre-launch)"** (Design/Deploy is now Phase 5), so the funnel is live the moment traffic starts. **Approach pre-locked for Phase 4 (do not re-decide):** PostHog **EU Cloud** (`eu.i.posthog.com`); **cookieless** (`persistence:'memory'` — no cookies/localStorage/device-IDs → no consent banner needed; per-session funnels only, no cross-session stitching); init `autocapture:false` + `ip:false` + `person_profiles:'identified_only'` (TRUST-02), pageview via the Suspense pattern; **5 client-side events** `start`/`parse_done`/`letter_done`/`copy`/`download` (resolves the ROADMAP-vs-CLAUDE.md count discrepancy in favor of ROADMAP) carrying non-PII properties only — never CV/job-posting/answer/letter text; `posthog-js ^1.391.0` + `instrumentation-client.ts` (no `posthog-node`); key in `NEXT_PUBLIC_POSTHOG_KEY`, **no-op gracefully** if unset or blocked by an adblocker, fire **only in production**.
 - **Rate limiting / per-IP throttling** — a *different* abuse boundary than length (TRUST-03 is length-only) and awkward on stateless serverless without a store. Revisit only if real abuse appears post-launch.
 - **Server-side request logging / metrics** — intentionally NOT added; would conflict with zero-retention (and D-05's no-rejection-logging rule).
 
