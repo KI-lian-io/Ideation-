@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Pre-flight + Parse Flow** - Upgrade Node, confirm SDK shapes, and deliver the end-to-end CV paste → Lebenslauf + bilingual norm-gap display (completed 2026-06-22)
 - [x] **Phase 2: Cover Letter Flow** - Add job posting input, personalization questions, and streamed Anschreiben with copy/download — product complete end-to-end (completed 2026-06-22)
-- [ ] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users
+- [x] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users (completed 2026-06-23)
 - [ ] **Phase 4: Analytics (pre-launch)** - Wire the PostHog funnel (zero PII, EU Cloud, cookieless) so user behavior is measurable the moment real traffic starts
 - [ ] **Phase 5: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
 - [ ] **Phase 6: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts
@@ -93,7 +93,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A client-side character counter + disabled submit prevents oversized input in normal use
   4. No user data is persisted server-side and guard rejections do not log rejected content — confirmed by reviewing both routes
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 **Wave 1**
 
@@ -101,7 +101,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on Wave 1 — shares page.tsx)*
 
-- [ ] 03-02-PLAN.md — Cover-letter-route guard slice: server-side 30k/15k/2k 400s aligned to JSON shape + CoverLetterInputView job-posting & per-answer counters & disabled submit (Wave 2)
+- [x] 03-02-PLAN.md — Cover-letter-route guard slice: server-side 30k/15k/2k 400s aligned to JSON shape + CoverLetterInputView job-posting & per-answer counters & disabled submit (Wave 2)
 
 ### Phase 4: Analytics (pre-launch)
 
@@ -153,7 +153,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 |-------|----------------|--------|-----------|
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
-| 3. Security Guards | 1/2 | In Progress|  |
+| 3. Security Guards | 2/2 | Complete   | 2026-06-23 |
 | 4. Analytics (pre-launch) | 0/TBD | Not started | - |
 | 5. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
 | 6. Distribution Operationalization | 0/TBD | Not started | - |
