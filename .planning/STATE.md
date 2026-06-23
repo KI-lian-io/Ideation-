@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 02
-current_phase_name: cover-letter-flow
+current_phase: 03
+current_phase_name: Security Guards
 status: executing
 stopped_at: Phase 3 context gathered (analytics deferred)
-last_updated: "2026-06-23T06:00:38.813Z"
-last_activity: 2026-06-22
-last_activity_desc: Phase 02 execution started
+last_updated: "2026-06-23T07:59:53.088Z"
+last_activity: 2026-06-23
+last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
   percent: 33
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** German output is native-quality and trustworthy — norm-correct, never fabricated — so a German recruiter takes the applicant seriously in the 8-second scan.
-**Current focus:** Phase 02 — cover-letter-flow
+**Current focus:** Phase 03 — Security Guards
 
 ## Current Position
 
-Phase: 02 (cover-letter-flow) — EXECUTING
+Phase: 03 (Security Guards) — EXECUTING
 Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-22 — Phase 02 execution started
+Last activity: 2026-06-23 — Phase 03 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P03 | 421 | 2 tasks | 5 files |
 | Phase 02 P01 | 30 | 3 tasks | 3 files |
+| Phase 03 P01 | 89s | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - Roadmap: Research 5-phase structure adopted verbatim (Node upgrade hard prerequisite; parse before cover-letter; analytics before deploy; design after working flow; distribution last)
 - Architecture: `useReducer` for step machine; `resumeText` must persist through all steps for `/api/cover-letter`; no Vercel AI SDK
 - PostHog: `autocapture:false`, `ip:false`, `person_profiles:'identified_only'` are mandatory before any public traffic
+- [Phase 03]: RESUME_LIMIT = 30_000 named constant in both server and client; isSubmitDisabled OR-extended to preserve base empty-check
+- [Phase 03]: Counter format uses toLocaleString('de-DE') to match German number conventions (period as thousands separator)
 
 ### Pending Todos
 
@@ -89,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T22:23:43.083Z
+Last session: 2026-06-23T07:58:47.962Z
 Stopped at: Phase 3 context gathered (analytics deferred)
 Resume file: .planning/phases/03-analytics-security-guards/03-CONTEXT.md

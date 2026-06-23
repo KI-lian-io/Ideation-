@@ -37,9 +37,9 @@
 
 ### Trust & Compliance (TRUST)
 
-- [ ] **TRUST-01**: No user CV/output is persisted server-side — the flow stays stateless _(backend exists; must not regress)_
+- [x] **TRUST-01**: No user CV/output is persisted server-side — the flow stays stateless _(backend exists; must not regress)_
 - [ ] **TRUST-02**: Analytics capture funnel events only, never CV/PII content — PostHog `autocapture:false`, `ip:false`, `person_profiles:'identified_only'`
-- [ ] **TRUST-03**: Both API routes reject oversized input via a length guard (cost + abuse boundary)
+- [x] **TRUST-03**: Both API routes reject oversized input via a length guard (cost + abuse boundary)
 
 ### Analytics & Deploy (OPS)
 
@@ -116,8 +116,8 @@ Each v1 requirement maps to exactly one phase.
 | CL-04 | Phase 2 | Complete |
 | CL-05 | Phase 2 | Complete |
 | CL-06 | Phase 2 | Complete |
-| TRUST-01 | Phase 3 | Pending |
-| TRUST-03 | Phase 3 | Pending |
+| TRUST-01 | Phase 3 | Complete |
+| TRUST-03 | Phase 3 | Complete |
 | TRUST-02 | Phase 4 | Pending |
 | OPS-01 | Phase 4 | Pending |
 | OPS-02 | Phase 5 | Pending |
