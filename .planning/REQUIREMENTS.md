@@ -44,8 +44,8 @@
 ### Analytics & Deploy (OPS)
 
 - [ ] **OPS-01**: Funnel events fire — `start`, `parse_done`, `letter_done`, `copy`, `download`
-- [ ] **OPS-02**: App is deployed publicly on Vercel with the cover-letter stream completing within the function time limit (confirm plan/`maxDuration`)
-- [ ] **OPS-03**: Production env is configured (ANTHROPIC_API_KEY, PostHog key) and Node pinned to 20.x on Vercel
+- [x] **OPS-02**: App is deployed publicly on Vercel with the cover-letter stream completing within the function time limit (confirm plan/`maxDuration`)
+- [x] **OPS-03**: Production env is configured (ANTHROPIC_API_KEY, PostHog key) and Node pinned to 20.x on Vercel
 
 ### Design & Landing (UI)
 
@@ -118,8 +118,8 @@ Each v1 requirement maps to exactly one phase.
 | CL-06 | Phase 2 | Complete |
 | TRUST-01 | Phase 3 | Complete |
 | TRUST-03 | Phase 3 | Complete |
-| OPS-02 | Phase 4 | Pending |
-| OPS-03 | Phase 4 | Pending |
+| OPS-02 | Phase 4 | Complete |
+| OPS-03 | Phase 4 | Complete |
 | UI-01 | Phase 4 | Complete |
 | UI-02 | Phase 4 | Complete |
 | GTM-01 | Phase 5 | Pending |

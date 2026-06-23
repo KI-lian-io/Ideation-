@@ -167,6 +167,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
-| 4. Design Pass + Vercel Deploy | 3/3 | Complete   | 2026-06-23 |
+| 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 0/TBD | Not started | - |
 | 6. Analytics (post-launch) | 0/TBD | Not started | - |
