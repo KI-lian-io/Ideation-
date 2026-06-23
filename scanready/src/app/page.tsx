@@ -365,7 +365,9 @@ function InputView({
   onTextChange: (text: string) => void
   onSubmit: () => void
 }) {
-  const isSubmitDisabled = resumeText.trim().length === 0
+  const RESUME_LIMIT = 30_000
+  const resumeOverLimit = resumeText.length > RESUME_LIMIT
+  const isSubmitDisabled = resumeText.trim().length === 0 || resumeOverLimit
 
   return (
     <div className="flex flex-col gap-4">
@@ -393,6 +395,10 @@ function InputView({
         className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
         aria-label="Resume text"
       />
+      <p className={`text-xs text-right ${resumeOverLimit ? 'text-red-500' : 'text-zinc-400 dark:text-zinc-500'}`}>
+        {resumeText.length.toLocaleString('de-DE')} / 30.000
+        {resumeOverLimit && ' — Text zu lang'}
+      </p>
 
       <button
         onClick={onSubmit}
