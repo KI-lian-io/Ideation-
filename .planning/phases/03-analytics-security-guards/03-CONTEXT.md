@@ -13,7 +13,7 @@
 
 Mode: **mvp** (per ROADMAP). This is a small, backend-leaning phase: per-handler length checks + client-side char counters; no new product features.
 
-**✓ ROADMAP restructured (2026-06-23).** Phase 3 is now "Security Guards" (TRUST-01 + TRUST-03); analytics moved to a new **Phase 4 "Analytics (pre-launch)"** (TRUST-02 + OPS-01); Design/Deploy → Phase 5, Distribution → Phase 6. ROADMAP.md + REQUIREMENTS.md traceability are in sync — safe to `/gsd-plan-phase 3`.
+**✓ Phase 3 complete (2026-06-23) — all criteria verified.** This phase = "Security Guards" (TRUST-01 + TRUST-03). Analytics (TRUST-02 + OPS-01) was subsequently pushed to a low-priority post-MVP **Phase 6 "Analytics (post-launch)"**; Design/Deploy = Phase 4, Distribution = Phase 5.
 </domain>
 
 <decisions>
@@ -82,7 +82,7 @@ Limits confirmed: `resumeText`/`cvText` 30k · `jobPosting` 15k · `answer` 2k. 
 <deferred>
 ## Deferred Ideas
 
-- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — moved to the new **Phase 4 "Analytics (pre-launch)"** (Design/Deploy is now Phase 5), so the funnel is live the moment traffic starts. **Approach pre-locked for Phase 4 (do not re-decide):** PostHog **EU Cloud** (`eu.i.posthog.com`); **cookieless** (`persistence:'memory'` — no cookies/localStorage/device-IDs → no consent banner needed; per-session funnels only, no cross-session stitching); init `autocapture:false` + `ip:false` + `person_profiles:'identified_only'` (TRUST-02), pageview via the Suspense pattern; **5 client-side events** `start`/`parse_done`/`letter_done`/`copy`/`download` (resolves the ROADMAP-vs-CLAUDE.md count discrepancy in favor of ROADMAP) carrying non-PII properties only — never CV/job-posting/answer/letter text; `posthog-js ^1.391.0` + `instrumentation-client.ts` (no `posthog-node`); key in `NEXT_PUBLIC_POSTHOG_KEY`, **no-op gracefully** if unset or blocked by an adblocker, fire **only in production**.
+- **PostHog analytics — the 5-event funnel (TRUST-02 + OPS-01)** — pushed to a low-priority post-MVP **Phase 6 "Analytics (post-launch)"** (Design/Deploy is Phase 4, Distribution Phase 5). Added after the MVP ships to measure usage — no longer "live the moment traffic starts." **Approach pre-locked for Phase 6 (do not re-decide):** PostHog **EU Cloud** (`eu.i.posthog.com`); **cookieless** (`persistence:'memory'` — no cookies/localStorage/device-IDs → no consent banner needed; per-session funnels only, no cross-session stitching); init `autocapture:false` + `ip:false` + `person_profiles:'identified_only'` (TRUST-02), pageview via the Suspense pattern; **5 client-side events** `start`/`parse_done`/`letter_done`/`copy`/`download` (resolves the ROADMAP-vs-CLAUDE.md count discrepancy in favor of ROADMAP) carrying non-PII properties only — never CV/job-posting/answer/letter text; `posthog-js ^1.391.0` + `instrumentation-client.ts` (no `posthog-node`); key in `NEXT_PUBLIC_POSTHOG_KEY`, **no-op gracefully** if unset or blocked by an adblocker, fire **only in production**.
 - **Rate limiting / per-IP throttling** — a *different* abuse boundary than length (TRUST-03 is length-only) and awkward on stateless serverless without a store. Revisit only if real abuse appears post-launch.
 - **Server-side request logging / metrics** — intentionally NOT added; would conflict with zero-retention (and D-05's no-rejection-logging rule).
 

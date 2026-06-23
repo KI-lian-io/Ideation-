@@ -2,7 +2,7 @@
 
 ## Overview
 
-ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 adds input-length security guards. Phase 4 wires the analytics funnel before any public traffic. Phase 5 does the design pass and deploys to production. Phase 6 operationalizes distribution as a set of concrete deliverable artifacts.
+ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 adds input-length security guards. Phase 4 does the design pass and deploys to production. Phase 5 operationalizes distribution as a set of concrete deliverable artifacts. Phase 6 adds the analytics funnel as a low-priority post-MVP follow-up.
 
 ## Phases
 
@@ -16,9 +16,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Pre-flight + Parse Flow** - Upgrade Node, confirm SDK shapes, and deliver the end-to-end CV paste → Lebenslauf + bilingual norm-gap display (completed 2026-06-22)
 - [x] **Phase 2: Cover Letter Flow** - Add job posting input, personalization questions, and streamed Anschreiben with copy/download — product complete end-to-end (completed 2026-06-22)
 - [x] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users (completed 2026-06-23)
-- [ ] **Phase 4: Analytics (pre-launch)** - Wire the PostHog funnel (zero PII, EU Cloud, cookieless) so user behavior is measurable the moment real traffic starts
-- [ ] **Phase 5: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
-- [ ] **Phase 6: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts
+- [ ] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned
+- [ ] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts
+- [ ] **Phase 6: Analytics (post-launch)** - Add the PostHog funnel (zero PII, EU Cloud, cookieless) after the MVP ships — a low-priority follow-up to measure usage
 
 ## Phase Details
 
@@ -103,25 +103,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] 03-02-PLAN.md — Cover-letter-route guard slice: server-side 30k/15k/2k 400s aligned to JSON shape + CoverLetterInputView job-posting & per-answer counters & disabled submit (Wave 2)
 
-### Phase 4: Analytics (pre-launch)
-
-**Goal**: The PostHog funnel fires the five events with zero CV/PII capture — user behavior is measurable the moment real traffic starts
-**Mode:** mvp
-**Depends on**: Phase 3
-**Requirements**: TRUST-02, OPS-01
-**Success Criteria** (what must be TRUE):
-
-  1. PostHog fires `start`, `parse_done`, `letter_done`, `copy`, and `download` events, visible in the PostHog (EU Cloud) dashboard
-  2. PostHog is initialized cookieless (`persistence: 'memory'`) with `autocapture: false`, `ip: false`, `person_profiles: 'identified_only'` — no CV/PII text in the event stream and no consent banner required
-  3. Analytics fires only in production and degrades silently if the PostHog key is unset or PostHog is blocked — never breaking the core flow
-
-**Plans**: TBD
-
-### Phase 5: Design Pass + Vercel Deploy
+### Phase 4: Design Pass + Vercel Deploy
 
 **Goal**: The landing page and tool UI are conversion-oriented and German-market-credible, and the app is publicly live on Vercel with streaming completing within the function time limit
 **Mode:** mvp
-**Depends on**: Phase 4
+**Depends on**: Phase 3
 **Requirements**: UI-01, UI-02, OPS-02, OPS-03
 **Success Criteria** (what must be TRUE):
 
@@ -133,17 +119,31 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 6: Distribution Operationalization
+### Phase 5: Distribution Operationalization
 
 **Goal**: Three concrete distribution artifacts exist — a build-in-public content plan, an SEO keyword list with cadence, and a paid-test spec — so distribution can start the moment the live tool is ready
 **Mode:** mvp
-**Depends on**: Phase 5
+**Depends on**: Phase 4
 **Requirements**: GTM-01, GTM-02, GTM-03
 **Success Criteria** (what must be TRUE):
 
   1. A written build-in-public / community plan exists: founder job-search story as the lead, Reddit (r/germany, r/expats) and LinkedIn cadence documented, first 3 posts drafted
   2. An SEO keyword list exists covering expat-EN long-tail and emerging German "KI" terms, with a 6-month publishing cadence and the Sept–Oct application peak flagged as the stretch goal
   3. A paid conversion-test spec exists: one specific keyword, a defined success metric, and a hard budget cap — with an explicit "only after organic validation" gate documented
+
+**Plans**: TBD
+
+### Phase 6: Analytics (post-launch)
+
+**Goal**: The PostHog funnel fires the five events with zero CV/PII capture — added as a low-priority post-MVP follow-up to measure usage once the tool is live
+**Mode:** mvp
+**Depends on**: Phase 5
+**Requirements**: TRUST-02, OPS-01
+**Success Criteria** (what must be TRUE):
+
+  1. PostHog fires `start`, `parse_done`, `letter_done`, `copy`, and `download` events, visible in the PostHog (EU Cloud) dashboard
+  2. PostHog is initialized cookieless (`persistence: 'memory'`) with `autocapture: false`, `ip: false`, `person_profiles: 'identified_only'` — no CV/PII text in the event stream and no consent banner required
+  3. Analytics fires only in production and degrades silently if the PostHog key is unset or PostHog is blocked — never breaking the core flow
 
 **Plans**: TBD
 
@@ -154,6 +154,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
-| 4. Analytics (pre-launch) | 0/TBD | Not started | - |
-| 5. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
-| 6. Distribution Operationalization | 0/TBD | Not started | - |
+| 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
+| 5. Distribution Operationalization | 0/TBD | Not started | - |
+| 6. Analytics (post-launch) | 0/TBD | Not started | - |

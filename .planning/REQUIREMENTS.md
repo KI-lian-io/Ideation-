@@ -118,15 +118,15 @@ Each v1 requirement maps to exactly one phase.
 | CL-06 | Phase 2 | Complete |
 | TRUST-01 | Phase 3 | Complete |
 | TRUST-03 | Phase 3 | Complete |
-| TRUST-02 | Phase 4 | Pending |
-| OPS-01 | Phase 4 | Pending |
-| OPS-02 | Phase 5 | Pending |
-| OPS-03 | Phase 5 | Pending |
-| UI-01 | Phase 5 | Pending |
-| UI-02 | Phase 5 | Pending |
-| GTM-01 | Phase 6 | Pending |
-| GTM-02 | Phase 6 | Pending |
-| GTM-03 | Phase 6 | Pending |
+| OPS-02 | Phase 4 | Pending |
+| OPS-03 | Phase 4 | Pending |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Pending |
+| GTM-01 | Phase 5 | Pending |
+| GTM-02 | Phase 5 | Pending |
+| GTM-03 | Phase 5 | Pending |
+| TRUST-02 | Phase 6 | Pending |
+| OPS-01 | Phase 6 | Pending |
 
 **Coverage:**
 
@@ -136,4 +136,4 @@ Each v1 requirement maps to exactly one phase.
 
 ---
 *Requirements defined: 2026-06-22*
-*Last updated: 2026-06-23 — analytics deferred: Phase 3 split into "Security Guards" (TRUST-01, TRUST-03) + new Phase 4 "Analytics (pre-launch)" (TRUST-02, OPS-01); Design/Deploy → Phase 5, Distribution → Phase 6*
+*Last updated: 2026-06-23 — analytics pushed to post-MVP: Phase 4 = Design Pass + Vercel Deploy (UI-01/02, OPS-02/03), Phase 5 = Distribution (GTM-01/02/03), Phase 6 = Analytics post-launch (TRUST-02, OPS-01). Phase 3 Security Guards (TRUST-01, TRUST-03) complete.*
