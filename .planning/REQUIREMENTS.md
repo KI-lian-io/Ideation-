@@ -49,7 +49,7 @@
 
 ### Design & Landing (UI)
 
-- [ ] **UI-01**: A conversion-oriented landing communicates the value — trust-forward, zero-retention stated loudly, German-market-credible (not generic AI-purple), built via claude.ai/design
+- [x] **UI-01**: A conversion-oriented landing communicates the value — trust-forward, zero-retention stated loudly, German-market-credible (not generic AI-purple), built via claude.ai/design
 - [x] **UI-02**: The tool UI presents the full flow on one page and is mobile-readable
 
 ### Distribution (GTM)
@@ -120,7 +120,7 @@ Each v1 requirement maps to exactly one phase.
 | TRUST-03 | Phase 3 | Complete |
 | OPS-02 | Phase 4 | Pending |
 | OPS-03 | Phase 4 | Pending |
-| UI-01 | Phase 4 | Pending |
+| UI-01 | Phase 4 | Complete |
 | UI-02 | Phase 4 | Complete |
 | GTM-01 | Phase 5 | Pending |
 | GTM-02 | Phase 5 | Pending |
