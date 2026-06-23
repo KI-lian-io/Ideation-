@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 4
+current_phase: 04
 current_phase_name: Design Pass + Vercel Deploy
 status: executing
-stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-06-23T19:00:26.609Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-06-23T19:25:22.863Z"
 last_activity: 2026-06-23
-last_activity_desc: Phase 3 complete, transitioned to Phase 4
+last_activity_desc: Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
   percent: 50
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** German output is native-quality and trustworthy — norm-correct, never fabricated — so a German recruiter takes the applicant seriously in the 8-second scan.
-**Current focus:** Phase 04 — Design Pass + Vercel Deploy (next); analytics pushed to post-MVP Phase 06
+**Current focus:** Phase 04 — Design Pass + Vercel Deploy
 
 ## Current Position
 
-Phase: 4 — Design Pass + Vercel Deploy
-Plan: Not started
+Phase: 04 (Design Pass + Vercel Deploy) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-23 — Phase 3 complete, transitioned to Phase 4
+Last activity: 2026-06-23 — Phase 04 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P01 | 30 | 3 tasks | 3 files |
 | Phase 03 P01 | 89s | 2 tasks | 2 files |
 | Phase 03 P02 | 105s | 2 tasks | 2 files |
+| Phase 04 P01 | 390 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase ?]: CV_LIMIT/POSTING_LIMIT/ANSWER_LIMIT as named constants in both server and client
 - [Phase ?]: NextResponse.json 400 shape on cover-letter route aligned to /api/parse (D-03)
 - [Phase ?]: canSubmit AND-extended to preserve base non-empty check plus over-limit gates
+- [Phase ?]: Brand foundation + route split
+- [Phase ?]: Brand foundation + route split
+- [Phase ?]: Brand foundation + route split
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T18:38:35.059Z
-Stopped at: Phase 4 UI-SPEC approved
-Resume file: .planning/phases/04-design-pass-vercel-deploy/04-UI-SPEC.md
+Last session: 2026-06-23T19:25:22.858Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
