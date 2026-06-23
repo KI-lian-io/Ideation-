@@ -22,9 +22,9 @@ export function NormGapPanel({ normGapNotes }: NormGapPanelProps) {
   if (normGapNotes.length === 0) return null
 
   return (
-    <div className="mt-8 border-t border-zinc-100 dark:border-zinc-800 pt-6">
+    <div className="mt-8 border-t border-zinc-100 pt-6">
       <details>
-        <summary className="cursor-pointer text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 list-none flex items-center justify-between">
+        <summary className="cursor-pointer text-sm font-semibold text-zinc-600 hover:text-zinc-900 list-none flex items-center justify-between">
           <span>Was hat sich geändert &amp; warum? ({normGapNotes.length} Hinweise)</span>
           {/* Visual expand/collapse indicator — inline SVG, no icon library */}
           <svg
@@ -43,7 +43,7 @@ export function NormGapPanel({ normGapNotes }: NormGapPanelProps) {
         </summary>
 
         {/* Notes list — each note as a text node (no HTML injection) */}
-        <ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <ul className="mt-3 space-y-2 text-sm text-zinc-600">
           {normGapNotes.map((note, i) => (
             <li key={i}>{note}</li>
           ))}

@@ -92,7 +92,7 @@ function PersonalSection({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+      <div className="text-2xl font-semibold text-zinc-900">
         <EditableField
           value={personal.fullName}
           placeholder="+ Vorname, Nachname"
@@ -100,7 +100,7 @@ function PersonalSection({
           className="text-2xl font-semibold"
         />
       </div>
-      <div className="flex flex-col gap-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="flex flex-col gap-1 text-sm text-zinc-600">
         <EditableField
           value={personal.address}
           placeholder="+ Adresse"
@@ -133,12 +133,12 @@ function PersonalSection({
           Framed as legally optional under the AGG; user's choice; never mandated.
           The tool does NOT accept, upload, or process photos (zero-retention / T-01-11). */}
       {photoAdvice && (
-        <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+        <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3">
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">
             Foto (optional)
           </p>
           {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">{photoAdvice}</p>
+          <p className="text-sm text-zinc-600">{photoAdvice}</p>
         </div>
       )}
     </div>
@@ -155,7 +155,7 @@ function ExperienceSection({
   return (
     <div className="flex flex-col gap-4">
       {experience.map((exp, i) => (
-        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4">
           {/* On-hover controls: remove + reorder */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
@@ -185,7 +185,7 @@ function ExperienceSection({
 
           <div className="flex flex-col gap-2">
             {/* Role */}
-            <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="font-semibold text-zinc-900">
               <EditableField
                 value={exp.role}
                 placeholder="+ Berufsbezeichnung"
@@ -194,7 +194,7 @@ function ExperienceSection({
               />
             </div>
             {/* Company + location */}
-            <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <div className="flex flex-wrap gap-2 text-sm text-zinc-600">
               <EditableField
                 value={exp.company}
                 placeholder="+ Unternehmen"
@@ -207,7 +207,7 @@ function ExperienceSection({
               />
             </div>
             {/* Dates */}
-            <div className="flex gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="flex gap-2 text-sm text-zinc-500">
               <EditableField
                 value={exp.start}
                 placeholder="+ Datum"
@@ -277,7 +277,7 @@ function EducationSection({
   return (
     <div className="flex flex-col gap-4">
       {education.map((edu, i) => (
-        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4">
           {/* On-hover controls */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
@@ -306,7 +306,7 @@ function EducationSection({
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="font-semibold text-zinc-900">
               <EditableField
                 value={edu.qualification}
                 placeholder="+ Abschluss"
@@ -314,7 +314,7 @@ function EducationSection({
                 className="font-semibold"
               />
             </div>
-            <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <div className="flex flex-wrap gap-2 text-sm text-zinc-600">
               <EditableField
                 value={edu.institution}
                 placeholder="+ Bildungseinrichtung"
@@ -326,7 +326,7 @@ function EducationSection({
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'location', value: v })}
               />
             </div>
-            <div className="flex gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="flex gap-2 text-sm text-zinc-500">
               <EditableField
                 value={edu.start}
                 placeholder="+ Datum"

@@ -108,7 +108,7 @@ function CategoryChips({
         {cat.skills.map((skill, skillIndex) => (
           <div
             key={skillIndex}
-            className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+            className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm"
           >
             <EditableField
               value={skill}
@@ -183,7 +183,7 @@ export function LanguageLevelSelect({ value, onChange }: LanguageLevelSelectProp
       value={value ?? ''}
       onChange={(e) => onChange(e.target.value)}
       aria-label="Sprachniveau"
-      className="border-0 bg-transparent text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none cursor-pointer"
+      className="border-0 bg-transparent text-sm text-zinc-700 focus:outline-none cursor-pointer"
     >
       <option value="">— Niveau wählen —</option>
       {GERMAN_LANGUAGE_LEVELS.map((level) => (
