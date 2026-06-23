@@ -3,7 +3,7 @@ import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { COVER_LETTER_SYSTEM, buildCoverLetterUser } from "@/lib/prompts";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 /**
  * POST /api/cover-letter
