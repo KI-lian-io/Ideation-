@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { COVER_LETTER_SYSTEM, buildCoverLetterUser } from "@/lib/prompts";
 
@@ -12,10 +12,35 @@ export const maxDuration = 120;
  */
 export async function POST(req: NextRequest) {
   const { cvText, jobPosting, answers } = await req.json();
-  if (!cvText || !jobPosting || !Array.isArray(answers)) {
-    return new Response("cvText, jobPosting and answers are required", {
-      status: 400,
-    });
+  if (!cvText || typeof cvText !== "string" || !jobPosting || typeof jobPosting !== "string" || !Array.isArray(answers)) {
+    return NextResponse.json(
+      { error: "cvText, jobPosting und answers sind erforderlich." },
+      { status: 400 }
+    );
+  }
+  // Length guards (D-01): reject before stream / Anthropic cost
+  const CV_LIMIT = 30_000;
+  const POSTING_LIMIT = 15_000;
+  const ANSWER_LIMIT = 2_000;
+  if (cvText.length > CV_LIMIT) {
+    return NextResponse.json(
+      { error: "Der Lebenslauf-Text ist zu lang (max. 30.000 Zeichen)." },
+      { status: 400 }
+    );
+  }
+  if (jobPosting.length > POSTING_LIMIT) {
+    return NextResponse.json(
+      { error: "Das Stellenangebot ist zu lang (max. 15.000 Zeichen)." },
+      { status: 400 }
+    );
+  }
+  for (const ans of answers) {
+    if (typeof ans.answer === "string" && ans.answer.length > ANSWER_LIMIT) {
+      return NextResponse.json(
+        { error: "Eine Antwort ist zu lang (max. 2.000 Zeichen)." },
+        { status: 400 }
+      );
+    }
   }
 
   const stream = anthropic.messages.stream({
