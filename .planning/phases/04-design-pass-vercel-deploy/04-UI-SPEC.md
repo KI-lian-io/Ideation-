@@ -40,7 +40,7 @@ created: 2026-06-23
 
 ## Spacing Scale
 
-Inherited 8-point grid from Phase 1/2. Phase 4 adds three landing-specific tokens.
+Inherited 8-point grid from Phase 1/2. Phase 4 adds landing-specific extended tokens for section and hero breathing room; all are multiples of 4 and standard Tailwind scale tokens.
 
 | Token | Tailwind | Value | Usage |
 |-------|----------|-------|-------|
@@ -49,8 +49,8 @@ Inherited 8-point grid from Phase 1/2. Phase 4 adds three landing-specific token
 | md | `gap-4` / `px-4 py-3` | 16px | Form element internal padding, section gaps (inherited) |
 | lg | `gap-6` / `p-4` | 16–24px | Card internal padding, vertical gap inside landing cards (inherited) |
 | xl | `py-12 px-6` / `sm:px-12` | 24–48px | Page outer padding (inherited) |
-| section | `py-20 sm:py-28` | 80–112px | Vertical breathing room between the six landing sections |
-| hero | `pt-24 pb-20 sm:pt-32 sm:pb-28` | 96–128px top, 80–112px bottom | Hero section top/bottom padding |
+| **section** (landing-only extended) | `py-20 sm:py-28` | 80–112px | Vertical breathing room between landing sections — landing section/hero breathing room; all ×4 Tailwind standard tokens, grid-aligned |
+| **hero** (landing-only extended) | `pt-24 pb-20 sm:pt-32 sm:pb-28` | 96–128px top, 80–112px bottom | Hero section top/bottom padding — landing section/hero breathing room; all ×4 Tailwind standard tokens, grid-aligned |
 | content-max | `max-w-4xl mx-auto px-6` | 896px container, 24px side padding | Landing content container (wider than the tool's `max-w-3xl`) |
 
 Exceptions:
@@ -64,28 +64,30 @@ Exceptions:
 
 ## Typography
 
-Phase 4 EXTENDS the Phase 1/2 scale (3 sizes, 2 weights) by adding 2 landing-specific sizes and wiring the serif font. The tool UI retains the existing 3-size scale unchanged.
+Phase 4 EXTENDS the Phase 1/2 scale by wiring the serif font and adding landing-specific roles, while consolidating to exactly 4 distinct sizes and 2 weights across the whole system (landing + tool combined).
 
-### Complete type scale (landing + tool)
+### Complete type scale (landing + tool — 4 sizes, 2 weights)
 
 | Role | Family | Size | Tailwind | Weight | Tailwind | Line Height | Usage |
 |------|--------|------|----------|--------|----------|-------------|-------|
 | Body / field text | Geist Sans | 14px | `text-sm` | 400 | `font-normal` | 1.5 | Tool UI — all field content, notes, placeholders (inherited) |
-| Label / meta | Geist Sans | 12px | `text-xs` | 600 | `font-semibold` | 1.4 | Uppercase section labels, landing eyebrow labels (inherited) |
-| Heading | Geist Sans | 24px | `text-2xl` | 600 | `font-semibold` | 1.2 | Tool h1, Lebenslauf name display (inherited) |
-| CTA / button | Geist Sans | 14px | `text-sm` | 600 | `font-semibold` | — | All buttons, landing + tool (inherited) |
-| Section title | **Lora** (serif) | 28px | `text-3xl` | 600 | `font-semibold` | 1.2 | Landing section headings ("Two documents. Both have to survive the scan." etc.) |
-| Hero headline | **Lora** (serif) | 40px mobile / 52px desktop | `text-4xl sm:text-5xl` | 700 | `font-bold` | 1.15 | Hero only — "Win the 8-second German recruiter scan." |
-| Hero subhead | Geist Sans | 16px | `text-base` | 400 | `font-normal` | 1.6 | Hero subhead — the D-08 bilingual output sentence |
-| Body / landing prose | Geist Sans | 16px | `text-base` | 400 | `font-normal` | 1.65 | Landing body paragraphs (how-it-works steps, trust band, founder note) |
-| Nav / footer | Geist Sans | 14px | `text-sm` | 600 (nav links) / 400 (footer) | — | 1.4 | Navigation links, footer label |
+| Eyebrow / label / nav / footer | Geist Sans | 14px | `text-sm` | 600 | `font-semibold` | 1.4 | Uppercase section labels, landing eyebrow labels, CTA buttons, nav links, footer. Visual differentiation from body comes from `uppercase tracking-widest font-semibold` treatment, NOT a separate size. |
+| Hero subhead / landing prose | Geist Sans | 16px | `text-base` | 400 | `font-normal` | 1.6–1.65 | Landing subhead (D-08 bilingual sentence) + all landing body paragraphs (how-it-works steps, trust band, founder note). Landing-only — never on tool UI. |
+| Section title / tool heading | **Lora** (serif) for landing section titles; Geist Sans for tool heading | 28px | `text-3xl` | 600 | `font-semibold` | 1.2 | Landing `<h2>` section headings (serif Lora) AND the tool's main `<h1>` heading (Geist Sans). These were previously 28px (section titles) and 24px (tool heading) — both are now unified at 28px. |
+| Hero headline | **Lora** (serif) | 40px mobile / 52px desktop | `text-4xl sm:text-5xl` | 600 | `font-semibold` | 1.15 | Hero `<h1>` only — "Win the 8-second German recruiter scan." Responsive pair counts as one size step. |
+
+**Declared scale: 14 / 16 / 28 / 40–52 — exactly 4 distinct sizes.**
+
+**Declared weights: 400 (font-normal) + 600 (font-semibold) — exactly 2 weights.**
 
 **Hard constraints:**
 - Serif (Lora) is used ONLY on the landing: hero headline + section titles. NEVER on tool UI, buttons, labels, or body paragraphs.
-- `font-bold` (700) is permitted ONLY on the hero headline. All other emphasis remains `font-semibold` (600) per Phase 1 contract.
-- No `text-lg` on the tool UI. `text-base` (16px) is landing-only.
-- The 40/52px hero size pair is landing-only. No other element exceeds `text-3xl` (28px).
+- `font-bold` (700) is NOT used anywhere. The hero headline uses `font-semibold` (600) — Lora at 40/52px has ample authority at 600; dominance comes from size + serif character, not a weight step.
 - `font-medium` (500) remains prohibited everywhere.
+- `text-base` (16px) is landing-only. Tool UI uses `text-sm` (14px) for all field content.
+- `text-xs` (12px) is eliminated from the scale entirely. All elements that previously used `text-xs` (eyebrows, step labels, card labels, mockup captions) now use `text-sm` with `uppercase tracking-widest font-semibold` treatment. This also improves WCAG-AA readability (D-19).
+- The 40/52px hero size pair is landing-only. No other element exceeds `text-3xl` (28px).
+- The tool `<h1>` heading ("Convert your CV to a German Lebenslauf") was previously specified at `text-2xl` (24px) in Phase 1. Phase 4 upgrades it to `text-3xl` (28px) as part of the brand retrofit — update this class in `InputView`.
 
 ---
 
@@ -227,7 +229,7 @@ Fixed to top of viewport on desktop; static on mobile. Height: `h-14` (56px).
     <!-- Wordmark -->
     <a href="/" class="text-sm font-semibold text-zinc-900 tracking-tight">
       ScanReady
-      <span class="text-blue-700 font-normal text-xs ml-1 tracking-normal">
+      <span class="text-blue-700 font-normal text-sm ml-1 tracking-normal">
         DE
       </span>
     </a>
@@ -243,7 +245,7 @@ Fixed to top of viewport on desktop; static on mobile. Height: `h-14` (56px).
 ```
 
 Notes:
-- The `DE` wordmark accent is a German-language signal (D-14 — German appears as nav accent).
+- The `DE` wordmark accent is a German-language signal (D-14 — German appears as nav accent). It uses `text-sm` (not `text-xs`) per the consolidated type scale.
 - No hamburger menu, no links beyond the single CTA in Phase 4.
 - `sticky top-0 z-50` keeps the nav over scroll content without JavaScript.
 
@@ -259,13 +261,13 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 <section class="bg-white pt-24 pb-20 sm:pt-32 sm:pb-28">
   <div class="max-w-4xl mx-auto px-6 text-center">
 
-    <!-- Eyebrow label -->
-    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-6">
+    <!-- Eyebrow label: text-sm with uppercase treatment for visual differentiation -->
+    <p class="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-6">
       For internationals applying in Germany
     </p>
 
-    <!-- Serif headline -->
-    <h1 class="font-[--font-serif] text-4xl sm:text-5xl font-bold text-zinc-900 leading-[1.15] mb-6">
+    <!-- Serif headline: font-semibold (600) — no font-bold -->
+    <h1 class="font-[--font-serif] text-4xl sm:text-5xl font-semibold text-zinc-900 leading-[1.15] mb-6">
       Win the
       <span class="relative inline-block">
         8-second
@@ -317,10 +319,11 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 
       <!-- LEFT: Authentic voice -->
       <div class="rounded-xl border border-zinc-200 bg-white px-6 py-8">
-        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">
+        <!-- Card eyebrow: text-sm with uppercase treatment -->
+        <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">
           Authentic voice
         </p>
-        <h3 class="text-xl font-semibold text-zinc-900 mb-3 leading-snug">
+        <h3 class="text-3xl font-semibold text-zinc-900 mb-3 leading-snug">
           Sounds like you — not a template.
         </h3>
         <p class="text-sm text-zinc-500 leading-relaxed mb-6">
@@ -343,10 +346,11 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 
       <!-- RIGHT: German-norm -->
       <div class="rounded-xl border border-zinc-200 bg-white px-6 py-8">
-        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">
+        <!-- Card eyebrow: text-sm with uppercase treatment -->
+        <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">
           German-norm format
         </p>
-        <h3 class="text-xl font-semibold text-zinc-900 mb-3 leading-snug">
+        <h3 class="text-3xl font-semibold text-zinc-900 mb-3 leading-snug">
           The format gap, closed.
         </h3>
         <p class="text-sm text-zinc-500 leading-relaxed mb-4">
@@ -354,7 +358,7 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
           the rules are the gap, not your experience. Reverse-chronological DIN layout,
           correct date format, personal-data block, photo guidance.
         </p>
-        <p class="text-xs text-zinc-400 italic">
+        <p class="text-sm text-zinc-400 italic">
           A native German speaker should review the final letter before you send it.
         </p>
 
@@ -398,7 +402,8 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 
       <!-- Step 1 -->
       <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 1</p>
+        <!-- Step label: text-sm with uppercase treatment -->
+        <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 1</p>
         <h3 class="text-base font-semibold text-zinc-900 mb-2">Paste your CV</h3>
         <p class="text-sm text-zinc-500 leading-relaxed">
           Paste your résumé text — US, UK, or any English format.
@@ -408,7 +413,7 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 
       <!-- Step 2 -->
       <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 2</p>
+        <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 2</p>
         <h3 class="text-base font-semibold text-zinc-900 mb-2">Get a Lebenslauf + English notes</h3>
         <p class="text-sm text-zinc-500 leading-relaxed">
           Your CV is restructured into a norm-correct German Lebenslauf.
@@ -419,7 +424,7 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
 
       <!-- Step 3 -->
       <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 3</p>
+        <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-3">Step 3</p>
         <h3 class="text-base font-semibold text-zinc-900 mb-2">Answer 3–5 questions, get your Anschreiben</h3>
         <p class="text-sm text-zinc-500 leading-relaxed">
           Paste the job posting and answer a few questions about your
@@ -467,15 +472,15 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
     <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-zinc-500">
       <span class="flex items-center gap-2">
         <!-- Inline checkmark SVG -->
-        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" ...>✓</svg>
+        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" aria-hidden="true" ...>✓</svg>
         No storage, no account
       </span>
       <span class="flex items-center gap-2">
-        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" ...>✓</svg>
+        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" aria-hidden="true" ...>✓</svg>
         Not used for AI training
       </span>
       <span class="flex items-center gap-2">
-        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" ...>✓</svg>
+        <svg class="h-4 w-4 text-blue-700 flex-shrink-0" aria-hidden="true" ...>✓</svg>
         Grounded — never fabricated
       </span>
     </div>
@@ -540,7 +545,8 @@ Sections are rendered in order. Alternating background: sections 1/3/5 use `bg-w
   <div class="max-w-4xl mx-auto px-6 text-center">
 
     <!-- Proof block: ONLY founder's dogfooded before/after — no fake counters, no invented testimonials (D-17) -->
-    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">
+    <!-- Section eyebrow: text-sm with uppercase treatment -->
+    <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">
       Real output — the founder's own application
     </p>
 
@@ -583,7 +589,7 @@ Minimal — below Section 6:
 
 ### F. Tool UI retrofit — `/app` route
 
-The tool UI (`src/app/app/page.tsx`) receives the following identity changes. Functionality, AppState machine, component APIs, and copy are UNCHANGED except the dark-mode removal.
+The tool UI (`src/app/app/page.tsx`) receives the following identity changes. Functionality, AppState machine, component APIs, and copy are UNCHANGED except the dark-mode removal and heading size upgrade.
 
 **Changes:**
 
@@ -594,7 +600,7 @@ The tool UI (`src/app/app/page.tsx`) receives the following identity changes. Fu
 <div class="border-b border-zinc-200 h-14 flex items-center px-6">
   <a href="/" class="text-sm font-semibold text-zinc-900 tracking-tight">
     ScanReady
-    <span class="text-blue-700 font-normal text-xs ml-1">DE</span>
+    <span class="text-blue-700 font-normal text-sm ml-1">DE</span>
   </a>
 </div>
 ```
@@ -604,9 +610,9 @@ The `← Back` affordance is not needed — users on `/app` are in task mode. Th
 
 4. **Page outer padding:** Keep existing `py-12 px-6 sm:px-12` — no changes to the tool layout container.
 
-5. **Tool page h1:** The existing "Convert your CV to a German Lebenslauf" h1 stays — it is now in `InputView` which renders at `/app`. No copy change.
+5. **Tool page h1:** The existing `<h1>` heading ("Convert your CV to a German Lebenslauf") in `InputView` is currently `text-2xl` (24px) per Phase 1. Upgrade to `text-3xl` (28px) — this unifies it with the 28px tier in the consolidated type scale. No copy change, class change only.
 
-6. **`shadow-sm` on textarea:** The existing `page.tsx` line 395 textarea has `shadow-sm`. Remove it (D-11 flat surfaces, no shadows).
+6. **`shadow-sm` on textarea:** The existing `page.tsx` textarea has `shadow-sm`. Remove it (D-11 flat surfaces, no shadows).
 
 ---
 
@@ -631,8 +637,8 @@ Three mockup instances appear on the landing:
 
 ```html
 <div class="bg-zinc-50 rounded-lg border border-zinc-200 p-4 h-40 overflow-hidden text-left">
-  <!-- BEFORE label -->
-  <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2">Before</p>
+  <!-- BEFORE label: text-sm with uppercase treatment -->
+  <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-2">Before</p>
 
   <!-- Generic struck-through filler line -->
   <p class="text-sm text-zinc-400 line-through italic mb-3">
@@ -640,7 +646,7 @@ Three mockup instances appear on the landing:
   </p>
 
   <!-- Arrow / after label -->
-  <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2">After</p>
+  <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-2">After</p>
 
   <!-- Grounded specific line (drawn from founder's real answers) -->
   <p class="text-sm text-zinc-900">
@@ -657,20 +663,20 @@ Note: The "after" sentence is in German because that is the actual product outpu
 ```html
 <div class="bg-zinc-50 rounded-lg border border-zinc-200 p-4 h-40 overflow-hidden text-left relative">
   <!-- Mini Lebenslauf content (faux document lines) -->
-  <p class="text-xs font-semibold text-zinc-900 mb-1">Lebenslauf</p>
-  <div class="space-y-1">
+  <p class="text-sm font-semibold text-zinc-900 mb-1">Lebenslauf</p>
+  <div class="space-y-1" aria-hidden="true">
     <div class="flex items-center gap-2">
       <div class="h-2 w-20 rounded bg-zinc-300"></div>
       <!-- Norm-gap pin: blue dot -->
-      <div class="h-2 w-2 rounded-full bg-blue-700 flex-shrink-0" aria-hidden="true"></div>
-      <span class="text-xs text-zinc-400">Foto (optional)</span>
+      <div class="h-2 w-2 rounded-full bg-blue-700 flex-shrink-0"></div>
+      <span class="text-sm text-zinc-400">Foto (optional)</span>
     </div>
     <div class="h-2 w-32 rounded bg-zinc-200"></div>
     <div class="h-2 w-24 rounded bg-zinc-200"></div>
     <div class="flex items-center gap-2 mt-2">
       <div class="h-2 w-16 rounded bg-zinc-300"></div>
-      <div class="h-2 w-2 rounded-full bg-blue-700 flex-shrink-0" aria-hidden="true"></div>
-      <span class="text-xs text-zinc-400">01.03.2022 (DIN)</span>
+      <div class="h-2 w-2 rounded-full bg-blue-700 flex-shrink-0"></div>
+      <span class="text-sm text-zinc-400">01.03.2022 (DIN)</span>
     </div>
     <div class="h-2 w-28 rounded bg-zinc-200"></div>
   </div>
@@ -687,7 +693,8 @@ This mockup is the strongest pre-launch proof. The executor must use real conten
 <div class="rounded-xl border border-zinc-200 bg-white overflow-hidden max-w-2xl mx-auto">
   <!-- Before panel -->
   <div class="border-b border-zinc-200 px-6 py-5">
-    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Original CV (English)</p>
+    <!-- Panel label: text-sm with uppercase treatment -->
+    <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-3">Original CV (English)</p>
     <p class="text-sm text-zinc-500 italic leading-relaxed">
       <!-- REPLACE WITH REAL CONTENT: founder's real résumé excerpt -->
       "Senior Product Manager | Jan 2021–Present | Drove cross-functional alignment…"
@@ -696,14 +703,14 @@ This mockup is the strongest pre-launch proof. The executor must use real conten
 
   <!-- After panel -->
   <div class="px-6 py-5">
-    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Lebenslauf Output (German)</p>
+    <p class="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-3">Lebenslauf Output (German)</p>
     <p class="text-sm text-zinc-900 leading-relaxed mb-3">
       <!-- REPLACE WITH REAL CONTENT: real Lebenslauf excerpt generated by the tool -->
       Senior Product Manager | Jan. 2021 – heute
     </p>
     <!-- Norm-gap note (English explanation) -->
     <div class="rounded-md bg-zinc-50 border border-zinc-200 px-3 py-2">
-      <p class="text-xs text-zinc-500">
+      <p class="text-sm text-zinc-500">
         <span class="font-semibold text-zinc-700">Norm note:</span>
         Date reformatted to DIN standard (Jan. 2021); "Present" replaced with "heute" (German norm).
       </p>
@@ -728,7 +735,7 @@ All motion is opt-in only — the default is no motion.
 | Landing sections | Quiet fade + 8px slide-up on scroll-into-view | CSS `@keyframes` or Tailwind `animate-fade-in-up` custom animation class. Trigger: `IntersectionObserver` with `threshold: 0.1`. Not applied to the hero (it is the first visible element, no scroll needed). |
 | Primary CTA buttons (landing) | Gentle 2px upward lift on hover | `hover:-translate-y-0.5 transition-transform duration-150` — applies to all `bg-blue-700` CTA buttons |
 | `prefers-reduced-motion` guard | All animations disabled | `@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }` — add to `globals.css` |
-| Tool UI | No new animations | Existing `animate-pulse` skeleton is already respects reduced motion via Tailwind's built-in safe list |
+| Tool UI | No new animations | Existing `animate-pulse` skeleton already respects reduced motion via Tailwind's built-in safe list |
 
 **Forbidden motion (per D-13):** No parallax, no animated gradient, no particle/aurora/shader backgrounds, no autoplay video, no background animation of any kind on the landing.
 
@@ -752,7 +759,7 @@ The landing is a static Server Component — no client state. Interaction is lim
 
 All five AppState machine phases (`input`, `loading`, `result`, `error`, `junk`) and all four cover-letter phases (`cover_letter_input`, `cover_letter_streaming`, `cover_letter_result`, `cover_letter_error`) are fully specified in `01-UI-SPEC.md` and `02-UI-SPEC.md`. Phase 4 does not change any state logic, transitions, or copy.
 
-The only behavioral change on the tool route is the removal of `dark:` classes (visual-only).
+The only behavioral change on the tool route is the removal of `dark:` classes and the tool `<h1>` class upgrade from `text-2xl` to `text-3xl` (visual-only).
 
 ---
 
@@ -814,7 +821,7 @@ All copy below is locked. Executor must not substitute headlines, reorder sectio
 
 ### Tool copy (inherited — no changes)
 
-All tool UI copy is locked in `01-UI-SPEC.md` §Copywriting Contract and `02-UI-SPEC.md` §Copywriting Contract. No changes in Phase 4 except removal of dark-mode CSS (no copy changes).
+All tool UI copy is locked in `01-UI-SPEC.md` §Copywriting Contract and `02-UI-SPEC.md` §Copywriting Contract. No changes in Phase 4 except removal of dark-mode CSS and the `<h1>` class upgrade (no copy changes).
 
 ---
 
@@ -837,6 +844,7 @@ Phase 4 closes the WCAG-AA gaps flagged in Phase 1 (D-19). This is a full-pass r
 | Scroll animations | `prefers-reduced-motion` disables all animations (see motion contract). Animated elements must still be readable in static state. |
 | Color contrast | All text on white: `text-zinc-900` (21:1 AA/AAA), `text-zinc-500` (7.5:1 AA). `text-zinc-400` (3.1:1) is NOT AA — permitted only for decorative/placeholder text. Never use `text-zinc-400` for any text a user must read. |
 | CTA button contrast | `text-white` on `bg-blue-700`: 4.6:1 — passes AA (minimum 4.5:1 for normal text). |
+| Eyebrow / label readability | All eyebrows and step labels now use `text-sm` (14px) minimum — bumped from the previously spec'd `text-xs` (12px) — improving readability per D-19. |
 
 ### Tool UI (AA fixes — D-19)
 
@@ -870,7 +878,7 @@ No new npm packages in Phase 4 beyond Google Fonts (Lora via `next/font/google` 
 | `scanready/src/app/layout.tsx` | Current metadata strings ("Create Next App" → target real title), font variables, html/body class structure |
 | `scanready/src/app/globals.css` | Current dark-mode block to remove, Arial body fallback to replace, `@theme inline` block to keep |
 | `scanready/src/app/api/cover-letter/route.ts` | `maxDuration = 120` confirmed — 120s is below the Hobby 300s ceiling, cover-letter stream fits on Hobby tier |
-| `scanready/src/app/page.tsx` (lines 355–412) | `InputView` exact class names confirmed; `shadow-sm` on textarea identified for removal (D-11 flat surfaces) |
+| `scanready/src/app/page.tsx` (lines 355–412) | `InputView` exact class names confirmed; `shadow-sm` on textarea identified for removal (D-11 flat surfaces); `text-2xl` h1 identified for upgrade to `text-3xl` |
 | User input | 0 — zero questions asked; all 23 decisions were already locked in `04-CONTEXT.md` |
 
 ---
@@ -889,5 +897,5 @@ No new npm packages in Phase 4 beyond Google Fonts (Lora via `next/font/google` 
 ---
 
 *Phase: 04-design-pass-vercel-deploy*
-*UI-SPEC created: 2026-06-23*
+*UI-SPEC revised: 2026-06-23 (blocking issues A + B fixed; spacing FLAG cleared)*
 *Serves: Phase 4 plans — landing (UI-01), tool retrofit + routing split (UI-02), layout/globals cleanup (UI-02), Vercel deploy config (OPS-02/OPS-03)*
