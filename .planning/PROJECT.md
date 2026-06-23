@@ -2,7 +2,7 @@
 
 ## What This Is
 
-ScanReady is a free, stateless web tool that helps expats job-hunting in Germany turn a US/UK résumé into a norm-correct German **Lebenslauf** and generate an authentic-voice German **Anschreiben** (cover letter), grounded strictly in their real CV facts and their own answers. It's a tight-scope learning side project, dogfooded on the owner's own live applications.
+ScanReady is a free, stateless web tool that helps internationals job-hunting in Germany turn their foreign résumé into a norm-correct German **Lebenslauf** and generate an authentic-voice German **Anschreiben** (cover letter), grounded strictly in their real CV facts and their own answers. It's a tight-scope learning side project, dogfooded on the owner's own live applications.
 
 ## Core Value
 
@@ -10,7 +10,7 @@ The German output is native-quality and trustworthy — norm-correct and never f
 
 ## Business Context
 
-- **Customer**: Expats applying for jobs in Germany (English-speaking, often on the Chancenkarte / Opportunity Card). Later B2B: university career services, relocation firms.
+- **Customer**: Internationals applying for jobs in Germany — anyone who didn't grow up writing German applications. Primary *addressable* market is the full international inflow (non-EU skilled migrants on the Chancenkarte/Blue Card — India/Turkey/China-led — plus international grads of German universities and US/UK expats). **Launch go-to-market motion** stays on the *reachable* cohort: US/UK expats (founder dogfoods; his story is the build-in-public content) + intl uni grads. Landing copy is nationality-neutral so the larger inflow converts via SEO. Later B2B: university career services, relocation firms. *(Re-opened 2026-06-23 — Phase 4 discussion + research; was "US/UK English-speaking expats".)*
 - **Revenue model**: Free MVP now; later a finish-line one-shot paywall (€19–29/application, €39–49 bundle) once output quality + demand are proven; B2B channel later.
 - **Success metric**: Do strangers complete the flow and want the output (start → copy/download rate)? Revenue is a later test, not the v1 metric.
 - **Strategy notes**: `BUILD_PLAN.md`, `cv-germany-expat-concept.md`, `necessity-tools-strategy.md`, `low-barrier-tools-strategy.md`.
@@ -74,6 +74,8 @@ The German output is native-quality and trustworthy — norm-correct and never f
 | Build the CV-for-Germany "relief" tool over the "dream-engine" ideas | High intent, low legal risk, real localization moat + B2B channel | — Pending |
 | Bilingual output (German docs + English explanation of changes) | Expat trusts/learns from output; differentiation | — Pending |
 | B2C-first beachhead (Chancenkarte / expat communities, founder-led) | Fastest feedback, no gatekeepers; B2B deferred to protect focus | — Pending |
+| Re-open customer → "internationals applying for jobs in Germany" (neutral copy); broaden *messaging*, keep *launch* motion on reachable cohort (US/UK + uni grads) | US/UK are a minority of the actual inflow; the norm-gap + authenticity pain is non-native-universal; broadening is messaging-only (zero backend change) — but a solo founder can't build-in-public into India/Turkey communities, so don't pivot the GTM there | — Pending (Phase 4) |
+| Dual-angle positioning under the "8-second scan" frame: authentic/grounded voice + norm-correct localization | Sells the whole product, not half; authentic angle ships as quality/voice, never detection-evasion; no outcome/income claims | — Pending (Phase 4) |
 | Keep "ScanReady" as placeholder name | Don't let naming block the build; revisit pre-launch | — Pending |
 | Distribution: founder-led/build-in-public → SEO → paid LAST (as a test) | Zero budget; €50–100 paid is a conversion test, not a channel | — Pending |
 | Grounding via prompt + Zod schema, not a flag | Fabrication = fraud/liability; enforce structurally | ✓ Good |
@@ -98,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 5. Update Context with current state
 
 ---
-*Last updated: 2026-06-22 after initialization*
+*Last updated: 2026-06-23 — Phase 4 discussion re-opened the target customer (broadened to "internationals applying for jobs in Germany", nationality-neutral messaging) + locked dual-angle positioning. Messaging-only; no backend change.*
