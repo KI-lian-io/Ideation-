@@ -616,7 +616,11 @@ function CoverLetterInputView({
   onSubmit: () => void
   onBack: () => void
 }) {
-  const canSubmit = jobPosting.trim().length > 0
+  const POSTING_LIMIT = 15_000
+  const ANSWER_LIMIT = 2_000
+  const postingOverLimit = jobPosting.length > POSTING_LIMIT
+  const anyAnswerOverLimit = answers.some((a) => a.answer.length > ANSWER_LIMIT)
+  const canSubmit = jobPosting.trim().length > 0 && !postingOverLimit && !anyAnswerOverLimit
 
   return (
     <div className="flex flex-col gap-6">
@@ -642,6 +646,10 @@ function CoverLetterInputView({
           className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
           aria-label="Job posting"
         />
+        <p className={`text-xs text-right ${postingOverLimit ? 'text-red-500' : 'text-zinc-400 dark:text-zinc-500'}`}>
+          {jobPosting.length.toLocaleString('de-DE')} / 15.000
+          {postingOverLimit && ' — Text zu lang'}
+        </p>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -658,6 +666,10 @@ function CoverLetterInputView({
               className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
               aria-label={`Answer to question ${i + 1}`}
             />
+            <p className={`text-xs text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-zinc-400 dark:text-zinc-500'}`}>
+              {a.answer.length.toLocaleString('de-DE')} / 2.000
+              {a.answer.length > ANSWER_LIMIT && ' — Antwort zu lang'}
+            </p>
           </div>
         ))}
       </div>
