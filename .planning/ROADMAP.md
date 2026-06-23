@@ -116,7 +116,20 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The app is publicly reachable on a Vercel URL with `ANTHROPIC_API_KEY` and PostHog key configured in the production environment
   4. The cover-letter stream completes end-to-end on Vercel without hitting the function time limit — `maxDuration` declared in `vercel.json` and Vercel plan tier confirmed
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Brand foundation (Lora serif, deep-blue accent, light-only, metadata) + D-01 route split (tool → /app) + tool UI retrofit & WCAG-AA pass (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 — needs tokens + freed / route)*
+
+- [ ] 04-02-PLAN.md — Marketing landing at / : 6-section blueprint, static before/after mockups, scroll micro-motion, OG card, copy-guardrail + WCAG-AA sweep (Wave 2)
+
+**Wave 3** *(blocked on Wave 2 — deploys the whole app)*
+
+- [ ] 04-03-PLAN.md — Vercel deploy: vercel.json + maxDuration 300, ANTHROPIC_API_KEY in prod, Node 20.x, live SC4 stream-duration measurement + documented fallback (Wave 3)
+
 **UI hint**: yes
 
 ### Phase 5: Distribution Operationalization
@@ -154,6 +167,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
-| 4. Design Pass + Vercel Deploy | 0/TBD | Not started | - |
+| 4. Design Pass + Vercel Deploy | 0/3 | Not started | - |
 | 5. Distribution Operationalization | 0/TBD | Not started | - |
 | 6. Analytics (post-launch) | 0/TBD | Not started | - |
