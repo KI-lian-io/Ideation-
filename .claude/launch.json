@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "scanready",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd scanready && exec npm run dev"],
+      "port": 3000
+    }
+  ]
+}
