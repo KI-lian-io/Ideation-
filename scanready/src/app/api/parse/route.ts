@@ -15,7 +15,14 @@ export async function POST(req: NextRequest) {
   try {
     const { resumeText } = await req.json();
     if (!resumeText || typeof resumeText !== "string") {
-      return NextResponse.json({ error: "resumeText is required" }, { status: 400 });
+      return NextResponse.json({ error: "Lebenslauf-Text ist erforderlich." }, { status: 400 });
+    }
+    const RESUME_LIMIT = 30_000;
+    if (resumeText.length > RESUME_LIMIT) {
+      return NextResponse.json(
+        { error: "Der Text ist zu lang (max. 30.000 Zeichen)." },
+        { status: 400 }
+      );
     }
 
     const response = await anthropic.messages.parse({
