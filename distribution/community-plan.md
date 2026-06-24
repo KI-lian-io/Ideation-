@@ -3,7 +3,7 @@
 **Owner:** Kilian Hartmann  
 **Last updated:** 2026-06-24  
 **Requirement:** GTM-01  
-**Status:** Ready for founder review (Task 3 checkpoint pending)
+**Status:** Founder-reviewed and approved 2026-06-24. Before any post goes live, the founder must still (a) verify each target subreddit's live rules and (b) decide the Post 3 PII-redaction question — see Section 6.
 
 ---
 
