@@ -144,7 +144,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. An SEO keyword list exists covering expat-EN long-tail and emerging German "KI" terms, with a 6-month publishing cadence and the Sept–Oct application peak flagged as the stretch goal
   3. A paid conversion-test spec exists: one specific keyword, a defined success metric, and a hard budget cap — with an explicit "only after organic validation" gate documented
 
-**Plans**: TBD
+**Plans**: 3/3 planned
+
+**Wave 1** *(all three artifacts are independent — fully parallelizable)*
+
+- [ ] 05-01-PLAN.md — GTM-01 community plan: Reddit-led build-in-public, subreddit shortlist + risk tiers, ~1-post/week cadence, 3 drafted posts, per-sub rule-verification checklist (Wave 1)
+- [ ] 05-02-PLAN.md — GTM-02 SEO keyword plan: EN + DE clusters ("German CV" head term), 2 cornerstone guides, 6-month cadence with Sept–Oct stretch goal + Keyword-Planner validation step (Wave 1)
+- [ ] 05-03-PLAN.md — GTM-03 paid-test spec: one Google Search keyword, cost-per-completed-flow metric, €100 cap, organic-proof gate (N≈50), Phase-6 analytics dependency flagged BLOCKED (Wave 1)
 
 ### Phase 6: Analytics (post-launch)
 
@@ -168,5 +174,5 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
-| 5. Distribution Operationalization | 0/TBD | Not started | - |
+| 5. Distribution Operationalization | 0/3 | Not started | - |
 | 6. Analytics (post-launch) | 0/TBD | Not started | - |
