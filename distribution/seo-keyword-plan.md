@@ -162,3 +162,115 @@ The title phrase "doesn't sound like every other AI letter" refers to **personal
 - Zero-retention stated.
 
 ---
+
+## Keyword Validation Step (D-08 Mandate — Do Before Publishing)
+
+> **All keyword volumes in this document are [ASSUMED] estimates.** They are carried from prior research (cv-germany-expat-concept.md, SERP inference from competitor pages). No paid keyword tool was used during research. Before publishing either cornerstone guide, the founder must verify the top terms.
+
+**Action required (Google Ads Keyword Planner — free, no spend needed):**
+
+1. Go to [Google Ads](https://ads.google.com) → Tools → Keyword Planner → "Discover new keywords."
+2. Enter these ~10 terms one batch at a time:
+   - `german cv`
+   - `how to write a german cv`
+   - `cv for germany`
+   - `german resume format`
+   - `german cover letter`
+   - `ki lebenslauf`
+   - `lebenslauf mit ki erstellen`
+   - `ki anschreiben`
+   - `german cv converter`
+   - `lebenslauf in english`
+3. Set location to Germany + United Kingdom + United States (to capture all three searcher cohorts). Language: German + English.
+4. Record the actual average monthly search volume and competition level for each term.
+5. If "German CV" shows significantly lower volume than "German resume," swap the primary/secondary terms in all content before publishing.
+6. If KI-cluster terms show near-zero volume (<100/mo), deprioritize Cornerstone 2's KI angle and focus on the DIN 5008 / structural angle instead.
+7. Note findings in this file or a separate `distribution/keyword-validation-log.md`.
+
+**This step satisfies the D-08 data-driven mandate and addresses Open Question 2 from the research phase.**
+
+---
+
+## 6-Month Publishing Cadence (D-10)
+
+**Goal:** Front-load the two cornerstone guides immediately so they accumulate indexing time and domain authority before the Sept–Oct application peak. Then publish ~2 long-tail posts/month to build topic cluster depth.
+
+**Sept–Oct Application Peak — STRETCH GOAL, NOT A DEPENDENCY:**
+> Germany has a confirmed secondary hiring peak in Sept–Oct (primary peak is Jan–Feb). The evidence is qualitative and multi-sourced but the exact timing carries **[ASSUMED]** status — no Google Trends data was obtained to verify the precise peak window. Do not make the entire cadence dependent on hitting this window. Cornerstones published now will have 60–90 days to index before the uptick — that is the indexing-window rationale for front-loading. If the Sept–Oct peak does not materialize, the content still earns long-term organic traffic.
+
+### Month-by-Month Cadence
+
+| Month | Content | Channel | Target Keywords | Notes |
+|-------|---------|---------|-----------------|-------|
+| **Month 1** (now, July 2026) | **Cornerstone 1:** "German CV Guide for Expats: What German Recruiters Expect (That US/UK CVs Always Get Wrong)" | SEO blog | german cv, how to write a german cv, cv for germany, german resume format | Publish first — highest search volume, broadest entry point. Complete keyword validation step before publishing. |
+| **Month 1–2** (July–Aug 2026) | **Cornerstone 2:** "How to Write a German Cover Letter (Anschreiben) That Doesn't Sound Like Every Other AI Letter" | SEO blog | german cover letter, anschreiben in english, ki anschreiben | Publish immediately after Cornerstone 1. Both cornerstones must be live before Sept–Oct to maximize indexing window. |
+| **Month 2–3** (Aug–Sept 2026) | **Long-tail 1:** "Chancenkarte CV: How to Apply for Jobs in Germany on an Opportunity Card" | SEO blog | chancenkarte cv, opportunity card germany jobs, chancenkarte lebenslauf | Topical authority for visa-specific angle; Chancenkarte is a 2024 program with growing search interest. Links back to Cornerstone 1. |
+| **Month 3–4** (Sept–Oct 2026) | **Long-tail 2:** "What Is DIN 5008? The German Business Letter Format Explained for Internationals" | SEO blog | din 5008 english, din 5008 cover letter, german business letter format | Supports Cornerstone 2; DIN 5008 is a confirmed real search with results from Wikipedia, university guides, and career sites. Links back to Cornerstone 2. |
+| **Month 4–5** (Oct–Nov 2026) | **Long-tail 3:** "KI Lebenslauf: Can AI Really Help You Apply for Jobs in Germany?" | SEO blog | ki lebenslauf, lebenslauf mit ki erstellen, ki lebenslauf tool | First-mover play for Cluster B. Targets German-language searchers. Framing: honest assessment of AI-assisted applications, not a puff piece. Links back to both cornerstones + tool CTA. |
+| **Month 5–6** (Nov–Dec 2026) | **Long-tail 4:** "German CV Photo: Do You Really Need One? (The AGG Explained)" | SEO blog | german cv photo, lebenslauf foto, foto im lebenslauf | Nuanced photo guidance topic (see guardrail below). High shareability. Links back to Cornerstone 1. |
+
+### Photo / AGG Topic — Guardrail Note (Month 5–6)
+
+The German Equal Treatment Act (Allgemeines Gleichbehandlungsgesetz, AGG) means photos are **optional per law** but **widely expected in practice** by German employers. The article must reflect this nuance:
+
+- State clearly that photos are not legally required under the AGG.
+- State clearly that German recruiter convention still expects them in most industries.
+- Never mandate a photo. Present the tradeoffs and let the applicant decide.
+- ScanReady's `photoAdvice` output in the Lebenslauf schema already surfaces this nuance — the article reinforces it.
+
+This is not a legal grey area to exploit for clicks; it is a real norm-gap that confuses internationals and is genuinely helpful to explain.
+
+---
+
+## Content Requirements (All Pages)
+
+Every page in this SEO plan must meet all of the following before publishing:
+
+**Linking:**
+- [ ] Ends with a CTA linking to `/` (landing) or `/app` (tool) — specific anchor text that describes the action (e.g., "Convert my CV to a German Lebenslauf").
+- [ ] Links back to at least one cornerstone guide (for long-tail posts).
+- [ ] Internal links are natural — not forced keyword stuffing.
+
+**Guardrails (non-negotiable):**
+- [ ] No income or outcome claims. Do not write "get the job," "land interviews," "boost your chances" in a way that promises a result. State capability: "ScanReady converts your CV into a norm-correct Lebenslauf and writes your Anschreiben."
+- [ ] "Authentic" / AI framing = personalization quality only. Never imply or state that ScanReady makes output "undetectable by AI checkers," "passes ATS scanners," or "avoids AI filters." Any such framing is product misrepresentation and must be rejected.
+- [ ] Nationality-neutral. The tool works for any non-German-speaking international. "US/UK" examples are illustrative, not exclusive.
+- [ ] Zero-retention stated at least once per page (a trust signal, not boilerplate). Example: "ScanReady processes your CV in-session — nothing is stored or used for training."
+- [ ] Native-quality German nudge: at least one mention that the output should be reviewed by a native speaker before submission (especially in Cornerstone 2 and Long-tail 3).
+- [ ] Grounded generation: never imply the tool adds, enhances, or creates experience that wasn't in the original CV. The tool converts and formats; it never fabricates.
+
+---
+
+## Linking Map
+
+Every piece of content links to the live tool:
+
+```
+Cornerstone 1 (German CV Guide)  ──┐
+                                   ├── → /app (ScanReady tool)
+Cornerstone 2 (Anschreiben Guide) ─┘
+       ↑                ↑
+Long-tail 1          Long-tail 2
+(Chancenkarte)       (DIN 5008)
+       ↑                ↑
+Long-tail 3          Long-tail 4
+(KI Lebenslauf)      (CV Photo/AGG)
+```
+
+All long-tail posts link back to at least one cornerstone, and both cornerstones link directly to `/app`. No orphan content.
+
+---
+
+## Relationship to Other GTM Artifacts
+
+| This plan | Coordinates with |
+|-----------|-----------------|
+| Keyword clusters (Cluster A) | `community-plan.md` — the "8-second scan" explainer post (D-05 Post 1) mirrors Cornerstone 1's positioning; reuse framing |
+| Cornerstone 2's "authentic voice" differentiator | `paid-test-spec.md` — paid ad copy must use the same capability framing, not outcome claims |
+| Cadence timing | Phase-6 analytics (`posthog-js` PostHog funnel events) must be live before GTM-03 paid test runs |
+
+---
+
+*Last updated: 2026-06-24*
+*Research basis: 05-RESEARCH.md §GTM-02 (keyword clusters, vocabulary finding, KI terms, seasonality evidence, cornerstone topics)*
+*Decisions implemented: D-07, D-08, D-09, D-10*
