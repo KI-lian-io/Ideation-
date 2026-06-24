@@ -54,9 +54,9 @@
 
 ### Distribution (GTM)
 
-- [ ] **GTM-01**: A build-in-public / community plan exists — founder job-search story leads, Reddit (r/germany, r/expats) + LinkedIn cadence
-- [ ] **GTM-02**: An SEO keyword list + publishing cadence exists — expat-EN long-tail + emerging German "KI" terms, treated as a 6-month horizon
-- [ ] **GTM-03**: A paid conversion-test spec exists — specific keyword, success metric, and budget cap — to run only after organic validation (test, not a channel)
+- [x] **GTM-01**: A build-in-public / community plan exists — founder job-search story leads, Reddit (r/germany, r/expats) + LinkedIn cadence
+- [x] **GTM-02**: An SEO keyword list + publishing cadence exists — expat-EN long-tail + emerging German "KI" terms, treated as a 6-month horizon
+- [x] **GTM-03**: A paid conversion-test spec exists — specific keyword, success metric, and budget cap — to run only after organic validation (test, not a channel)
 
 ## v2 Requirements
 
@@ -122,9 +122,9 @@ Each v1 requirement maps to exactly one phase.
 | OPS-03 | Phase 4 | Complete |
 | UI-01 | Phase 4 | Complete |
 | UI-02 | Phase 4 | Complete |
-| GTM-01 | Phase 5 | Pending |
-| GTM-02 | Phase 5 | Pending |
-| GTM-03 | Phase 5 | Pending |
+| GTM-01 | Phase 5 | Complete |
+| GTM-02 | Phase 5 | Complete |
+| GTM-03 | Phase 5 | Complete |
 | TRUST-02 | Phase 6 | Pending |
 | OPS-01 | Phase 6 | Pending |
 
