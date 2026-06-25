@@ -6,6 +6,7 @@ import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS } from '@/lib/prompts'
+import { btnClass, CARD } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -403,7 +404,7 @@ function InputView({
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="self-end rounded-lg bg-ink px-6 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+        className={`${btnClass('primary')} self-end`}
       >
         Convert to Lebenslauf
       </button>
@@ -476,14 +477,14 @@ function ResultView({
           <button
             onClick={handleCopy}
             aria-label="Lebenslauf in Zwischenablage kopieren"
-            className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
+            className={btnClass('primary')}
           >
             {copyState === 'copied' ? 'Kopiert ✓' : 'Lebenslauf kopieren'}
           </button>
           {/* Start over — D-16 */}
           <button
             onClick={onReset}
-            className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+            className={`${btnClass('secondary')} shrink-0`}
           >
             Start over / paste a new CV
           </button>
@@ -519,7 +520,7 @@ function ResultView({
         </p>
         <button
           onClick={onStartCoverLetter}
-          className="rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
+          className={btnClass('primary')}
         >
           Write Anschreiben →
         </button>
@@ -548,7 +549,7 @@ function ErrorView({
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+        className={`${btnClass('primary')} self-start`}
       >
         Try again
       </button>
@@ -589,7 +590,7 @@ function JunkView({
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+        className={`${btnClass('primary')} self-start`}
       >
         Try again
       </button>
@@ -686,13 +687,13 @@ function CoverLetterInputView({
         <button
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="rounded-lg bg-ink px-6 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+          className={btnClass('primary')}
         >
           Anschreiben schreiben
         </button>
         <button
           onClick={onBack}
-          className="rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+          className={btnClass('secondary')}
         >
           Back to Lebenslauf
         </button>
@@ -807,7 +808,7 @@ function CoverLetterResultView({
         <button
           onClick={handleCopy}
           aria-label="Anschreiben in Zwischenablage kopieren"
-          className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
+          className={btnClass('primary')}
         >
           {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
         </button>
@@ -816,7 +817,7 @@ function CoverLetterResultView({
         <button
           onClick={handleDownload}
           aria-label="Anschreiben als .txt herunterladen"
-          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+          className={`${btnClass('secondary')} shrink-0`}
         >
           .txt herunterladen
         </button>
@@ -825,7 +826,7 @@ function CoverLetterResultView({
         <button
           onClick={onRegenerate}
           aria-label="Anschreiben neu generieren"
-          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+          className={`${btnClass('secondary')} shrink-0`}
         >
           Regenerieren
         </button>
@@ -834,7 +835,7 @@ function CoverLetterResultView({
         <button
           onClick={onReset}
           aria-label="Zurücksetzen und neues Lebenslauf einfügen"
-          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+          className={`${btnClass('secondary')} shrink-0`}
         >
           Start over
         </button>
@@ -986,7 +987,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col flex-1 items-center bg-paper font-sans px-4 py-8 sm:py-12">
-      <main aria-label="ScanReady tool" className="w-full max-w-3xl flex-col rounded-[14px] border border-hair bg-card px-6 py-10 sm:px-12 sm:py-12">
+      <main aria-label="ScanReady tool" className={`w-full max-w-3xl flex-col ${CARD} px-6 py-10 sm:px-12 sm:py-12`}>
         {state.phase === 'input' && (
           <InputView
             resumeText={state.resumeText}

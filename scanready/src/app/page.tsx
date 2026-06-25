@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { Btn, CARD } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "ScanReady — Win the 8-Second German Recruiter Scan",
@@ -64,12 +65,9 @@ function CtaLink({
   className?: string;
 }) {
   return (
-    <a
-      href={href}
-      className={`inline-block rounded-lg bg-ink px-8 py-3 text-sm font-semibold text-white active:scale-[0.97] transition-[transform,background-color] duration-150 focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2 ${className}`}
-    >
+    <Btn as="a" href={href} size="lg" className={className}>
       {children}
-    </a>
+    </Btn>
   );
 }
 
@@ -98,12 +96,9 @@ export default function HomePage() {
               DE
             </span>
           </a>
-          <a
-            href="/app"
-            className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white active:scale-[0.97] transition-[transform,background-color] duration-150 focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
-          >
+          <Btn as="a" href="/app">
             Try it free
-          </a>
+          </Btn>
         </div>
       </nav>
 
@@ -159,7 +154,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* LEFT: Authentic voice */}
-              <div className="rounded-[14px] border border-hair bg-card px-6 py-8">
+              <div className={`${CARD} px-6 py-8`}>
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-4">
                   Authentic voice
                 </p>
@@ -201,7 +196,7 @@ export default function HomePage() {
               </div>
 
               {/* RIGHT: German-norm format */}
-              <div className="rounded-[14px] border border-hair bg-card px-6 py-8">
+              <div className={`${CARD} px-6 py-8`}>
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-4">
                   German-norm format
                 </p>
@@ -413,7 +408,7 @@ export default function HomePage() {
             {/* Full before/after founder mockup */}
             {/* REPLACE WITH REAL CONTENT when founder's real CV excerpt is available */}
             <div
-              className="rounded-[14px] border border-hair bg-card overflow-hidden mx-auto max-w-2xl text-left"
+              className={`${CARD} overflow-hidden mx-auto max-w-2xl text-left`}
               role="img"
               aria-label="Before and after comparison: original English-format résumé section on the left, converted to a norm-correct German Lebenslauf on the right, with English norm-gap annotation notes visible below the German output"
             >
