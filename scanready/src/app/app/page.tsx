@@ -6,7 +6,7 @@ import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS } from '@/lib/prompts'
-import { btnClass, CARD } from '@/components/ui'
+import { btnClass, CARD, EYEBROW } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -469,7 +469,7 @@ function ResultView({
     <div className="flex flex-col gap-6">
       {/* Header: label + action buttons */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">
+        <p className={EYEBROW}>
           Lebenslauf
         </p>
         <div className="flex items-center gap-2 flex-wrap">
@@ -705,7 +705,7 @@ function CoverLetterInputView({
 function CoverLetterStreamingView({ letterText }: { letterText: string }) {
   return (
     <div className="flex flex-col gap-4" role="status" aria-label="Generating Anschreiben">
-      <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">Anschreiben</p>
+      <p className={EYEBROW}>Anschreiben</p>
       {letterText ? (
         // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
         <pre className="whitespace-pre-wrap font-sans text-sm text-ink leading-relaxed">
@@ -764,7 +764,7 @@ function CoverLetterResultView({
   return (
     <div className="flex flex-col gap-6">
       {/* Header: section label */}
-      <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">Anschreiben</p>
+      <p className={EYEBROW}>Anschreiben</p>
 
       {/* One-shot click-to-edit hint — hidden after first interaction */}
       {showEditHint && (
@@ -789,7 +789,7 @@ function CoverLetterResultView({
       {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
       <div className="rounded-lg border border-hair bg-paper px-4 py-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-1">Hinweis</p>
+        <p className={`${EYEBROW} mb-1`}>Hinweis</p>
         <p className="text-sm text-muted">
           Bitte lassen Sie dieses Anschreiben von einem Muttersprachler prüfen, bevor Sie es absenden.
         </p>

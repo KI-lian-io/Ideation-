@@ -8,10 +8,9 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
  *            <button> when you don't need polymorphism (most of the tool).
  * Btn   — polymorphic button/link built on btnClass. Discriminated `as` union keeps
  *         href/onClick from crossing. Use for the landing <a> CTAs.
- * CARD  — class const for the card surface (no component: few sites, all bespoke padding).
- *
- * Deliberately NOT abstracted: the eyebrow label and inset surface are one-line class
- * strings used inline — a component would be pure churn for no real depth. // ponytail
+ * CARD    — class const for the card surface (few sites, all bespoke padding).
+ * EYEBROW — class const for the mono taupe label. A const, not a component: a one-line
+ *           label as a component would be a shallow module. // ponytail
  */
 
 type Variant = 'primary' | 'secondary'
@@ -66,3 +65,4 @@ export function Btn(props: BtnProps) {
 }
 
 export const CARD = 'rounded-[14px] border border-hair bg-card'
+export const EYEBROW = 'font-mono text-xs uppercase tracking-[0.18em] text-eyebrow'

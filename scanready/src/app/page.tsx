@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { Btn, CARD } from "@/components/ui";
+import { Btn, CARD, EYEBROW } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "ScanReady — Win the 8-Second German Recruiter Scan",
@@ -109,7 +109,7 @@ export default function HomePage() {
           aria-labelledby={SECTION_IDS.hero}
         >
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-6">
+            <p className={`${EYEBROW} mb-6`}>
               For internationals applying in Germany
             </p>
 
@@ -155,7 +155,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* LEFT: Authentic voice */}
               <div className={`${CARD} px-6 py-8`}>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-4">
+                <p className={`${EYEBROW} mb-4`}>
                   Authentic voice
                 </p>
                 <h3 className="text-3xl font-semibold text-ink mb-3 leading-snug">
@@ -174,7 +174,7 @@ export default function HomePage() {
                   role="img"
                   aria-label="Before and after: generic filler sentence replaced by grounded, specific language drawn from the applicant's own answers"
                 >
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-2">
+                  <p className={`${EYEBROW} mb-2`}>
                     Before
                   </p>
                   <p
@@ -184,7 +184,7 @@ export default function HomePage() {
                     &ldquo;I am a results-driven professional with strong
                     communication skills…&rdquo;
                   </p>
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-2">
+                  <p className={`${EYEBROW} mb-2`}>
                     After
                   </p>
                   <p className="text-sm text-ink">
@@ -197,7 +197,7 @@ export default function HomePage() {
 
               {/* RIGHT: German-norm format */}
               <div className={`${CARD} px-6 py-8`}>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-4">
+                <p className={`${EYEBROW} mb-4`}>
                   German-norm format
                 </p>
                 <h3 className="text-3xl font-semibold text-ink mb-3 leading-snug">
@@ -267,7 +267,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-3">
+                <p className={`${EYEBROW} mb-3`}>
                   Step 1
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
@@ -280,7 +280,7 @@ export default function HomePage() {
               </div>
 
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-3">
+                <p className={`${EYEBROW} mb-3`}>
                   Step 2
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
@@ -294,7 +294,7 @@ export default function HomePage() {
               </div>
 
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-3">
+                <p className={`${EYEBROW} mb-3`}>
                   Step 3
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
@@ -400,7 +400,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <p
               id={SECTION_IDS.proof}
-              className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-4"
+              className={`${EYEBROW} mb-4`}
             >
               Real output — the founder&rsquo;s own application
             </p>
@@ -414,7 +414,7 @@ export default function HomePage() {
             >
               {/* Before panel */}
               <div className="border-b border-hair px-6 py-5">
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-3">
+                <p className={`${EYEBROW} mb-3`}>
                   Original CV (English)
                 </p>
                 <p className="text-sm text-muted italic leading-relaxed">
@@ -428,7 +428,7 @@ export default function HomePage() {
 
               {/* After panel */}
               <div className="px-6 py-5">
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-3">
+                <p className={`${EYEBROW} mb-3`}>
                   Lebenslauf Output (German)
                 </p>
                 <p className="text-sm text-ink leading-relaxed mb-3">

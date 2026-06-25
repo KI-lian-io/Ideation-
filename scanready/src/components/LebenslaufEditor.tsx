@@ -4,6 +4,7 @@ import { EditableField } from '@/components/EditableField'
 import { SkillChips, LanguageLevelSelect } from '@/components/SkillChips'
 import { softFormatDate } from '@/lib/lebenslauf-utils'
 import type { Lebenslauf } from '@/lib/schema'
+import { EYEBROW } from '@/components/ui'
 
 /**
  * LebenslaufAction union — all edit/add/remove/reorder actions for the WYSIWYG
@@ -134,7 +135,7 @@ function PersonalSection({
           The tool does NOT accept, upload, or process photos (zero-retention / T-01-11). */}
       {photoAdvice && (
         <div className="mt-4 rounded-lg border border-hair bg-paper px-4 py-3">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-1">
+          <p className={`${EYEBROW} mb-1`}>
             Foto (optional)
           </p>
           {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
@@ -474,7 +475,7 @@ export function LebenslaufEditor({
           <section key={key}>
             {/* Section header with always-visible reorder buttons (D-12) */}
             <div className="flex items-center gap-2 mb-2">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow flex-1">
+              <p className={`${EYEBROW} flex-1`}>
                 {label}
               </p>
               {/* Section ↑/↓ are always visible — deliberate navigation action */}

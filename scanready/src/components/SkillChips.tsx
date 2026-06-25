@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { EditableField } from '@/components/EditableField'
 import type { SkillCategory } from '@/lib/schema'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
+import { EYEBROW } from '@/components/ui'
 
 /**
  * German CV language-level vocabulary (D-10).
@@ -62,14 +63,14 @@ function CategoryChips({
     <div className="flex flex-col gap-2">
       {/* Category heading row */}
       <div className="flex items-center gap-2 mt-4">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow flex-1 mb-1">
+        <p className={`${EYEBROW} flex-1 mb-1`}>
           <EditableField
             value={cat.category}
             placeholder="+ Kategoriename"
             onSave={(v) =>
               dispatch({ type: 'UPDATE_SKILL_CATEGORY_NAME', catIndex, value: v })
             }
-            className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow"
+            className={EYEBROW}
           />
         </p>
 
