@@ -80,7 +80,7 @@ export function EditableField({
         }
       },
       // Bottom-border only signals edit mode (UI-SPEC active state)
-      className: `border-b border-blue-400 outline-none bg-transparent w-full ${monoClass} ${className ?? ''}`.trim(),
+      className: `border-b border-ink outline-none bg-transparent w-full ${monoClass} ${className ?? ''}`.trim(),
     }
     return multiline ? (
       <textarea {...sharedProps} rows={3} />
@@ -92,7 +92,7 @@ export function EditableField({
   return (
     <span
       // hover:bg-blue-50 is the only other blue usage — reserved per UI-SPEC
-      className={`cursor-pointer hover:bg-blue-50 rounded px-1 ${monoClass} ${className ?? ''}`.trim()}
+      className={`cursor-pointer hover:bg-faint rounded px-1 ${monoClass} ${className ?? ''}`.trim()}
       onClick={() => {
         setDraft(value ?? '')
         setEditing(true)
@@ -102,7 +102,7 @@ export function EditableField({
         value
       ) : (
         // Fillable blank — muted italic prompt (D-08)
-        <span className="text-zinc-400 italic">{placeholder}</span>
+        <span className="text-muted italic">{placeholder}</span>
       )}
     </span>
   )

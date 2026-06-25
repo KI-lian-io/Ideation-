@@ -92,7 +92,7 @@ function PersonalSection({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl font-semibold text-zinc-900">
+      <div className="text-2xl font-semibold text-ink">
         <EditableField
           value={personal.fullName}
           placeholder="+ Vorname, Nachname"
@@ -100,7 +100,7 @@ function PersonalSection({
           className="text-2xl font-semibold"
         />
       </div>
-      <div className="flex flex-col gap-1 text-sm text-zinc-600">
+      <div className="flex flex-col gap-1 text-sm text-muted">
         <EditableField
           value={personal.address}
           placeholder="+ Adresse"
@@ -133,12 +133,12 @@ function PersonalSection({
           Framed as legally optional under the AGG; user's choice; never mandated.
           The tool does NOT accept, upload, or process photos (zero-retention / T-01-11). */}
       {photoAdvice && (
-        <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">
+        <div className="mt-4 rounded-lg border border-hair bg-paper px-4 py-3">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-1">
             Foto (optional)
           </p>
           {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
-          <p className="text-sm text-zinc-600">{photoAdvice}</p>
+          <p className="text-sm text-muted">{photoAdvice}</p>
         </div>
       )}
     </div>
@@ -155,14 +155,14 @@ function ExperienceSection({
   return (
     <div className="flex flex-col gap-4">
       {experience.map((exp, i) => (
-        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4">
+        <div key={i} className="group relative rounded-lg border border-hair bg-card p-4">
           {/* On-hover controls: remove + reorder */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EXPERIENCE', from: i, to: i - 1 })}
               disabled={i === 0}
               aria-label="Eintrag nach oben"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-700 text-sm px-2 py-1 disabled:opacity-30"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↑
             </button>
@@ -170,14 +170,14 @@ function ExperienceSection({
               onClick={() => i < experience.length - 1 && dispatch({ type: 'REORDER_EXPERIENCE', from: i, to: i + 1 })}
               disabled={i === experience.length - 1}
               aria-label="Eintrag nach unten"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-700 text-sm px-2 py-1 disabled:opacity-30"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↓
             </button>
             <button
               onClick={() => dispatch({ type: 'REMOVE_EXPERIENCE', index: i })}
               aria-label="Eintrag entfernen"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-red-600 text-sm px-2 py-1"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-sm px-2 py-1"
             >
               ×
             </button>
@@ -185,7 +185,7 @@ function ExperienceSection({
 
           <div className="flex flex-col gap-2">
             {/* Role */}
-            <div className="font-semibold text-zinc-900">
+            <div className="font-semibold text-ink">
               <EditableField
                 value={exp.role}
                 placeholder="+ Berufsbezeichnung"
@@ -194,7 +194,7 @@ function ExperienceSection({
               />
             </div>
             {/* Company + location */}
-            <div className="flex flex-wrap gap-2 text-sm text-zinc-600">
+            <div className="flex flex-wrap gap-2 text-sm text-muted">
               <EditableField
                 value={exp.company}
                 placeholder="+ Unternehmen"
@@ -207,14 +207,14 @@ function ExperienceSection({
               />
             </div>
             {/* Dates */}
-            <div className="flex gap-2 text-sm text-zinc-500">
+            <div className="flex gap-2 text-sm text-muted">
               <EditableField
                 value={exp.start}
                 placeholder="+ Datum"
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'start', value: v })}
                 onBlurFormat={softFormatDate}
               />
-              <span className="text-zinc-400">–</span>
+              <span className="text-muted">–</span>
               <EditableField
                 value={exp.end}
                 placeholder="+ Datum"
@@ -226,7 +226,7 @@ function ExperienceSection({
             <div className="flex flex-col gap-1 mt-1">
               {exp.bullets.map((bullet, bi) => (
                 <div key={bi} className="group/bullet flex items-start gap-1">
-                  <span className="text-zinc-400 mt-0.5 text-sm select-none">–</span>
+                  <span className="text-muted mt-0.5 text-sm select-none">–</span>
                   <div className="flex-1">
                     <EditableField
                       value={bullet}
@@ -239,7 +239,7 @@ function ExperienceSection({
                   <button
                     onClick={() => dispatch({ type: 'REMOVE_BULLET', expIndex: i, bulletIndex: bi })}
                     aria-label="Eintrag entfernen"
-                    className="opacity-0 group-hover/bullet:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-red-600 text-xs px-1"
+                    className="opacity-0 group-hover/bullet:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
                   >
                     ×
                   </button>
@@ -247,7 +247,7 @@ function ExperienceSection({
               ))}
               <button
                 onClick={() => dispatch({ type: 'ADD_BULLET', expIndex: i })}
-                className="self-start text-sm text-zinc-400 hover:text-zinc-600 cursor-pointer mt-1"
+                className="self-start text-sm text-muted hover:text-ink cursor-pointer mt-1"
               >
                 + Aufgabe hinzufügen
               </button>
@@ -259,7 +259,7 @@ function ExperienceSection({
       {/* Add experience entry */}
       <button
         onClick={() => dispatch({ type: 'ADD_EXPERIENCE' })}
-        className="self-start text-sm text-zinc-400 hover:text-zinc-600 cursor-pointer"
+        className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
         + Berufserfahrung hinzufügen
       </button>
@@ -277,14 +277,14 @@ function EducationSection({
   return (
     <div className="flex flex-col gap-4">
       {education.map((edu, i) => (
-        <div key={i} className="group relative rounded-lg border border-zinc-100 bg-zinc-50 p-4">
+        <div key={i} className="group relative rounded-lg border border-hair bg-card p-4">
           {/* On-hover controls */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EDUCATION', from: i, to: i - 1 })}
               disabled={i === 0}
               aria-label="Eintrag nach oben"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-700 text-sm px-2 py-1 disabled:opacity-30"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↑
             </button>
@@ -292,21 +292,21 @@ function EducationSection({
               onClick={() => i < education.length - 1 && dispatch({ type: 'REORDER_EDUCATION', from: i, to: i + 1 })}
               disabled={i === education.length - 1}
               aria-label="Eintrag nach unten"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-700 text-sm px-2 py-1 disabled:opacity-30"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↓
             </button>
             <button
               onClick={() => dispatch({ type: 'REMOVE_EDUCATION', index: i })}
               aria-label="Eintrag entfernen"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-red-600 text-sm px-2 py-1"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-sm px-2 py-1"
             >
               ×
             </button>
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="font-semibold text-zinc-900">
+            <div className="font-semibold text-ink">
               <EditableField
                 value={edu.qualification}
                 placeholder="+ Abschluss"
@@ -314,7 +314,7 @@ function EducationSection({
                 className="font-semibold"
               />
             </div>
-            <div className="flex flex-wrap gap-2 text-sm text-zinc-600">
+            <div className="flex flex-wrap gap-2 text-sm text-muted">
               <EditableField
                 value={edu.institution}
                 placeholder="+ Bildungseinrichtung"
@@ -326,14 +326,14 @@ function EducationSection({
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'location', value: v })}
               />
             </div>
-            <div className="flex gap-2 text-sm text-zinc-500">
+            <div className="flex gap-2 text-sm text-muted">
               <EditableField
                 value={edu.start}
                 placeholder="+ Datum"
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'start', value: v })}
                 onBlurFormat={softFormatDate}
               />
-              <span className="text-zinc-400">–</span>
+              <span className="text-muted">–</span>
               <EditableField
                 value={edu.end}
                 placeholder="+ Datum"
@@ -347,7 +347,7 @@ function EducationSection({
 
       <button
         onClick={() => dispatch({ type: 'ADD_EDUCATION' })}
-        className="self-start text-sm text-zinc-400 hover:text-zinc-600 cursor-pointer"
+        className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
         + Bildungsabschluss hinzufügen
       </button>
@@ -385,7 +385,7 @@ function LanguagesSection({
             onSave={(v) => dispatch({ type: 'UPDATE_LANGUAGE', index: i, field: 'language', value: v })}
             className="text-sm"
           />
-          <span className="text-zinc-400 text-sm">—</span>
+          <span className="text-muted text-sm">—</span>
           {/* Language level — German-convention dropdown (D-10) */}
           <LanguageLevelSelect
             value={lang.level}
@@ -396,7 +396,7 @@ function LanguagesSection({
           <button
             onClick={() => dispatch({ type: 'REMOVE_LANGUAGE', index: i })}
             aria-label="Eintrag entfernen"
-            className="opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-red-600 text-xs px-1"
+            className="opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
           >
             ×
           </button>
@@ -404,7 +404,7 @@ function LanguagesSection({
       ))}
       <button
         onClick={() => dispatch({ type: 'ADD_LANGUAGE' })}
-        className="self-start text-sm text-zinc-400 hover:text-zinc-600 cursor-pointer"
+        className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
         + Sprache hinzufügen
       </button>
@@ -474,7 +474,7 @@ export function LebenslaufEditor({
           <section key={key}>
             {/* Section header with always-visible reorder buttons (D-12) */}
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 flex-1">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow flex-1">
                 {label}
               </p>
               {/* Section ↑/↓ are always visible — deliberate navigation action */}
@@ -482,7 +482,7 @@ export function LebenslaufEditor({
                 onClick={() => i > 0 && dispatch({ type: 'REORDER_SECTION', from: i, to: i - 1 })}
                 disabled={i === 0}
                 aria-label="Abschnitt nach oben"
-                className="text-xs text-zinc-400 hover:text-zinc-700 px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
+                className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
               >
                 ↑
               </button>
@@ -490,7 +490,7 @@ export function LebenslaufEditor({
                 onClick={() => i < sectionOrder.length - 1 && dispatch({ type: 'REORDER_SECTION', from: i, to: i + 1 })}
                 disabled={i === sectionOrder.length - 1}
                 aria-label="Abschnitt nach unten"
-                className="text-xs text-zinc-400 hover:text-zinc-700 px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
+                className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
               >
                 ↓
               </button>

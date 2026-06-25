@@ -372,17 +372,17 @@ function InputView({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 mb-1">
+        <h1 className="font-serif text-3xl font-semibold text-ink mb-1">
           Convert your CV to a German Lebenslauf
         </h1>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted">
           Paste your US or UK resume below. We will reformat it to a norm-correct German
           tabellarischer Lebenslauf, grounded strictly in your real CV facts.
         </p>
       </div>
 
       {/* Zero-retention reassurance — calm inline line with lock icon (D-14 / INPUT-02) */}
-      <p className="flex items-center gap-2 text-sm text-zinc-500">
+      <p className="flex items-center gap-2 text-sm text-muted">
         <LockIcon />
         Your CV is never stored or used for training — processing is stateless and zero-retention.
       </p>
@@ -392,10 +392,10 @@ function InputView({
         onChange={(e) => onTextChange(e.target.value)}
         placeholder="Paste your resume here — name, contact info, work history, education, skills…"
         rows={18}
-        className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         aria-label="Resume text"
       />
-      <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-zinc-500'}`}>
+      <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
         {resumeText.length.toLocaleString('de-DE')} / 30.000
         {resumeOverLimit && ' — Text zu lang'}
       </p>
@@ -403,7 +403,7 @@ function InputView({
       <button
         onClick={onSubmit}
         disabled={isSubmitDisabled}
-        className="self-end rounded-lg bg-zinc-900 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="self-end rounded-lg bg-ink px-6 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
       >
         Convert to Lebenslauf
       </button>
@@ -416,20 +416,20 @@ function LoadingView() {
     <div className="flex flex-col gap-4" role="status" aria-label="Parsing your CV, please wait">
       <div className="animate-pulse flex flex-col gap-3">
         {/* Skeleton blocks simulating the Lebenslauf layout (D-15 / INPUT-03) */}
-        <div className="h-6 w-1/3 rounded bg-zinc-200" />
-        <div className="h-4 w-1/2 rounded bg-zinc-200" />
-        <div className="h-4 w-2/5 rounded bg-zinc-200" />
+        <div className="h-6 w-1/3 rounded bg-faint" />
+        <div className="h-4 w-1/2 rounded bg-faint" />
+        <div className="h-4 w-2/5 rounded bg-faint" />
 
-        <div className="mt-4 h-5 w-1/4 rounded bg-zinc-200" />
-        <div className="h-4 w-3/4 rounded bg-zinc-200" />
-        <div className="h-4 w-2/3 rounded bg-zinc-200" />
-        <div className="h-4 w-1/2 rounded bg-zinc-200" />
+        <div className="mt-4 h-5 w-1/4 rounded bg-faint" />
+        <div className="h-4 w-3/4 rounded bg-faint" />
+        <div className="h-4 w-2/3 rounded bg-faint" />
+        <div className="h-4 w-1/2 rounded bg-faint" />
 
-        <div className="mt-4 h-5 w-1/4 rounded bg-zinc-200" />
-        <div className="h-4 w-3/5 rounded bg-zinc-200" />
-        <div className="h-4 w-1/2 rounded bg-zinc-200" />
+        <div className="mt-4 h-5 w-1/4 rounded bg-faint" />
+        <div className="h-4 w-3/5 rounded bg-faint" />
+        <div className="h-4 w-1/2 rounded bg-faint" />
       </div>
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted">
         Converting your CV to a German Lebenslauf…
       </p>
     </div>
@@ -468,7 +468,7 @@ function ResultView({
     <div className="flex flex-col gap-6">
       {/* Header: label + action buttons */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">
           Lebenslauf
         </p>
         <div className="flex items-center gap-2 flex-wrap">
@@ -476,14 +476,14 @@ function ResultView({
           <button
             onClick={handleCopy}
             aria-label="Lebenslauf in Zwischenablage kopieren"
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+            className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
           >
             {copyState === 'copied' ? 'Kopiert ✓' : 'Lebenslauf kopieren'}
           </button>
           {/* Start over — D-16 */}
           <button
             onClick={onReset}
-            className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+            className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
           >
             Start over / paste a new CV
           </button>
@@ -509,17 +509,17 @@ function ResultView({
       <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
 
       {/* Cover letter CTA — next step in the flow */}
-      <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-        <p className="text-sm font-semibold text-zinc-900 mb-1">
+      <div className="rounded-lg border border-hair bg-paper p-5">
+        <p className="text-sm font-semibold text-ink mb-1">
           Anschreiben schreiben
         </p>
-        <p className="text-sm text-zinc-500 mb-4">
+        <p className="text-sm text-muted mb-4">
           Generate an authentic German cover letter grounded in your Lebenslauf. You will answer
           3–5 short questions so the letter sounds like you, not generic AI prose.
         </p>
         <button
           onClick={onStartCoverLetter}
-          className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+          className="rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
         >
           Write Anschreiben →
         </button>
@@ -548,7 +548,7 @@ function ErrorView({
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="self-start rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
       >
         Try again
       </button>
@@ -583,13 +583,13 @@ function JunkView({
         onChange={(e) => onTextChange(e.target.value)}
         placeholder="Paste your resume here…"
         rows={12}
-        className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         aria-label="Resume text"
       />
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
-        className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="self-start rounded-lg bg-ink px-5 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
       >
         Try again
       </button>
@@ -625,17 +625,17 @@ function CoverLetterInputView({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 mb-1">
+        <h2 className="font-serif text-3xl font-semibold text-ink mb-1">
           Anschreiben
         </h2>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted">
           Paste the job posting and answer the questions below. The letter is grounded strictly in
           your Lebenslauf facts and your own words.
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-zinc-700">
+        <label className="text-sm font-semibold text-ink">
           Job posting <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -643,30 +643,30 @@ function CoverLetterInputView({
           onChange={(e) => onJobPostingChange(e.target.value)}
           placeholder="Paste the full job posting here…"
           rows={8}
-          className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
           aria-label="Job posting"
         />
-        <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-zinc-500'}`}>
+        <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-muted'}`}>
           {jobPosting.length.toLocaleString('de-DE')} / 15.000
           {postingOverLimit && ' — Text zu lang'}
         </p>
       </div>
 
       <div className="flex flex-col gap-4">
-        <p className="text-sm font-semibold text-zinc-700">
+        <p className="text-sm font-semibold text-ink">
           A few quick questions — so the letter sounds like you, not generic AI prose:
         </p>
         {answers.map((a, i) => (
           <div key={i} className="flex flex-col gap-1">
-            <label className="text-sm text-zinc-600">{a.question}</label>
+            <label className="text-sm text-muted">{a.question}</label>
             <textarea
               value={a.answer}
               onChange={(e) => onAnswerChange(i, e.target.value)}
               rows={2}
-              className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+              className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
               aria-label={`Answer to question ${i + 1}`}
             />
-            <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-zinc-500'}`}>
+            <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
               {a.answer.length.toLocaleString('de-DE')} / 2.000
               {a.answer.length > ANSWER_LIMIT && ' — Antwort zu lang'}
             </p>
@@ -686,13 +686,13 @@ function CoverLetterInputView({
         <button
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="rounded-lg bg-zinc-900 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-lg bg-ink px-6 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         >
           Anschreiben schreiben
         </button>
         <button
           onClick={onBack}
-          className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         >
           Back to Lebenslauf
         </button>
@@ -704,22 +704,22 @@ function CoverLetterInputView({
 function CoverLetterStreamingView({ letterText }: { letterText: string }) {
   return (
     <div className="flex flex-col gap-4" role="status" aria-label="Generating Anschreiben">
-      <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500">Anschreiben</p>
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">Anschreiben</p>
       {letterText ? (
         // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
-        <pre className="whitespace-pre-wrap font-sans text-sm text-zinc-800 leading-relaxed">
+        <pre className="whitespace-pre-wrap font-sans text-sm text-ink leading-relaxed">
           {letterText}
         </pre>
       ) : (
         <div className="animate-pulse flex flex-col gap-3">
-          <div className="h-4 w-3/4 rounded bg-zinc-200" />
-          <div className="h-4 w-2/3 rounded bg-zinc-200" />
-          <div className="h-4 w-1/2 rounded bg-zinc-200" />
-          <div className="mt-3 h-4 w-4/5 rounded bg-zinc-200" />
-          <div className="h-4 w-3/5 rounded bg-zinc-200" />
+          <div className="h-4 w-3/4 rounded bg-faint" />
+          <div className="h-4 w-2/3 rounded bg-faint" />
+          <div className="h-4 w-1/2 rounded bg-faint" />
+          <div className="mt-3 h-4 w-4/5 rounded bg-faint" />
+          <div className="h-4 w-3/5 rounded bg-faint" />
         </div>
       )}
-      <p className="text-sm text-zinc-500">Generating Anschreiben…</p>
+      <p className="text-sm text-muted">Generating Anschreiben…</p>
     </div>
   )
 }
@@ -763,11 +763,11 @@ function CoverLetterResultView({
   return (
     <div className="flex flex-col gap-6">
       {/* Header: section label */}
-      <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500">Anschreiben</p>
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow">Anschreiben</p>
 
       {/* One-shot click-to-edit hint — hidden after first interaction */}
       {showEditHint && (
-        <p className="text-sm text-zinc-500">Klicken zum Bearbeiten</p>
+        <p className="text-sm text-muted">Klicken zum Bearbeiten</p>
       )}
 
       {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
@@ -781,15 +781,15 @@ function CoverLetterResultView({
         }}
         onFocus={() => { if (showEditHint) setShowEditHint(false) }}
         rows={18}
-        className="w-full resize-y rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         aria-label="Anschreiben"
       />
 
       {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
-      <div className="rounded-lg border border-zinc-200 bg-zinc-100 px-4 py-3">
-        <p className="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-1">Hinweis</p>
-        <p className="text-sm text-zinc-600">
+      <div className="rounded-lg border border-hair bg-paper px-4 py-3">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-eyebrow mb-1">Hinweis</p>
+        <p className="text-sm text-muted">
           Bitte lassen Sie dieses Anschreiben von einem Muttersprachler prüfen, bevor Sie es absenden.
         </p>
       </div>
@@ -807,7 +807,7 @@ function CoverLetterResultView({
         <button
           onClick={handleCopy}
           aria-label="Anschreiben in Zwischenablage kopieren"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+          className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color] active:scale-[0.97] hover:bg-ink/90"
         >
           {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
         </button>
@@ -816,7 +816,7 @@ function CoverLetterResultView({
         <button
           onClick={handleDownload}
           aria-label="Anschreiben als .txt herunterladen"
-          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         >
           .txt herunterladen
         </button>
@@ -825,7 +825,7 @@ function CoverLetterResultView({
         <button
           onClick={onRegenerate}
           aria-label="Anschreiben neu generieren"
-          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         >
           Regenerieren
         </button>
@@ -834,7 +834,7 @@ function CoverLetterResultView({
         <button
           onClick={onReset}
           aria-label="Zurücksetzen und neues Lebenslauf einfügen"
-          className="shrink-0 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="shrink-0 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-muted transition-[transform,border-color,color] active:scale-[0.97] hover:border-ink/30 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
         >
           Start over
         </button>
@@ -978,15 +978,15 @@ export default function Home() {
   return (
     <>
       {/* Top-bar wordmark — links back to the landing (UI-SPEC §F item 2) */}
-      <div className="border-b border-zinc-200 h-14 flex items-center px-6">
-        <a href="/" className="text-sm font-semibold text-zinc-900 tracking-tight">
+      <div className="border-b border-hair h-14 flex items-center px-6">
+        <a href="/" className="text-sm font-semibold text-ink tracking-tight">
           ScanReady
-          <span className="text-blue-700 font-normal text-sm ml-1">DE</span>
+          <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
         </a>
       </div>
 
-      <div className="flex flex-col flex-1 items-center bg-zinc-50 font-sans">
-      <main aria-label="ScanReady tool" className="flex flex-1 w-full max-w-3xl flex-col justify-center py-12 px-6 bg-white sm:px-12">
+      <div className="flex flex-col flex-1 items-center bg-paper font-sans px-4 py-8 sm:py-12">
+      <main aria-label="ScanReady tool" className="w-full max-w-3xl flex-col rounded-[14px] border border-hair bg-card px-6 py-10 sm:px-12 sm:py-12">
         {state.phase === 'input' && (
           <InputView
             resumeText={state.resumeText}

@@ -1,28 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #18181b;
-  --font-serif: var(--font-lora), Georgia, serif;
-  --color-accent: #1d4ed8;
-}
+/* AreaButler design system — warm paper, navy ink, taupe label.
+   Seven colors, three system-font voices, one curve. No second accent, no shadows. */
+@theme {
+  --color-paper: #f0eee9; /* page background, warm off-white */
+  --color-card: #fbfaf7; /* card surfaces, almost white */
+  --color-ink: #1b2430; /* primary text, deep navy ink */
+  --color-muted: #6f6960; /* secondary text, warm grey */
+  --color-faint: rgba(27, 36, 48, 0.12); /* skeletons, faint fills */
+  --color-hair: rgba(27, 36, 48, 0.1); /* hairlines, card borders */
+  --color-eyebrow: #9a8b72; /* warm taupe, mono labels only */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Charter", Georgia, serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* one curve for everything */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-faint);
+}
+
+/* Scroll reveal — hidden state applies only once JS adds .reveal-ready (see ScrollReveal.tsx).
+   Without JS, or before hydration, sections render fully visible. Content rises on enter. */
+.reveal-ready .section-animate {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.46s var(--ease-out),
+    transform 0.46s var(--ease-out);
+}
+.reveal-ready .section-animate.section-visible {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+  *,
+  *::before,
+  *::after {
+    /* Drop movement (transform/animation), keep opacity & color fades that aid comprehension */
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
   }
 }
