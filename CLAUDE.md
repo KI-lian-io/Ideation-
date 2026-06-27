@@ -7,7 +7,7 @@
 
 ## TL;DR — what this repo is
 
-An **ideation → execution** repo. We explored "low-barrier tools to build a business online," narrowed through research, and **converged on one thing to build**: an AI tool that helps **expats apply for jobs in Germany** — converts a US/UK CV into a proper German **Lebenslauf** and writes an authentic-voice **Anschreiben** (cover letter). The MVP backend is **scaffolded and working**; the **UI is the next task**.
+An **ideation → execution** repo. We explored "low-barrier tools to build a business online," narrowed through research, and **converged on one thing to build**: an AI tool that helps **expats apply for jobs in Germany** — converts a foreign CV into a proper German **Lebenslauf** and writes an authentic-voice **Anschreiben** (cover letter). The **full product is built, shipped, and live on Vercel** — the four-step flow works end-to-end, security guards are in, the design pass is done, and the distribution artifacts are written. The only roadmap item left is the **optional Phase 6 analytics funnel** (PostHog).
 
 Working product name: **ScanReady** (placeholder — "win the 8-second German recruiter scan"). Rename freely.
 
@@ -32,37 +32,35 @@ Working product name: **ScanReady** (placeholder — "win the 8-second German re
 | `necessity-tools-strategy.md` | Strategy: "relief"/chore tools (SEO-as-moat, ethics). Context. |
 | `cv-germany-expat-concept.md` | **The validated concept** (norm gap, market, competitors, search volumes, monetization). |
 | `BUILD_PLAN.md` | **The execution plan** (scope, stack, phased roadmap, distribution, guardrails). |
-| `scanready/` | **The app** — Next.js (App Router, TS, Tailwind) + Claude API. |
+| `scanready/` | **The app** — Next.js (App Router, TS, Tailwind) + Claude API. Marketing landing at `/`, tool at `/app`. |
+| `.planning/` | **Source of truth for project status** — `ROADMAP.md`, `STATE.md`, `PROJECT.md`, phase plans. Phases 1–5 done (83%). |
+| `distribution/` | Phase-5 GTM artifacts — `community-plan.md`, `seo-keyword-plan.md`, `paid-test-spec.md`. |
 
 ---
 
 ## Current build state (`/scanready`)
 
-**✅ Done (typechecks, pushed):**
-- `create-next-app` scaffold (TS, Tailwind, App Router, `src/`).
-- `src/lib/anthropic.ts` — Anthropic client + model config. `GENERATION_MODEL` & `PARSE_MODEL` = `claude-opus-4-8`. Cost lever: switch `PARSE_MODEL` to `claude-sonnet-4-6` once parse quality is confirmed.
-- `src/lib/schema.ts` — Zod `LebenslaufSchema` (incl. `normGapNotes`, `photoAdvice`).
-- `src/lib/prompts.ts` — grounded system/user prompt builders + the 5 personalization questions.
-- `src/app/api/parse/route.ts` — CV → Lebenslauf via **structured output** (`messages.parse()` + `zodOutputFormat`).
-- `src/app/api/cover-letter/route.ts` — **streamed** Anschreiben (`messages.stream`, adaptive thinking).
-- `.env.example` (needs `ANTHROPIC_API_KEY`).
+**✅ Done — phases 1–5 complete (`.planning/ROADMAP.md` + `STATE.md`: 83%, 14/14 plans):**
+- **Full four-step UI** — paste CV → Lebenslauf + bilingual norm-gap notes (inline WYSIWYG editor, skill chips, language dropdown, optional-photo callout) → paste job posting + answer 3–5 questions → **streamed** Anschreiben → copy/download. Route split: marketing landing at `/`, tool at `/app`. (Phases 1–2)
+- **Backend** — `src/lib/{anthropic,schema,prompts}.ts`; `src/app/api/parse/route.ts` (structured output, `messages.parse()` + `zodOutputFormat`) and `src/app/api/cover-letter/route.ts` (streamed, adaptive thinking). `GENERATION_MODEL` & `PARSE_MODEL` = `claude-opus-4-8` (cost lever: switch `PARSE_MODEL` to `claude-sonnet-4-6` once parse quality is confirmed).
+- **Security guards** — per-field input-length limits (400 + German message) on both API routes, client-side char counters + disabled submit, no rejected-content logging, still stateless. (Phase 3)
+- **Design pass + deploy** — trust-forward, German-market-credible landing + tool UI, WCAG-AA; **live on Vercel** with `vercel.json` `maxDuration` and Node pinned. (Phase 4)
+- **Distribution artifacts** under `distribution/` — `community-plan.md` (Reddit-led build-in-public), `seo-keyword-plan.md` (EN + DE clusters, 6-month cadence), `paid-test-spec.md` (one keyword, cost-per-completed-flow, €100 cap, organic-proof gate). (Phase 5)
 
-**⏳ NOT done (next tasks, in priority order):**
-1. **Front-end UI** — the single-page flow: paste/upload CV → show Lebenslauf + norm-gap notes → paste job posting + answer 3–5 questions → stream the Anschreiben → copy/download. `src/app/page.tsx` is still create-next-app boilerplate.
-2. **Design pass** — landing + tool UI via the `artifact-design` skill (trust-forward, zero-retention stated, not generic AI-purple). See BUILD_PLAN §6.
-3. **PDF upload** (v1 is text-paste only) + **PostHog** analytics events.
-4. **Deploy to Vercel.**
-5. Later: finish-line paywall (€19–29) + Stripe; B2B; sister tools.
+**⏳ NOT done (all that's left):**
+1. **Phase 6 — Analytics (optional, low-priority, plans TBD).** PostHog funnel (`start`, `parse_done`, `letter_done`, `copy`, `download`), cookieless / zero-PII / EU Cloud, production-only, fails silent. Flagged a post-launch follow-up — the tool can ship without it.
+2. **GTM-03 paid conversion test — BLOCKED on Phase 6** (needs the funnel to measure cost-per-completed-flow) and gated behind organic validation (N≈50).
+3. Deferred to v2 (`.planning/STATE.md`): PDF upload/download + .docx, finish-line paywall (€19–29) + Stripe, B2B channel, LinkedIn import, ATS scoring.
 
 ---
 
-## Decisions still OPEN for Kilian (ask before building UI)
+## Decisions (resolved — recorded in `.planning/PROJECT.md`)
 
-1. **Output language:** German-only, or **bilingual** (German docs + an English explanation of each change so the expat trusts it)? *Recommended: bilingual.*
-2. **Beachhead:** B2C (Chancenkarte / expat communities) first, or a B2B university/relocation pilot in parallel? *Recommended: B2C first.*
-3. **Working name:** keep *ScanReady* or rename?
+1. **Output language:** ✅ **Bilingual** — German documents plus an English explanation of each change/choice, so the applicant trusts and learns from the result. (A German-*or*-English content mode is logged as an optional near-term item, not the USP.)
+2. **Beachhead:** ✅ **B2C-first**, founder-led; parallel B2B pilot deferred. Customer was also broadened (2026-06-23) to **"internationals applying for jobs in Germany"** with nationality-neutral landing copy; launch motion stays on the reachable cohort (US/UK expats + intl uni grads).
+3. **Working name:** ✅ **Keep *ScanReady* as a placeholder; revisit pre-launch.** Not a blocker.
 
-Distribution sequence already agreed: **(A) Reddit/build-in-public first** (Kilian is applying now → his story is the content), SEO second, **(C) €50–100 paid LAST as a conversion test, not a channel.**
+Distribution sequence (agreed, now operationalized in `distribution/`): **(A) Reddit/build-in-public first** (Kilian is applying now → his story is the content), **SEO second**, **(C) €50–100 paid LAST as a conversion test, not a channel.**
 
 ---
 
@@ -82,7 +80,7 @@ Distribution sequence already agreed: **(A) Reddit/build-in-public first** (Kili
 ```bash
 cd scanready
 cp .env.example .env.local   # add ANTHROPIC_API_KEY
-npm run dev                  # http://localhost:3000  (API routes work; UI is boilerplate)
+npm run dev                  # http://localhost:3000  (full UI: landing at /, tool at /app)
 npx tsc --noEmit             # typecheck
 ```
 
@@ -101,4 +99,4 @@ npx tsc --noEmit             # typecheck
 ---
 
 ## Suggested first message for the new session
-> "Continue ScanReady. I want **[German-only | bilingual]** output. Build the front-end UI for the full flow (paste CV → Lebenslauf + norm-gap notes → job posting + 3–5 questions → streamed Anschreiben → copy/download), then do a design pass with artifact-design."
+> "Continue ScanReady. The product is built and deployed (phases 1–5 done). Decide whether to build the **optional Phase 6 analytics funnel** (PostHog) — it's the only roadmap item left and it unblocks the GTM-03 paid test — or skip it and start distribution from the `distribution/` artifacts. Either way, clear the native-speaker German quality gate before going public."
