@@ -58,14 +58,16 @@ function CheckIcon() {
 function CtaLink({
   href,
   children,
+  variant = "primary",
   className = "",
 }: {
   href: string;
   children: React.ReactNode;
+  variant?: "primary" | "accent";
   className?: string;
 }) {
   return (
-    <Btn as="a" href={href} size="lg" className={className}>
+    <Btn as="a" href={href} variant={variant} size="lg" className={className}>
       {children}
     </Btn>
   );
@@ -96,7 +98,7 @@ export default function HomePage() {
               DE
             </span>
           </a>
-          <Btn as="a" href="/app">
+          <Btn as="a" href="/app" variant="accent">
             Try it free
           </Btn>
         </div>
@@ -130,7 +132,7 @@ export default function HomePage() {
               change so you trust what you send.
             </p>
 
-            <CtaLink href="/app">Convert your CV — it&rsquo;s free</CtaLink>
+            <CtaLink href="/app" variant="accent">Convert your CV — it&rsquo;s free</CtaLink>
 
             <p className="mt-4 flex items-center justify-center gap-2 text-sm text-muted">
               <LockIcon />

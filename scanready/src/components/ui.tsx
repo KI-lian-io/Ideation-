@@ -13,14 +13,16 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
  *           label as a component would be a shallow module. // ponytail
  */
 
-type Variant = 'primary' | 'secondary'
+type Variant = 'primary' | 'accent' | 'secondary'
 type Size = 'sm' | 'md' | 'lg'
 
+// Full-pill (Mintlify base). Mint focus ring (the single accent). Navy primary (AreaButler).
 const BASE =
-  'inline-block rounded-lg text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40'
+  'inline-block rounded-full text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-ink text-white hover:bg-ink/90',
+  accent: 'bg-accent text-ink hover:bg-accent-deep',
   secondary: 'border border-hair text-muted hover:border-ink/30 hover:text-ink',
 }
 

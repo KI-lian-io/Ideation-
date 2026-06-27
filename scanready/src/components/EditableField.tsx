@@ -80,7 +80,7 @@ export function EditableField({
         }
       },
       // Bottom-border only signals edit mode (UI-SPEC active state)
-      className: `border-b border-ink outline-none bg-transparent w-full ${monoClass} ${className ?? ''}`.trim(),
+      className: `border-b border-accent outline-none bg-transparent w-full ${monoClass} ${className ?? ''}`.trim(),
     }
     return multiline ? (
       <textarea {...sharedProps} rows={3} />

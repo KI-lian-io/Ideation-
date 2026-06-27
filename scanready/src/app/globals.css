@@ -11,9 +11,14 @@
   --color-hair: rgba(27, 36, 48, 0.1); /* hairlines, card borders */
   --color-eyebrow: #9a8b72; /* warm taupe, mono labels only */
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  /* Mint — the single CTA / active / focus accent (from Mintlify). Used sparingly. */
+  --color-accent: #00d4a4;
+  --color-accent-deep: #00b48a;
+
+  /* Three voices: serif (display, system stack) · Inter (UI) · Geist Mono (code). */
   --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Charter", Georgia, serif;
-  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* one curve for everything */
 }
