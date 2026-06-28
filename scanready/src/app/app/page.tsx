@@ -498,16 +498,20 @@ function ResultView({
         </p>
       )}
 
-      {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) */}
-      <LebenslaufEditor
-        lebenslauf={lebenslauf}
-        sectionOrder={sectionOrder}
-        dispatch={dispatch}
-        photoAdvice={lebenslauf.photoAdvice}
-      />
+      {/* Two-column: document (Lebenslauf) left, bilingual annotation right at desktop;
+          stacks on mobile. Print-proof "document + margin notes" layout (DESIGN.md). */}
+      <div className="grid gap-8 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+        {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) */}
+        <LebenslaufEditor
+          lebenslauf={lebenslauf}
+          sectionOrder={sectionOrder}
+          dispatch={dispatch}
+          photoAdvice={lebenslauf.photoAdvice}
+        />
 
-      {/* Collapsible bilingual norm-gap panel (D-05 / LL-02) — below the editor so CV stays hero */}
-      <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
+        {/* Bilingual norm-gap panel (D-05 / LL-02) — the annotation column */}
+        <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
+      </div>
 
       {/* Cover letter CTA — next step in the flow */}
       <div className="rounded-lg border border-hair bg-paper p-5">

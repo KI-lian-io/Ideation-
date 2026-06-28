@@ -467,7 +467,7 @@ export function LebenslaufEditor({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 font-serif-text">
       {sectionOrder.map((key, i) => {
         const label = SECTION_LABELS[key]
         if (!label) return null

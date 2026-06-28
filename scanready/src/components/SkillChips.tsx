@@ -109,7 +109,7 @@ function CategoryChips({
         {cat.skills.map((skill, skillIndex) => (
           <div
             key={skillIndex}
-            className="flex items-center gap-1 rounded-full border border-hair bg-paper px-3 py-1 text-sm"
+            className="flex items-center gap-1 rounded-full bg-accent-soft px-3 py-1 text-sm text-accent"
           >
             <EditableField
               value={skill}
