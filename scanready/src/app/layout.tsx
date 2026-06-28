@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-// Blend type voices: Inter for UI prose, Geist Mono for code. Serif (display) stays
-// a system stack (Iowan/Palatino/Georgia) — defined in globals.css, no web-font load.
+// Four type voices: Inter (UI prose), Geist Mono (labels/code), Source Serif 4 (the
+// reading serif for the generated Lebenslauf/Anschreiben). Display serif stays a system
+// stack (Iowan/Palatino/Georgia) — defined in globals.css, no web-font load.
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
+const sourceSerif = Source_Serif_4({ variable: "--font-source-serif", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   // Vercel injects VERCEL_PROJECT_PRODUCTION_URL (the stable production domain) at build time;
@@ -32,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

@@ -46,7 +46,7 @@ function CheckIcon() {
       strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-ink flex-shrink-0"
+      className="h-4 w-4 text-accent flex-shrink-0"
       aria-hidden="true"
     >
       <polyline points="20 6 9 17 4 12" />
@@ -318,12 +318,12 @@ export default function HomePage() {
 
         {/* ── Section 4: Trust & privacy band ── */}
         <section
-          className="bg-paper py-16 sm:py-20 section-animate"
+          className="bg-ink py-20 sm:py-24 section-animate"
           aria-labelledby={SECTION_IDS.trust}
         >
           <div className="max-w-4xl mx-auto px-6 text-center">
             <div
-              className="mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white"
+              className="mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white"
               aria-hidden="true"
             >
               <LockIcon className="h-5 w-5" />
@@ -331,17 +331,17 @@ export default function HomePage() {
 
             <h2
               id={SECTION_IDS.trust}
-              className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-4"
+              className="font-serif text-3xl font-semibold text-white leading-[1.2] mb-4"
             >
               Zero-retention, by design.
             </h2>
-            <p className="text-base text-muted leading-relaxed max-w-2xl mx-auto mb-8">
+            <p className="text-base text-white/70 leading-relaxed max-w-2xl mx-auto mb-8">
               Your CV text is sent to the AI, the output comes back, and nothing
               is saved. No database. No account. No training on your data. What
               you paste here stays between you and your application.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-muted">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-white/70">
               <span className="flex items-center gap-2">
                 <CheckIcon />
                 No storage, no account
@@ -465,8 +465,8 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-paper border-t border-hair py-6">
-        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between text-sm text-muted">
+      <footer className="bg-ink py-10">
+        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between text-sm text-white/70">
           <p>ScanReady</p>
           <p>© 2026</p>
         </div>

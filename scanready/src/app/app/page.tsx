@@ -708,7 +708,7 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
       <p className={EYEBROW}>Anschreiben</p>
       {letterText ? (
         // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
-        <pre className="whitespace-pre-wrap font-sans text-sm text-ink leading-relaxed">
+        <pre className="whitespace-pre-wrap font-serif-text text-base text-ink leading-[1.65]">
           {letterText}
         </pre>
       ) : (
@@ -782,7 +782,7 @@ function CoverLetterResultView({
         }}
         onFocus={() => { if (showEditHint) setShowEditHint(false) }}
         rows={18}
-        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 font-serif-text text-base text-ink leading-[1.65] placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
         aria-label="Anschreiben"
       />
 

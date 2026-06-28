@@ -16,13 +16,13 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
 type Variant = 'primary' | 'accent' | 'secondary'
 type Size = 'sm' | 'md' | 'lg'
 
-// Full-pill (Mintlify base). Mint focus ring (the single accent). Navy primary (AreaButler).
+// Editorial-crisp 6px corners (WIRED-lean, softened off square). Green accent + focus ring. Navy primary.
 const BASE =
-  'inline-block rounded-full text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40'
+  'inline-block rounded-md text-sm font-semibold transition-[transform,background-color,border-color,color] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-ink text-white hover:bg-ink/90',
-  accent: 'bg-accent text-ink hover:bg-accent-deep',
+  accent: 'bg-accent text-white hover:bg-accent-deep',
   secondary: 'border border-hair text-muted hover:border-ink/30 hover:text-ink',
 }
 
@@ -66,5 +66,5 @@ export function Btn(props: BtnProps) {
   )
 }
 
-export const CARD = 'rounded-[14px] border border-hair bg-card'
+export const CARD = 'rounded-xl border border-hair bg-card'
 export const EYEBROW = 'font-mono text-xs uppercase tracking-[0.18em] text-eyebrow'
