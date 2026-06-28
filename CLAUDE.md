@@ -98,5 +98,19 @@ npx tsc --noEmit             # typecheck
 
 ---
 
+## Design system — "Warm Editorial Broadsheet" (current, settled)
+
+A full design pass landed after phases 1–5. Don't re-open the exploration; build new UI against the spec.
+
+- **Canonical spec:** [`scanready/DESIGN.md`](scanready/DESIGN.md) — YAML-frontmatter in the claude.ai/design (`DesignSync`) schema. Provenance table records every source-conflict resolution.
+- **Identity:** WIRED editorial authority × Starbucks warmth × ScanReady navy/serif. Deep-green accent `#0a7d63` (4 tiers, the only accent), navy ink `#1b2430`, warm paper `#f0eee9`, **6px editorial buttons (not pills)**, 12px cards, navy color-block band. Four type voices: Iowan display serif · **Source Serif 4 reading serif for the generated Lebenslauf/Anschreiben (they render like print)** · Inter UI · Geist Mono taupe labels.
+- **Where it lives:** primitives in [`scanready/src/components/ui.tsx`](scanready/src/components/ui.tsx) (`btnClass`/`Btn`, `CARD`, `EYEBROW`); tokens in [`scanready/src/app/globals.css`](scanready/src/app/globals.css) Tailwind v4 `@theme`; fonts wired in `layout.tsx` (Inter + Geist Mono + Source Serif 4 via `next/font`).
+- **How we got here:** AreaButler → AreaButler×Mintlify blend → this (a getdesign.md agent survey of ~14 brands picked WIRED as anchor, Starbucks for warmth).
+- **design-sync follow-up:** sync-ready preview library at [`scanready/design-system/`](scanready/design-system/) (`overview.html` + README, `@dsCard` markers). Pushing to claude.ai/design is **blocked in web Claude Code** (needs interactive `/design-login`); run from a real terminal or use Claude Design's "Send to Claude Code Web". Then expand the overview card into per-component cards.
+
+## Git / deploy gotchas
+- **Push needs the repo-owner account:** `gh auth switch --hostname github.com --user KI-lian-io` first — the default `LiloAdmin` gets 403.
+- Shell cwd drifts between Bash calls — use absolute paths.
+
 ## Suggested first message for the new session
-> "Continue ScanReady. The product is built and deployed (phases 1–5 done). Decide whether to build the **optional Phase 6 analytics funnel** (PostHog) — it's the only roadmap item left and it unblocks the GTM-03 paid test — or skip it and start distribution from the `distribution/` artifacts. Either way, clear the native-speaker German quality gate before going public."
+> "Continue ScanReady. Product built + deployed (phases 1–5); the **Warm Editorial Broadsheet** design system is implemented and committed (see `scanready/DESIGN.md`). Options: (a) push the design system to claude.ai/design from an interactive terminal via `/design-login` + `scanready/design-system/`; (b) build the **optional Phase 6 analytics funnel** (PostHog, unblocks GTM-03); or (c) start distribution from `distribution/`. Either way, clear the native-speaker German quality gate before going public, and `gh auth switch --user KI-lian-io` before pushing."
