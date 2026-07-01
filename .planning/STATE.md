@@ -6,7 +6,7 @@ current_phase: 6
 current_phase_name: post-launch
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-24T14:51:21.841Z"
+last_updated: "2026-07-01T12:30:19.794Z"
 last_activity: 2026-06-24
 last_activity_desc: Phase 05 complete, transitioned to Phase 6
 progress:
@@ -85,6 +85,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Brand foundation + route split
 - [Phase ?]: Landing page motion implemented without 'use client' wrapper
 - [Phase ?]: metadataBase deferred to Plan 03 (needs Vercel deploy URL)
+- [Phase quick]: 260701-jxh: Reconciled globals.css @theme tokens + extracted SKILL_CHIP/NORM_NOTE primitives to match exported ScanReady Design System — Kept shipped accent hover/chip/tint hexes over DESIGN.md's differing frontmatter values since shipped code + export already agree and are live
 
 ### Pending Todos
 
@@ -96,6 +97,12 @@ None yet.
 - Vercel plan tier must be confirmed before Phase 5 deploy — Hobby caps cover-letter stream at 60s.
 - Native-speaker quality gate required before Phase 5 goes public.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260701-jxh | Apply ScanReady Design System export to app: reconcile globals.css tokens and ui.tsx primitives with the DesignSync export | 2026-07-01 | 65a10f3 | [260701-jxh-apply-scanready-design-system-export-to-](./quick/260701-jxh-apply-scanready-design-system-export-to-/) |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
@@ -106,6 +113,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T08:04:41.996Z
+Last session: 2026-07-01T12:29:27.448Z
+Last activity: 2026-07-01 - Completed quick task 260701-jxh: Apply ScanReady Design System export to app
 Stopped at: Phase 5 context gathered
 Resume file: .planning/phases/05-distribution-operationalization/05-CONTEXT.md
