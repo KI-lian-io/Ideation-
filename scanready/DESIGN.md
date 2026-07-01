@@ -19,9 +19,9 @@ colors:
   hairline: "rgba(27,36,48,0.12)"
   hairline-soft: "rgba(27,36,48,0.08)"
   accent-600: "#0a7d63"
-  accent-500: "#0c9379"
-  accent-100: "#cfe9e0"
-  accent-50: "#eef7f3"
+  accent-500: "#0b6e58"
+  accent-100: "#d2e9e1"
+  accent-50: "#eef6f2"
   error: "#c0503c"
   warn: "#b9791a"
 
@@ -241,9 +241,9 @@ The signature move: the **generated document renders in a reading serif**. The u
 ### Brand & Accent
 - **Navy Ink** (`{colors.primary}` / `{colors.ink}` `#1b2430`): Wordmark, headlines, primary CTA fill, dark bands, footer. The warm alternative to WIRED's pure black.
 - **Accent 600** (`#0a7d63`): The single accent — primary green CTA, active indicators, focus ring, document-confirmation checkmarks. Deep enough to read credible on cream (per Starbucks green-on-cream), not the bright AI-mint.
-- **Accent 500** (`#0c9379`): Hover/pressed variant.
-- **Accent 100** (`#cfe9e0`): Skill-chip fill, light confirmation surfaces.
-- **Accent 50** (`#eef7f3`): Norm-note tint, valid-field background.
+- **Accent 500** (`#0b6e58`): Hover/pressed variant.
+- **Accent 100** (`#d2e9e1`): Skill-chip fill, light confirmation surfaces.
+- **Accent 50** (`#eef6f2`): Norm-note tint, valid-field background.
 - **Eyebrow Taupe** (`{colors.eyebrow}` `#9a8b72`): Reserved for the mono uppercase micro-label only. Never body, never a button.
 
 ### Surface
