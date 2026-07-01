@@ -6,7 +6,7 @@ import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS } from '@/lib/prompts'
-import { btnClass, CARD, EYEBROW } from '@/components/ui'
+import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -792,7 +792,7 @@ function CoverLetterResultView({
 
       {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
-      <div className="rounded-lg border border-hair bg-paper px-4 py-3">
+      <div className={NORM_NOTE}>
         <p className={`${EYEBROW} mb-1`}>Hinweis</p>
         <p className="text-sm text-muted">
           Bitte lassen Sie dieses Anschreiben von einem Muttersprachler prüfen, bevor Sie es absenden.

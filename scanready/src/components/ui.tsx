@@ -1,16 +1,20 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react'
 
 /**
- * AreaButler UI primitives — single source of truth for the design-system class strings.
+ * ScanReady UI primitives — single source of truth for the design-system class strings.
  * Pure (no hooks) → valid in both Server and Client Components.
  *
- * btnClass — the button class string (the single source). Use directly on a plain
- *            <button> when you don't need polymorphism (most of the tool).
- * Btn   — polymorphic button/link built on btnClass. Discriminated `as` union keeps
- *         href/onClick from crossing. Use for the landing <a> CTAs.
- * CARD    — class const for the card surface (few sites, all bespoke padding).
- * EYEBROW — class const for the mono taupe label. A const, not a component: a one-line
- *           label as a component would be a shallow module. // ponytail
+ * btnClass   — the button class string (the single source). Use directly on a plain
+ *              <button> when you don't need polymorphism (most of the tool).
+ * Btn        — polymorphic button/link built on btnClass. Discriminated `as` union keeps
+ *              href/onClick from crossing. Use for the landing <a> CTAs.
+ * CARD       — class const for the card surface (few sites, all bespoke padding).
+ * EYEBROW    — class const for the mono taupe label. A const, not a component: a one-line
+ *              label as a component would be a shallow module. // ponytail
+ * SKILL_CHIP — class const for the skill pill visual shell (accent-soft fill, accent
+ *              text). Same one-line-const reasoning as EYEBROW.
+ * NORM_NOTE  — class const for the norm-note / annotation callout (accent-tint wash,
+ *              ink-soft body). Same one-line-const reasoning as EYEBROW.
  */
 
 type Variant = 'primary' | 'accent' | 'secondary'
@@ -68,3 +72,9 @@ export function Btn(props: BtnProps) {
 
 export const CARD = 'rounded-xl border border-hair bg-card'
 export const EYEBROW = 'font-mono text-xs uppercase tracking-[0.18em] text-eyebrow'
+
+// The full-pill skill chip (accent-soft fill, accent text) — the one place pills survive.
+export const SKILL_CHIP = 'rounded-full bg-accent-soft px-3 py-1 text-sm text-accent'
+
+// The norm-note / annotation callout (accent-tint wash, ink-soft body, 8px corner).
+export const NORM_NOTE = 'rounded-md border border-hair bg-accent-tint px-4 py-3 text-ink-soft'

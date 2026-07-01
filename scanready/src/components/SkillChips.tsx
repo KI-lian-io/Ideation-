@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { EditableField } from '@/components/EditableField'
 import type { SkillCategory } from '@/lib/schema'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
-import { EYEBROW } from '@/components/ui'
+import { EYEBROW, SKILL_CHIP } from '@/components/ui'
 
 /**
  * German CV language-level vocabulary (D-10).
@@ -109,7 +109,7 @@ function CategoryChips({
         {cat.skills.map((skill, skillIndex) => (
           <div
             key={skillIndex}
-            className="flex items-center gap-1 rounded-full bg-accent-soft px-3 py-1 text-sm text-accent"
+            className={`flex items-center gap-1 ${SKILL_CHIP}`}
           >
             <EditableField
               value={skill}
