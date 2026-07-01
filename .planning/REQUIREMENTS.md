@@ -38,12 +38,10 @@
 ### Trust & Compliance (TRUST)
 
 - [x] **TRUST-01**: No user CV/output is persisted server-side — the flow stays stateless _(backend exists; must not regress)_
-- [ ] **TRUST-02**: Analytics capture funnel events only, never CV/PII content — PostHog `autocapture:false`, `ip:false`, `person_profiles:'identified_only'`
 - [x] **TRUST-03**: Both API routes reject oversized input via a length guard (cost + abuse boundary)
 
 ### Analytics & Deploy (OPS)
 
-- [ ] **OPS-01**: Funnel events fire — `start`, `parse_done`, `letter_done`, `copy`, `download`
 - [x] **OPS-02**: App is deployed publicly on Vercel with the cover-letter stream completing within the function time limit (confirm plan/`maxDuration`)
 - [x] **OPS-03**: Production env is configured (ANTHROPIC_API_KEY, PostHog key) and Node pinned to 20.x on Vercel
 
@@ -77,6 +75,11 @@ Deferred. Tracked, not in the current roadmap.
 
 - **ENH-01**: LinkedIn profile import
 - **ENH-02**: ATS keyword scoring against the job posting
+
+### Analytics (deferred)
+
+- **TRUST-02**: Analytics capture funnel events only, never CV/PII content — PostHog `autocapture:false`, `ip:false`, `person_profiles:'identified_only'`
+- **OPS-01**: Funnel events fire — `start`, `parse_done`, `letter_done`, `copy`, `download`
 
 ## Out of Scope
 
@@ -125,15 +128,13 @@ Each v1 requirement maps to exactly one phase.
 | GTM-01 | Phase 5 | Complete |
 | GTM-02 | Phase 5 | Complete |
 | GTM-03 | Phase 5 | Complete |
-| TRUST-02 | Phase 6 | Pending |
-| OPS-01 | Phase 6 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 24 total
-- Mapped to phases: 24 ✓
+- v1 requirements: 22 total
+- Mapped to phases: 22 ✓
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-22*
-*Last updated: 2026-06-23 — analytics pushed to post-MVP: Phase 4 = Design Pass + Vercel Deploy (UI-01/02, OPS-02/03), Phase 5 = Distribution (GTM-01/02/03), Phase 6 = Analytics post-launch (TRUST-02, OPS-01). Phase 3 Security Guards (TRUST-01, TRUST-03) complete.*
+*Last updated: 2026-07-01 — analytics (TRUST-02, OPS-01) backlogged to v2; v1.0 milestone active roadmap is phases 1-5, all complete.*

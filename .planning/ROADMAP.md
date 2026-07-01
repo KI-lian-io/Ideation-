@@ -2,7 +2,7 @@
 
 ## Overview
 
-ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 adds input-length security guards. Phase 4 does the design pass and deploys to production. Phase 5 operationalizes distribution as a set of concrete deliverable artifacts. Phase 6 adds the analytics funnel as a low-priority post-MVP follow-up.
+ScanReady starts from a working backend and ships a complete, dogfoodable product. Phase 1 unblocks the environment and delivers the full CV-to-Lebenslauf wizard step. Phase 2 adds the cover-letter flow, completing the end-to-end product. Phase 3 adds input-length security guards. Phase 4 does the design pass and deploys to production. Phase 5 operationalizes distribution as a set of concrete deliverable artifacts. The analytics funnel is backlogged (see "## Backlog") rather than an active phase — pull it into a future milestone if analytics becomes a priority.
 
 ## Phases
 
@@ -18,7 +18,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users (completed 2026-06-23)
 - [x] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned (completed 2026-06-23)
 - [x] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts (completed 2026-06-24)
-- [ ] **Phase 6: Analytics (post-launch)** - Add the PostHog funnel (zero PII, EU Cloud, cookieless) after the MVP ships — a low-priority follow-up to measure usage
 
 ## Phase Details
 
@@ -152,6 +151,20 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-02-PLAN.md — GTM-02 SEO keyword plan: EN + DE clusters ("German CV" head term), 2 cornerstone guides, 6-month cadence with Sept–Oct stretch goal + Keyword-Planner validation step (Wave 1)
 - [x] 05-03-PLAN.md — GTM-03 paid-test spec: one Google Search keyword, cost-per-completed-flow metric, €100 cap, organic-proof gate (N≈50), Phase-6 analytics dependency flagged BLOCKED (Wave 1)
 
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
+| 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
+| 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
+| 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
+| 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
+
+## Backlog
+
+Not scheduled — pull into a future milestone if analytics becomes a priority.
+
 ### Phase 6: Analytics (post-launch)
 
 **Goal**: The PostHog funnel fires the five events with zero CV/PII capture — added as a low-priority post-MVP follow-up to measure usage once the tool is live
@@ -165,14 +178,3 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Analytics fires only in production and degrades silently if the PostHog key is unset or PostHog is blocked — never breaking the core flow
 
 **Plans**: TBD
-
-## Progress
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Pre-flight + Parse Flow | 4/4 | Complete    | 2026-06-22 |
-| 2. Cover Letter Flow | 2/2 | Complete   | 2026-06-22 |
-| 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
-| 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
-| 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
-| 6. Analytics (post-launch) | 0/TBD | Not started | - |
