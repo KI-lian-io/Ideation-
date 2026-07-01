@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* AreaButler design system — warm paper, navy ink, taupe label.
+/* ScanReady design system — Warm Editorial Broadsheet. Warm paper, navy ink, taupe label.
    Seven colors, three system-font voices, one curve. No second accent, no shadows. */
 @theme {
   --color-paper: #f0eee9; /* page background, warm off-white */
@@ -16,6 +16,20 @@
   --color-accent-deep: #0b6e58;
   --color-accent-soft: #d2e9e1;
   --color-accent-tint: #eef6f2;
+
+  /* Functional colors (error/warn/tag) — from the exported ScanReady Design System, additive. */
+  --color-brand-error: #c0503c;
+  --color-brand-warn: #b9791a;
+  --color-brand-tag: #3772cf;
+
+  /* Text ramp additions — annotation body + secondary/caption greys, additive. */
+  --color-ink-soft: #2a3340;
+  --color-slate: #4a5160;
+  --color-stone: #8a857c;
+
+  /* Signature dark band — navy-to-teal color-block, additive. */
+  --color-band-from: #1b2430;
+  --color-band-to: #234038;
 
   /* Four voices: display serif · reading serif (the document output) · Inter (UI) · Geist Mono (labels). */
   --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Charter", Georgia, serif;
