@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 6
-current_phase_name: post-launch
-status: executing
-stopped_at: Phase 5 context gathered
-last_updated: "2026-07-01T12:30:19.794Z"
-last_activity: 2026-06-24
-last_activity_desc: Phase 05 complete, transitioned to Phase 6
+current_phase: 5
+current_phase_name: distribution-operationalization
+status: complete
+stopped_at: v1.0 feature-complete; analytics backlogged
+last_updated: "2026-07-01T13:22:26Z"
+last_activity: 2026-07-01
+last_activity_desc: v1.0 feature-complete; analytics backlogged
 progress:
-  total_phases: 6
+  total_phases: 5
   completed_phases: 5
   total_plans: 14
   completed_plans: 14
-  percent: 83
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** German output is native-quality and trustworthy — norm-correct, never fabricated — so a German recruiter takes the applicant seriously in the 8-second scan.
-**Current focus:** Phase 05 — distribution-operationalization
+**Current focus:** Feature-complete (v1.0) — backlog only
 
 ## Current Position
 
-Phase: 6 — Analytics (post-launch)
-Plan: Not started
-Status: Executing Phase 05
-Last activity: 2026-06-24 — Phase 05 complete, transitioned to Phase 6
+v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase.
+Last activity: 2026-07-01 — v1.0 feature-complete; analytics backlogged
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -110,6 +108,8 @@ None yet.
 | v2 | PDF upload (FMT-01), PDF download (FMT-02), .docx (FMT-03) | Deferred | Roadmap creation |
 | v2 | Finish-line paywall (PAY-01), B2B channel (PAY-02) | Deferred | Roadmap creation |
 | v2 | LinkedIn import (ENH-01), ATS scoring (ENH-02) | Deferred | Roadmap creation |
+| v2 | Analytics funnel — funnel events (OPS-01) + PostHog zero-PII config (TRUST-02) | Deferred | 2026-07-01 |
+| Blocked | GTM-03 paid conversion-test execution (run the test) — spec complete (Phase 5); only *running* the test is blocked on the analytics funnel per `05-03-PLAN.md`'s existing BLOCKED flag | Blocked on analytics | 2026-07-01 |
 
 ## Session Continuity
 
