@@ -1,15 +1,23 @@
 import Stripe from "stripe";
 
 /**
- * Server-only Stripe client. Mirrors the anthropic.ts singleton pattern.
- * STRIPE_SECRET_KEY comes from .env.local / Vercel env.
- *
- * stripe@22's constructor throws synchronously on an empty/undefined apiKey
- * ("Neither apiKey nor config.authenticator provided"), which would crash this
- * module (and every route importing it) at boot when the key isn't configured.
- * The intent route already checks `!process.env.STRIPE_SECRET_KEY` and returns
- * a 503 before touching `stripe`, so a placeholder key here only matters if
- * that guard is ever bypassed — in which case Stripe's own API call fails with
- * an auth error, caught by the route's try/catch as a 502.
+ * Server-only Stripe client, constructed lazily on first use.
+ * stripe@22 throws synchronously on a missing/empty apiKey, so a module-scope
+ * singleton would crash at import time when STRIPE_SECRET_KEY is unset. The
+ * accessor throws a clear error instead — routes check isStripeConfigured()
+ * first and return a German 503, so this throw is a programming-error backstop,
+ * never a user-facing path.
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder_unconfigured");
+let client: Stripe | null = null;
+
+export function isStripeConfigured(): boolean {
+  return Boolean(process.env.STRIPE_SECRET_KEY);
+}
+
+export function getStripe(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not set — guard with isStripeConfigured() first.");
+  }
+  client ??= new Stripe(process.env.STRIPE_SECRET_KEY);
+  return client;
+}

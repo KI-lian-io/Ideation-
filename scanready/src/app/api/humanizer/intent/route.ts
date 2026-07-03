@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { HUMANIZER_PRICE_CENTS } from "@/lib/humanizer";
 
 export const runtime = "nodejs";
@@ -11,14 +11,14 @@ export const runtime = "nodejs";
  * inside the embedded Payment Element (the letter lives only in client memory).
  */
 export async function POST() {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  if (!isStripeConfigured()) {
     return NextResponse.json(
       { error: "Zahlungen sind derzeit nicht verfügbar." },
       { status: 503 }
     );
   }
   try {
-    const pi = await stripe.paymentIntents.create({
+    const pi = await getStripe().paymentIntents.create({
       amount: HUMANIZER_PRICE_CENTS,
       currency: "eur",
       automatic_payment_methods: { enabled: true, allow_redirects: "never" },
