@@ -24,25 +24,48 @@ const DIRECTION_LABELS: Record<HumanizerDirection, { title: string; blurb: strin
 
 type Step = 'direction' | 'payment' | 'refining' | 'error'
 
+/** sessionStorage key for a paid-but-unconsumed refinement attempt.
+ * Stores ONLY the PaymentIntent id + chosen direction — never letter content —
+ * so reopening the modal after a failed stream resumes instead of re-charging. */
+const PAID_ATTEMPT_KEY = 'humanizer_paid_attempt'
+
+type PaidAttempt = { paymentIntentId: string; direction: HumanizerDirection }
+
+function readPaidAttempt(): PaidAttempt | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(PAID_ATTEMPT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed.paymentIntentId === 'string' && typeof parsed.direction === 'string') {
+      return parsed as PaidAttempt
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 export default function HumanizerModal({
-  open,
   letterText,
   onClose,
   onDone,
 }: {
-  open: boolean
   letterText: string
   onClose: () => void
   onDone: (refined: string) => void
 }) {
-  const [step, setStep] = useState<Step>('direction')
-  const [direction, setDirection] = useState<HumanizerDirection | null>(null)
+  const pendingAttempt = useRef(readPaidAttempt()).current
+  const [step, setStep] = useState<Step>(pendingAttempt ? 'error' : 'direction')
+  const [direction, setDirection] = useState<HumanizerDirection | null>(pendingAttempt?.direction ?? null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const paymentIntentIdRef = useRef<string | null>(null)
+  const [error, setError] = useState<string | null>(
+    pendingAttempt
+      ? 'Eine bezahlte Verfeinerung ist noch offen. Sie können es erneut versuchen, ohne erneut zu zahlen.'
+      : null
+  )
+  const paymentIntentIdRef = useRef<string | null>(pendingAttempt?.paymentIntentId ?? null)
   const [failCount, setFailCount] = useState(0)
-
-  if (!open) return null
 
   async function pickDirection(d: HumanizerDirection) {
     setDirection(d)
@@ -60,6 +83,12 @@ export default function HumanizerModal({
 
   async function runRefinement(piId: string) {
     paymentIntentIdRef.current = piId
+    // Persist the paid-but-unconsumed attempt (PI id + direction only, never letter
+    // content) so a modal remount after a stream failure resumes instead of
+    // re-charging via the direction picker.
+    if (direction) {
+      sessionStorage.setItem(PAID_ATTEMPT_KEY, JSON.stringify({ paymentIntentId: piId, direction }))
+    }
     setStep('refining')
     setError(null)
     try {
@@ -81,6 +110,7 @@ export default function HumanizerModal({
         refined += decoder.decode(value, { stream: true })
       }
       if (!refined.trim()) throw new Error('Leere Antwort.')
+      sessionStorage.removeItem(PAID_ATTEMPT_KEY)
       onDone(refined)
     } catch (e) {
       setFailCount((n) => n + 1)
@@ -133,16 +163,22 @@ export default function HumanizerModal({
         {step === 'error' && (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-red-600">{error}</p>
-            {failCount < 3 && paymentIntentIdRef.current ? (
+            {paymentIntentIdRef.current && (
+              <p className="text-sm text-muted">
+                Zahlungsreferenz: <code className="font-mono">{paymentIntentIdRef.current}</code>
+                {failCount >= 3 && (
+                  <>
+                    {' '}— Mehrfach fehlgeschlagen? Wir erstatten den Kaufpreis, E-Mail mit dieser Referenz an
+                    die im{' '}
+                    <a className="underline" href="/impressum" target="_blank">Impressum</a> genannte Adresse.
+                  </>
+                )}
+              </p>
+            )}
+            {failCount < 3 && paymentIntentIdRef.current && (
               <button className={btnClass('primary')} onClick={() => runRefinement(paymentIntentIdRef.current!)}>
                 Erneut versuchen (bereits bezahlt)
               </button>
-            ) : (
-              <p className="text-sm text-muted">
-                Mehrfach fehlgeschlagen? Wir erstatten den Kaufpreis — E-Mail mit der Referenz{' '}
-                <code className="font-mono">{paymentIntentIdRef.current}</code> an die im{' '}
-                <a className="underline" href="/impressum" target="_blank">Impressum</a> genannte Adresse.
-              </p>
             )}
           </div>
         )}

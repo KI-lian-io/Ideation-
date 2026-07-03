@@ -886,7 +886,6 @@ function CoverLetterResultView({
           if this were mounted unconditionally with open={false}. */}
       {humanizerOpen && (
         <HumanizerModal
-          open={humanizerOpen}
           letterText={letterText}
           onClose={() => setHumanizerOpen(false)}
           onDone={(refined) => {
