@@ -18,12 +18,14 @@ export const maxDuration = 300;
  * Verifies the paid, unconsumed PaymentIntent, streams the refined letter, then marks
  * the PI consumed. Consumed is set only AFTER a complete stream so failures are
  * retryable; the metadata update is not atomic — a deliberate double-submit can get
- * two refinements for one payment (accepted: costs ~cents, spec D8).
+ * two refinements for one payment (accepted: costs ~cents, spec D8). If the client
+ * disconnects mid-stream, `cancel()` aborts the Anthropic stream so the for-await
+ * throws and the PI is left unconsumed (retryable) instead of being marked spent.
  */
 export async function POST(req: NextRequest) {
   const { letterText, direction, paymentIntentId } = await req.json();
 
-  if (!letterText || typeof letterText !== "string" || typeof paymentIntentId !== "string" || !(direction in HUMANIZER_DIRECTIONS)) {
+  if (!letterText || typeof letterText !== "string" || typeof paymentIntentId !== "string" || typeof direction !== "string" || !Object.prototype.hasOwnProperty.call(HUMANIZER_DIRECTIONS, direction)) {
     return NextResponse.json(
       { error: "letterText, direction und paymentIntentId sind erforderlich." },
       { status: 400 }
@@ -84,7 +86,11 @@ export async function POST(req: NextRequest) {
         }
       } catch (err) {
         console.error("humanize stream error", err); // never letter content
-        controller.error(err);
+        try {
+          controller.error(err);
+        } catch {
+          // stream already cancelled by the client — nothing to signal
+        }
         return; // PI stays unconsumed → client may retry
       }
       // Mark consumed only after a full successful stream.
@@ -96,6 +102,11 @@ export async function POST(req: NextRequest) {
         console.error("humanize consume-mark error", err); // user got their letter; worst case a free retry window
       }
       controller.close();
+    },
+    cancel() {
+      // Client disconnected: stop paying Anthropic for tokens nobody receives.
+      // The abort surfaces as a throw in the for-await above → caught → PI unconsumed.
+      stream.controller.abort();
     },
   });
 
