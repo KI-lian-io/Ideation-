@@ -1,5 +1,6 @@
 'use client'
 import React, { useReducer, useState, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import type { Lebenslauf } from '@/lib/schema'
 import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
@@ -7,6 +8,9 @@ import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS, questionsForPosting } from '@/lib/prompts'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
+
+// Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
+const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // State machine types
@@ -750,6 +754,9 @@ function CoverLetterResultView({
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
   // One-shot edit hint — dismissed on first interaction (D-06)
   const [showEditHint, setShowEditHint] = useState(true)
+  const [humanizerOpen, setHumanizerOpen] = useState(false)
+  // Pre-refinement letter, kept so the user can restore (null = not refined yet)
+  const [originalLetter, setOriginalLetter] = useState<string | null>(null)
 
   async function handleCopy() {
     try {
@@ -815,6 +822,15 @@ function CoverLetterResultView({
 
       {/* Action row — flex, gap-3, wraps on mobile (CL-06 / D-07) */}
       <div className="flex items-center gap-3 flex-wrap">
+        {/* Humanizer+ upsell — one-shot purchase, additive refinement (spec D1/D3) */}
+        <button
+          onClick={() => setHumanizerOpen(true)}
+          aria-label="Feinschliff mit Humanizer+ kaufen"
+          className={btnClass('accent')}
+        >
+          Feinschliff mit Humanizer+ — 2,99 €
+        </button>
+
         {/* Copy — primary button (CL-06) */}
         <button
           onClick={handleCopy}
@@ -851,6 +867,35 @@ function CoverLetterResultView({
           Start over
         </button>
       </div>
+
+      {originalLetter !== null && (
+        <button
+          onClick={() => {
+            setLetterText(originalLetter)
+            setOriginalLetter(null)
+          }}
+          className={`${btnClass('secondary')} self-start`}
+        >
+          Original wiederherstellen
+        </button>
+      )}
+
+      {/* Rendered only once opened — next/dynamic's import() fires on first render of this
+          element, and the module-level loadStripe() call would fetch Stripe.js (and its
+          fraud-prevention cookies) as soon as the letter finishes, not on the actual click,
+          if this were mounted unconditionally with open={false}. */}
+      {humanizerOpen && (
+        <HumanizerModal
+          open={humanizerOpen}
+          letterText={letterText}
+          onClose={() => setHumanizerOpen(false)}
+          onDone={(refined) => {
+            setOriginalLetter((prev) => prev ?? letterText)
+            setLetterText(refined)
+            setHumanizerOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }
