@@ -50,6 +50,10 @@ GERMAN ANSCHREIBEN NORMS:
 - Structure: opening (why writing + the specific role), middle (why you + why THIS
   company, with concrete, CV-grounded achievements + the applicant's stated motivation),
   close (availability, "Ich freue mich auf ...", signature line).
+- If the applicant's answers state a salary expectation (Gehaltsvorstellung) or an earliest
+  start date (Eintrittstermin), state them plainly in the closing paragraph, German-convention
+  phrasing (e.g. "Meine Gehaltsvorstellung liegt bei ...", "Ein Eintritt ist zum ... möglich").
+  If the answers do not provide them, do NOT mention or invent them.
 - Address the specific job posting. No superlatives, no English-style hype.
 
 Write only the letter. No preamble.`;
@@ -81,3 +85,25 @@ export const PERSONALIZATION_QUESTIONS = [
   "How would colleagues describe your working style in a sentence?",
   "Any gap, career change, or unusual background you'd like to address up front?",
 ];
+
+/** Conditional questions appended when the posting explicitly asks for these (German norm). */
+export const SALARY_QUESTION =
+  'This posting asks for a salary expectation (Gehaltsvorstellung). What gross annual figure or range do you want to state? (e.g. "55.000–60.000 € brutto/Jahr")';
+export const START_DATE_QUESTION =
+  'This posting asks for your earliest start date (Eintrittstermin). When can you start? (e.g. "zum 01.09.2026" or "ab sofort")';
+
+const SALARY_RE = /gehaltsvorstellung|gehaltswunsch|salary expectation|desired salary/i;
+const START_DATE_RE =
+  /eintrittstermin|eintrittsdatum|frühestmöglich|starting date|earliest start|start date/i;
+
+/**
+ * Base questions plus conditionals the posting explicitly requests.
+ * Pure function — the reducer re-syncs the answers array off this on every
+ * posting change, preserving answers by question identity.
+ */
+export function questionsForPosting(jobPosting: string): string[] {
+  const qs = [...PERSONALIZATION_QUESTIONS];
+  if (SALARY_RE.test(jobPosting)) qs.push(SALARY_QUESTION);
+  if (START_DATE_RE.test(jobPosting)) qs.push(START_DATE_QUESTION);
+  return qs;
+}

@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types src/lib/__tests__/lebenslauf-utils.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",

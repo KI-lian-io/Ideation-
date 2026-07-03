@@ -5,7 +5,7 @@ import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
-import { PERSONALIZATION_QUESTIONS } from '@/lib/prompts'
+import { PERSONALIZATION_QUESTIONS, questionsForPosting } from '@/lib/prompts'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
@@ -307,8 +307,15 @@ function reducer(state: AppState, action: AppAction): AppState {
     // -------------------------------------------------------------------------
     case 'START_COVER_LETTER':
       return { ...state, phase: 'cover_letter_input' }
-    case 'SET_JOB_POSTING':
-      return { ...state, jobPosting: action.payload }
+    case 'SET_JOB_POSTING': {
+      // Re-derive the question list from the posting (conditional Gehalt/Eintrittstermin
+      // questions) and sync answers by question identity so typed answers survive.
+      const questions = questionsForPosting(action.payload)
+      const answers = questions.map(
+        (q) => state.answers.find((a) => a.question === q) ?? { question: q, answer: '' }
+      )
+      return { ...state, jobPosting: action.payload, answers }
+    }
     case 'SET_ANSWER': {
       const answers = state.answers.map((a, i) =>
         i === action.payload.index ? { ...a, answer: action.payload.answer } : a
