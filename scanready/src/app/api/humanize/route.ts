@@ -93,6 +93,11 @@ export async function POST(req: NextRequest) {
         }
         return; // PI stays unconsumed → client may retry
       }
+      if (req.signal.aborted) {
+        // Disconnect raced with natural stream completion — the client never
+        // received the full letter, so leave the PI redeemable.
+        return;
+      }
       // Mark consumed only after a full successful stream.
       try {
         await getStripe().paymentIntents.update(paymentIntentId, {
