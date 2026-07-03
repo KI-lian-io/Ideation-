@@ -107,3 +107,35 @@ export function questionsForPosting(jobPosting: string): string[] {
   if (START_DATE_RE.test(jobPosting)) qs.push(START_DATE_QUESTION);
   return qs;
 }
+
+// ---------------------------------------------------------------------------
+// Humanizer+ — grounded style refinement (Feinschliff). NOT a rewrite, NOT
+// detection-evasion: rephrase only what is present; never add facts.
+// ---------------------------------------------------------------------------
+
+export const HUMANIZER_DIRECTIONS = {
+  formeller:
+    "Tune the register toward a traditional Konzern/Mittelstand application: more formal phrasing, conservative sentence structure, classical courtesy formulas.",
+  moderner:
+    "Tune the register toward a startup/scale-up: direct, energetic, shorter sentences, less ceremonial — while staying professional German (Sie-Form).",
+  praegnanter:
+    "Tighten the letter: remove redundancy and filler, merge overlapping sentences, make it noticeably shorter while preserving every fact and the applicant's voice.",
+} as const;
+
+export type HumanizerDirection = keyof typeof HUMANIZER_DIRECTIONS;
+
+export const HUMANIZER_SYSTEM = `You refine an existing German Anschreiben the applicant already has. This is a style refinement (Feinschliff), NOT a rewrite.
+
+GROUNDING — non-negotiable:
+- Preserve every factual claim exactly: employers, numbers, dates, qualifications, the company, the role, salary figures, start dates. Never add facts, achievements, or qualifications that are not in the input letter.
+- Preserve the applicant's personal motivations and specific wording where they carry voice.
+
+RULES:
+- Keep the DIN-5008 business-letter structure and one-page length.
+- Formal German (Sie-Form). No English-style hype, no clichés.
+- Apply exactly the refinement direction given in the user message.
+- Output only the refined letter. No preamble, no explanations.`;
+
+export function buildHumanizerUser(letterText: string, direction: HumanizerDirection): string {
+  return `REFINEMENT DIRECTION:\n${HUMANIZER_DIRECTIONS[direction]}\n\n---LETTER---\n${letterText}\n---END---\n\nWrite the refined Anschreiben now.`;
+}

@@ -6,6 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
 import { questionsForPosting, PERSONALIZATION_QUESTIONS, SALARY_QUESTION, START_DATE_QUESTION } from '../prompts.ts'
+import { HUMANIZER_DIRECTIONS, buildHumanizerUser, HUMANIZER_SYSTEM } from '../prompts.ts'
 
 test('plain posting returns only the base questions', () => {
   const qs = questionsForPosting('Wir suchen eine:n Frontend-Entwickler:in in Berlin.')
@@ -36,4 +37,19 @@ test('posting asking for both appends both, salary first', () => {
 test('matching is case-insensitive', () => {
   const qs = questionsForPosting('GEHALTSVORSTELLUNG erwünscht')
   assert.ok(qs.includes(SALARY_QUESTION))
+})
+
+test('humanizer has exactly the three directions', () => {
+  assert.deepEqual(Object.keys(HUMANIZER_DIRECTIONS).sort(), ['formeller', 'moderner', 'praegnanter'])
+})
+
+test('buildHumanizerUser embeds the letter and the chosen direction text', () => {
+  const out = buildHumanizerUser('Sehr geehrte Damen und Herren, ...', 'formeller')
+  assert.ok(out.includes('Sehr geehrte Damen und Herren'))
+  assert.ok(out.includes(HUMANIZER_DIRECTIONS.formeller))
+})
+
+test('humanizer system prompt forbids adding facts and contains no detection-evasion framing', () => {
+  assert.ok(/never add facts|Never add facts/i.test(HUMANIZER_SYSTEM))
+  assert.ok(!/detect/i.test(HUMANIZER_SYSTEM))
 })
