@@ -8,6 +8,7 @@ import {
   buildHumanizerUser,
   type HumanizerDirection,
 } from "@/lib/prompts";
+import { enforceSameOrigin, sentinelVerdict } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -23,6 +24,9 @@ export const maxDuration = 300;
  * throws and the PI is left unconsumed (retryable) instead of being marked spent.
  */
 export async function POST(req: NextRequest) {
+  const originBlock = enforceSameOrigin(req);
+  if (originBlock) return originBlock;
+
   const { letterText, direction, paymentIntentId } = await req.json();
 
   if (!letterText || typeof letterText !== "string" || typeof paymentIntentId !== "string" || typeof direction !== "string" || !Object.prototype.hasOwnProperty.call(HUMANIZER_DIRECTIONS, direction)) {
@@ -78,11 +82,33 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let buffer = "";
+      let gate: "pending" | "clean" | "sentinel" = "pending";
       try {
         for await (const event of stream) {
           if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-            controller.enqueue(encoder.encode(event.delta.text));
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(event.delta.text));
+              continue;
+            }
+            buffer += event.delta.text;
+            gate = sentinelVerdict(buffer, false);
+            if (gate === "sentinel") {
+              // Injection/garbage input: stop paying for tokens, end the stream as an
+              // error, and return BEFORE the consume-mark below — the PI stays
+              // redeemable, same as any other failed-refinement path.
+              stream.controller.abort();
+              controller.error(new Error("invalid input"));
+              return;
+            }
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(buffer));
+              buffer = "";
+            }
           }
+        }
+        if (gate === "pending" && sentinelVerdict(buffer, true) === "clean" && buffer) {
+          controller.enqueue(encoder.encode(buffer)); // stream ended shorter than sentinel
         }
       } catch (err) {
         console.error("humanize stream error", err); // never letter content

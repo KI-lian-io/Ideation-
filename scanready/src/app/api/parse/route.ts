@@ -3,6 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { anthropic, PARSE_MODEL } from "@/lib/anthropic";
 import { LebenslaufSchema } from "@/lib/schema";
 import { PARSE_SYSTEM, buildParseUser } from "@/lib/prompts";
+import { enforceRateLimit, enforceSameOrigin } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,6 +13,11 @@ export const maxDuration = 60;
  * Returns a structured, grounded German Lebenslauf. Stateless: nothing is stored.
  */
 export async function POST(req: NextRequest) {
+  const originBlock = enforceSameOrigin(req);
+  if (originBlock) return originBlock;
+  const rateBlock = await enforceRateLimit(req, "parse");
+  if (rateBlock) return rateBlock;
+
   try {
     const { resumeText } = await req.json();
     if (!resumeText || typeof resumeText !== "string") {

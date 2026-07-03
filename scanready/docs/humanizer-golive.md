@@ -24,6 +24,12 @@ Humanizer+ button ships to production traffic.
 - [ ] Landing page copy check: zero-retention claim still accurate (it is — no storage
       was added), but mention that payment uses Stripe
 
+## Abuse protection
+- [ ] Anthropic console: set a monthly spend cap + email alerts (the hard ceiling)
+- [ ] Create an Upstash Redis database (free tier) and set UPSTASH_REDIS_REST_URL /
+      UPSTASH_REDIS_REST_TOKEN in Vercel — without them, rate limiting is OFF (fail-open)
+- [ ] Verify: 6th parse from one IP within an hour returns the German 429
+
 ## Rollback
 - Unset NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY + STRIPE_SECRET_KEY in Vercel → intent route
   returns 503, modal shows the init error, core free flow unaffected.

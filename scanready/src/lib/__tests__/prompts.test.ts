@@ -6,7 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
 import { questionsForPosting, PERSONALIZATION_QUESTIONS, SALARY_QUESTION, START_DATE_QUESTION } from '../prompts.ts'
-import { HUMANIZER_DIRECTIONS, buildHumanizerUser, HUMANIZER_SYSTEM } from '../prompts.ts'
+import { HUMANIZER_DIRECTIONS, buildHumanizerUser, HUMANIZER_SYSTEM, COVER_LETTER_SYSTEM } from '../prompts.ts'
 
 test('plain posting returns only the base questions', () => {
   const qs = questionsForPosting('Wir suchen eine:n Frontend-Entwickler:in in Berlin.')
@@ -52,4 +52,12 @@ test('buildHumanizerUser embeds the letter and the chosen direction text', () =>
 test('humanizer system prompt forbids adding facts and contains no detection-evasion framing', () => {
   assert.ok(/never add facts|Never add facts/i.test(HUMANIZER_SYSTEM))
   assert.ok(!/detect/i.test(HUMANIZER_SYSTEM))
+})
+
+test('cover-letter and humanizer prompts carry the untrusted-input rules + sentinel', () => {
+  for (const p of [COVER_LETTER_SYSTEM, HUMANIZER_SYSTEM]) {
+    assert.ok(p.includes('UNTRUSTED INPUT'))
+    assert.ok(p.includes('UNGÜLTIGE EINGABE'))
+    assert.ok(!/detect/i.test(p))
+  }
 })

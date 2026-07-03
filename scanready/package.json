@@ -10,12 +10,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
     "@stripe/react-stripe-js": "^6.7.0",
     "@stripe/stripe-js": "^9.9.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",

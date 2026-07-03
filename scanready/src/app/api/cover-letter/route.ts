@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { COVER_LETTER_SYSTEM, buildCoverLetterUser } from "@/lib/prompts";
+import { enforceRateLimit, enforceSameOrigin, sentinelVerdict } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -11,6 +12,11 @@ export const maxDuration = 300;
  * Streams an authentic, grounded German Anschreiben as plain text. Stateless.
  */
 export async function POST(req: NextRequest) {
+  const originBlock = enforceSameOrigin(req);
+  if (originBlock) return originBlock;
+  const rateBlock = await enforceRateLimit(req, "letter");
+  if (rateBlock) return rateBlock;
+
   const { cvText, jobPosting, answers } = await req.json();
   if (!cvText || typeof cvText !== "string" || !jobPosting || typeof jobPosting !== "string" || !Array.isArray(answers)) {
     return NextResponse.json(
@@ -56,14 +62,34 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let buffer = "";
+      let gate: "pending" | "clean" | "sentinel" = "pending";
       try {
         for await (const event of stream) {
           if (
             event.type === "content_block_delta" &&
             event.delta.type === "text_delta"
           ) {
-            controller.enqueue(encoder.encode(event.delta.text));
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(event.delta.text));
+              continue;
+            }
+            buffer += event.delta.text;
+            gate = sentinelVerdict(buffer, false);
+            if (gate === "sentinel") {
+              // Injection/garbage input: stop paying for tokens, end the stream as an error.
+              stream.controller.abort();
+              controller.error(new Error("invalid input"));
+              return;
+            }
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(buffer));
+              buffer = "";
+            }
           }
+        }
+        if (gate === "pending" && sentinelVerdict(buffer, true) === "clean" && buffer) {
+          controller.enqueue(encoder.encode(buffer)); // stream ended shorter than sentinel
         }
       } catch (err) {
         console.error("cover-letter stream error", err);

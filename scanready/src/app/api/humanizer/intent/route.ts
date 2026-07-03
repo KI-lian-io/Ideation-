@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { HUMANIZER_PRICE_CENTS } from "@/lib/humanizer";
+import { enforceRateLimit, enforceSameOrigin } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,12 @@ export const runtime = "nodejs";
  * no body, no user data. allow_redirects: 'never' keeps the whole payment
  * inside the embedded Payment Element (the letter lives only in client memory).
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const originBlock = enforceSameOrigin(req);
+  if (originBlock) return originBlock;
+  const rateBlock = await enforceRateLimit(req, "intent");
+  if (rateBlock) return rateBlock;
+
   if (!isStripeConfigured()) {
     return NextResponse.json(
       { error: "Zahlungen sind derzeit nicht verfügbar." },

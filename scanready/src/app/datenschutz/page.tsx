@@ -36,6 +36,11 @@ export default function DatenschutzPage() {
           Vercel Inc.; dabei fallen technisch notwendige Server-Logs (z.&nbsp;B. IP-Adresse) an
           (Art. 6 Abs. 1 lit. f DSGVO).
         </p>
+        <p>
+          Zur Missbrauchsvermeidung (Ratenbegrenzung) wird pro Anfrage ein gekürzter Hash-Wert
+          Ihrer IP-Adresse für maximal 60 Minuten gespeichert (Art. 6 Abs. 1 lit. f DSGVO);
+          die IP-Adresse selbst wird dabei nicht gespeichert.
+        </p>
       </section>
 
       <section className="flex flex-col gap-2">
