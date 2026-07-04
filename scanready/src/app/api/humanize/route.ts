@@ -8,7 +8,7 @@ import {
   buildHumanizerUser,
   type HumanizerDirection,
 } from "@/lib/prompts";
-import { enforceSameOrigin, sentinelVerdict } from "@/lib/abuse-guards";
+import { enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -94,11 +94,15 @@ export async function POST(req: NextRequest) {
             buffer += event.delta.text;
             gate = sentinelVerdict(buffer, false);
             if (gate === "sentinel") {
-              // Injection/garbage input: stop paying for tokens, end the stream as an
-              // error, and return BEFORE the consume-mark below — the PI stays
-              // redeemable, same as any other failed-refinement path.
+              // Injection/garbage input: stop paying for tokens and pass the sentinel
+              // through as the (whole) response body — the client recognizes it and
+              // shows a specific German error. No controller.error: that produced an
+              // opaque "failed to pipe response" 500. This return is BEFORE the
+              // consume-mark below — the PI stays redeemable, same as any other
+              // failed-refinement path.
               stream.controller.abort();
-              controller.error(new Error("invalid input"));
+              controller.enqueue(encoder.encode(INVALID_INPUT_SENTINEL));
+              controller.close();
               return;
             }
             if (gate === "clean") {

@@ -61,3 +61,9 @@ test('cover-letter and humanizer prompts carry the untrusted-input rules + senti
     assert.ok(!/detect/i.test(p))
   }
 })
+
+test('hardening rules bias against false refusals', () => {
+  for (const p of [COVER_LETTER_SYSTEM, HUMANIZER_SYSTEM]) {
+    assert.ok(p.includes('when in doubt, do the task'))
+  }
+})

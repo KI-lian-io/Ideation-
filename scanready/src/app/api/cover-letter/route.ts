@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { COVER_LETTER_SYSTEM, buildCoverLetterUser } from "@/lib/prompts";
-import { enforceRateLimit, enforceSameOrigin, sentinelVerdict } from "@/lib/abuse-guards";
+import { enforceRateLimit, enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -77,9 +77,13 @@ export async function POST(req: NextRequest) {
             buffer += event.delta.text;
             gate = sentinelVerdict(buffer, false);
             if (gate === "sentinel") {
-              // Injection/garbage input: stop paying for tokens, end the stream as an error.
+              // Injection/garbage input: stop paying for tokens and pass the sentinel
+              // through as the (whole) response body — the client recognizes it and
+              // shows a specific German error. No controller.error: that produced an
+              // opaque "failed to pipe response" 500.
               stream.controller.abort();
-              controller.error(new Error("invalid input"));
+              controller.enqueue(encoder.encode(INVALID_INPUT_SENTINEL));
+              controller.close();
               return;
             }
             if (gate === "clean") {

@@ -7,6 +7,11 @@ import { NextRequest, NextResponse } from "next/server.js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
+// Re-exported for compat — the sentinel constant/function moved to sentinel.ts
+// (client-safe: zero imports) so browser code can import it without pulling in
+// this file's server-only baggage (node:crypto, next/server, Upstash).
+export { INVALID_INPUT_SENTINEL, sentinelVerdict } from "./sentinel.ts";
+
 /**
  * Abuse guards for the Claude-backed routes: per-IP rate limiting (Upstash,
  * sliding window, hashed IPs with short TTL — GDPR: Art. 6(1)(f) transient
@@ -101,21 +106,4 @@ export function enforceSameOrigin(req: NextRequest): NextResponse | null {
     }
   }
   return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 403 });
-}
-
-/** Sentinel emitted by the model when inputs aren't a real CV/posting/letter. */
-export const INVALID_INPUT_SENTINEL = "UNGÜLTIGE EINGABE";
-
-/**
- * Streaming gate: buffer the first chunks until we can tell whether the model
- * emitted the invalid-input sentinel. 'pending' = keep buffering (buffer is
- * still a strict prefix-candidate shorter than the sentinel and stream not done).
- */
-export function sentinelVerdict(buffer: string, done: boolean): "pending" | "clean" | "sentinel" {
-  const probe = buffer.trimStart();
-  if (probe.startsWith(INVALID_INPUT_SENTINEL)) return "sentinel";
-  if (!done && probe.length < INVALID_INPUT_SENTINEL.length && INVALID_INPUT_SENTINEL.startsWith(probe)) {
-    return "pending";
-  }
-  return "clean";
 }

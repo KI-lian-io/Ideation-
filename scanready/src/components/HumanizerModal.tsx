@@ -12,6 +12,7 @@ import { useState, useRef } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { HUMANIZER_DIRECTIONS, type HumanizerDirection } from '@/lib/prompts'
+import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, EYEBROW } from '@/components/ui'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
@@ -108,6 +109,11 @@ export default function HumanizerModal({
         const { done, value } = await reader.read()
         if (done) break
         refined += decoder.decode(value, { stream: true })
+      }
+      if (refined.trimStart().startsWith(INVALID_INPUT_SENTINEL)) {
+        throw new Error(
+          'Der Text wurde nicht als Anschreiben erkannt. Ihre Zahlung bleibt gültig — bitte versuchen Sie es erneut.'
+        )
       }
       if (!refined.trim()) throw new Error('Leere Antwort.')
       sessionStorage.removeItem(PAID_ATTEMPT_KEY)

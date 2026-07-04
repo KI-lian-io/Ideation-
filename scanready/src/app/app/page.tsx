@@ -7,6 +7,7 @@ import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS, questionsForPosting } from '@/lib/prompts'
+import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
@@ -1026,6 +1027,14 @@ export default function Home() {
       if (tail) {
         acc += tail
         setLetterText((prev) => prev + tail)
+      }
+      if (acc.trimStart().startsWith(INVALID_INPUT_SENTINEL)) {
+        dispatch({
+          type: 'COVER_LETTER_ERROR',
+          payload:
+            'Die Eingaben wurden nicht als Lebenslauf bzw. Stellenanzeige erkannt. Bitte prüfen Sie, ob beide Felder vollständig eingefügt sind, und versuchen Sie es erneut.',
+        })
+        return
       }
       // A stream can end cleanly but empty (thinking-only output, refusal, or a
       // max_tokens cut with zero text deltas). Guard the done transition on

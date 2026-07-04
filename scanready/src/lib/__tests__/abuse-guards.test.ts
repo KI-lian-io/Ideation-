@@ -4,7 +4,8 @@
  */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { clientIdFrom, sentinelVerdict, INVALID_INPUT_SENTINEL } from '../abuse-guards.ts'
+import { clientIdFrom } from '../abuse-guards.ts'
+import { sentinelVerdict, INVALID_INPUT_SENTINEL } from '../sentinel.ts'
 
 test('clientIdFrom hashes first forwarded hop, no raw IP in output', () => {
   const h = new Headers({ 'x-forwarded-for': '203.0.113.7, 10.0.0.1' })
