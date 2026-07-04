@@ -3,7 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { anthropic, PARSE_MODEL } from "@/lib/anthropic";
 import { LebenslaufSchema } from "@/lib/schema";
 import { PARSE_SYSTEM, buildParseUser } from "@/lib/prompts";
-import { enforceRateLimit, enforceSameOrigin } from "@/lib/abuse-guards";
+import { enforceRateLimit, enforceSameOrigin, readJsonObject } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
   if (rateBlock) return rateBlock;
 
   try {
-    const { resumeText } = await req.json();
+    const body = await readJsonObject(req);
+    const resumeText = body?.resumeText;
     if (!resumeText || typeof resumeText !== "string") {
       return NextResponse.json({ error: "Lebenslauf-Text ist erforderlich." }, { status: 400 });
     }
@@ -41,6 +42,13 @@ export async function POST(req: NextRequest) {
 
     if (response.stop_reason === "refusal") {
       return NextResponse.json({ error: "Request was declined." }, { status: 422 });
+    }
+
+    if (!response.parsed_output) {
+      return NextResponse.json(
+        { error: "Der Lebenslauf konnte nicht vollständig verarbeitet werden. Bitte kürzen Sie den Text oder versuchen Sie es erneut." },
+        { status: 422 }
+      );
     }
 
     return NextResponse.json({ lebenslauf: response.parsed_output });

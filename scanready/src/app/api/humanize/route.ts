@@ -8,7 +8,7 @@ import {
   buildHumanizerUser,
   type HumanizerDirection,
 } from "@/lib/prompts";
-import { enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL } from "@/lib/abuse-guards";
+import { enforceRateLimit, enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL, readJsonObject } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -26,8 +26,13 @@ export const maxDuration = 300;
 export async function POST(req: NextRequest) {
   const originBlock = enforceSameOrigin(req);
   if (originBlock) return originBlock;
+  const rateBlock = await enforceRateLimit(req, "humanize");
+  if (rateBlock) return rateBlock;
 
-  const { letterText, direction, paymentIntentId } = await req.json();
+  const reqBody = await readJsonObject(req);
+  const letterText = reqBody?.letterText;
+  const direction = reqBody?.direction;
+  const paymentIntentId = reqBody?.paymentIntentId;
 
   if (!letterText || typeof letterText !== "string" || typeof paymentIntentId !== "string" || typeof direction !== "string" || !Object.prototype.hasOwnProperty.call(HUMANIZER_DIRECTIONS, direction)) {
     return NextResponse.json(

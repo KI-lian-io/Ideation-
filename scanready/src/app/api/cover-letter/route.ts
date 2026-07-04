@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { COVER_LETTER_SYSTEM, buildCoverLetterUser } from "@/lib/prompts";
-import { enforceRateLimit, enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL } from "@/lib/abuse-guards";
+import { enforceRateLimit, enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL, readJsonObject, isValidAnswers } from "@/lib/abuse-guards";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -17,8 +17,17 @@ export async function POST(req: NextRequest) {
   const rateBlock = await enforceRateLimit(req, "letter");
   if (rateBlock) return rateBlock;
 
-  const { cvText, jobPosting, answers } = await req.json();
-  if (!cvText || typeof cvText !== "string" || !jobPosting || typeof jobPosting !== "string" || !Array.isArray(answers)) {
+  const reqBody = await readJsonObject(req);
+  const cvText = reqBody?.cvText;
+  const jobPosting = reqBody?.jobPosting;
+  const answers = reqBody?.answers;
+  if (
+    !cvText ||
+    typeof cvText !== "string" ||
+    !jobPosting ||
+    typeof jobPosting !== "string" ||
+    !isValidAnswers(answers)
+  ) {
     return NextResponse.json(
       { error: "cvText, jobPosting und answers sind erforderlich." },
       { status: 400 }

@@ -27,6 +27,9 @@ const RATE_LIMITS = {
   parse: { limit: 5, window: "1 h" },
   letter: { limit: 10, window: "1 h" },
   intent: { limit: 10, window: "1 h" },
+  // Generous: paid-gated route, but PI verify + Claude retries are free to spam
+  // without a bucket. Legitimate retries (network hiccup, disconnect) must never hit it.
+  humanize: { limit: 20, window: "1 h" },
 } as const;
 
 export type RateBucket = keyof typeof RATE_LIMITS;
@@ -58,6 +61,45 @@ function getLimiter(bucket: RateBucket): Ratelimit | null {
     limiters.set(bucket, limiter);
   }
   return limiter;
+}
+
+/**
+ * Parse the JSON body of a request; null when malformed or not a plain object.
+ * Centralizes the try/catch so a bare `req.json()` (which throws on malformed
+ * bodies or non-JSON) can never surface as an uncaught 500 — routes map null
+ * to their existing German 400 shape instead.
+ */
+export async function readJsonObject(req: NextRequest): Promise<Record<string, unknown> | null> {
+  try {
+    const body = await req.json();
+    return body && typeof body === "object" && !Array.isArray(body) ? body : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Shape of one cover-letter personalization Q&A pair. */
+export type AnswerEntry = { question: string; answer: string };
+
+/**
+ * True when `value` is a well-formed answers[] array for /api/cover-letter:
+ * a plain array, capped at `maxCount` (default 10 — aggregate-size bypass of
+ * the per-field ANSWER_LIMIT otherwise), where every element is a
+ * {question, answer} pair of strings. A non-object element (e.g. `null`)
+ * would otherwise crash the route with a TypeError on `ans.answer`.
+ */
+export function isValidAnswers(value: unknown, maxCount = 10): value is AnswerEntry[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= maxCount &&
+    value.every(
+      (a): a is AnswerEntry =>
+        !!a &&
+        typeof a === "object" &&
+        typeof (a as Record<string, unknown>).answer === "string" &&
+        typeof (a as Record<string, unknown>).question === "string"
+    )
+  );
 }
 
 /** First hop of x-forwarded-for (Vercel sets it), hashed so no raw IP is stored. */
