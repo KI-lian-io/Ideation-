@@ -381,6 +381,34 @@ function InputView({
   const resumeOverLimit = resumeText.length > RESUME_LIMIT
   const isSubmitDisabled = resumeText.trim().length === 0 || resumeOverLimit
 
+  const [extracting, setExtracting] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploadedName, setUploadedName] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFile(file: File) {
+    setUploadError(null)
+    setExtracting(true)
+    try {
+      const { extractCvText, CvExtractError, EXTRACT_ERROR_MESSAGES } = await import('@/lib/extract-cv')
+      try {
+        const text = await extractCvText(file)
+        onTextChange(text)
+        setUploadedName(file.name)
+      } catch (err) {
+        setUploadedName(null)
+        if (err instanceof CvExtractError) {
+          setUploadError(EXTRACT_ERROR_MESSAGES[err.reason])
+        } else {
+          setUploadError('Die Datei konnte nicht gelesen werden. Bitte kopieren Sie den Text manuell in das Feld.')
+        }
+      }
+    } finally {
+      setExtracting(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -388,7 +416,7 @@ function InputView({
           Convert your CV to a German Lebenslauf
         </h1>
         <p className="text-sm text-muted">
-          Paste your US or UK resume below. We will reformat it to a norm-correct German
+          Paste your US or UK resume below — or upload it as PDF. We will reformat it to a norm-correct German
           tabellarischer Lebenslauf, grounded strictly in your real CV facts.
         </p>
       </div>
@@ -399,12 +427,49 @@ function InputView({
         Your CV is never stored or used for training — processing is stateless and zero-retention.
       </p>
 
+      {/* CV file upload — extraction runs in the browser; the file is never uploaded (INPUT-02) */}
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.txt,application/pdf,text/plain"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0]
+            if (f) handleFile(f)
+            e.target.value = '' // same file re-selectable
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={extracting}
+          className={btnClass('secondary')}
+        >
+          {extracting ? 'Wird gelesen …' : 'PDF oder .txt hochladen'}
+        </button>
+        <span className="text-sm text-muted">
+          {uploadedName
+            ? <>Übernommen aus <span className="font-mono">{uploadedName}</span> — unten prüfen &amp; bearbeiten</>
+            : 'Wird lokal in Ihrem Browser gelesen — die Datei verlässt Ihr Gerät nicht.'}
+        </span>
+      </div>
+      {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+
       <textarea
         value={resumeText}
         onChange={(e) => onTextChange(e.target.value)}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragOver(false)
+          const f = e.dataTransfer.files?.[0]
+          if (f) handleFile(f)
+        }}
         placeholder="Paste your resume here — name, contact info, work history, education, skills…"
         rows={18}
-        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        className={`w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${dragOver ? 'border-accent ring-2 ring-accent/30' : ''}`}
         aria-label="Resume text"
       />
       <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
