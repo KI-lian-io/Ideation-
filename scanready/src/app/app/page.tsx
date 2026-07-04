@@ -421,17 +421,23 @@ function InputView({
   const [uploadedName, setUploadedName] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Monotonic request id — guards against a slower, earlier extraction overwriting
+  // a faster, later one (or a stale error clobbering a subsequent success).
+  const extractionIdRef = useRef(0)
 
   async function handleFile(file: File) {
+    const requestId = ++extractionIdRef.current
     setUploadError(null)
     setExtracting(true)
     try {
       const { extractCvText, CvExtractError, EXTRACT_ERROR_MESSAGES } = await import('@/lib/extract-cv')
       try {
         const text = await extractCvText(file)
+        if (requestId !== extractionIdRef.current) return // superseded — drop this result
         onTextChange(text)
         setUploadedName(file.name)
       } catch (err) {
+        if (requestId !== extractionIdRef.current) return // superseded — drop this result
         setUploadedName(null)
         if (err instanceof CvExtractError) {
           setUploadError(EXTRACT_ERROR_MESSAGES[err.reason])
@@ -440,7 +446,7 @@ function InputView({
         }
       }
     } finally {
-      setExtracting(false)
+      if (requestId === extractionIdRef.current) setExtracting(false)
     }
   }
 
@@ -481,35 +487,39 @@ function InputView({
           disabled={extracting}
           className={btnClass('secondary')}
         >
-          {extracting ? 'Wird gelesen …' : 'PDF oder .txt hochladen'}
+          {extracting ? 'Reading file …' : 'Upload PDF or .txt'}
         </button>
-        <span className="text-sm text-muted">
+        <span className="text-sm text-muted" role="status">
           {uploadedName
-            ? <>Übernommen aus <span className="font-mono">{uploadedName}</span> — unten prüfen &amp; bearbeiten</>
-            : 'Wird lokal in Ihrem Browser gelesen — die Datei verlässt Ihr Gerät nicht.'}
+            ? <>Imported from <span className="font-mono">{uploadedName}</span> — review &amp; edit below</>
+            : 'Read locally in your browser — the file never leaves your device.'}
         </span>
       </div>
-      {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+      {uploadError && (
+        <p className="text-sm text-red-600" role="status">{uploadError}</p>
+      )}
 
       <textarea
         value={resumeText}
         onChange={(e) => onTextChange(e.target.value)}
+        disabled={extracting}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => {
           e.preventDefault()
           setDragOver(false)
+          if (extracting) return // matches the upload button's disabled state
           const f = e.dataTransfer.files?.[0]
           if (f) handleFile(f)
         }}
         placeholder="Paste your resume here — name, contact info, work history, education, skills…"
         rows={18}
-        className={`w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${dragOver ? 'border-accent ring-2 ring-accent/30' : ''}`}
+        className={`w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${dragOver ? 'border-accent ring-2 ring-accent/30' : ''}`}
         aria-label="Resume text"
       />
       <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
         {resumeText.length.toLocaleString('de-DE')} / 30.000
-        {resumeOverLimit && ' — Text zu lang'}
+        {resumeOverLimit && ' — too long'}
       </p>
 
       <button
@@ -523,7 +533,23 @@ function InputView({
   )
 }
 
+const LOADING_MESSAGES = [
+  'Reading your CV…',
+  'Mapping to German norms…',
+  'Structuring the Lebenslauf…',
+  'Almost there…',
+]
+
 function LoadingView() {
+  const [messageIndex, setMessageIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((i) => (i + 1) % LOADING_MESSAGES.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="flex flex-col gap-4" role="status" aria-label="Parsing your CV, please wait">
       <div className="animate-pulse flex flex-col gap-3">
@@ -542,7 +568,7 @@ function LoadingView() {
         <div className="h-4 w-1/2 rounded bg-faint" />
       </div>
       <p className="text-sm text-muted">
-        Converting your CV to a German Lebenslauf…
+        {LOADING_MESSAGES[messageIndex]}
       </p>
     </div>
   )
@@ -587,10 +613,10 @@ function ResultView({
           {/* Copy button — D-04 / LL-04 */}
           <button
             onClick={handleCopy}
-            aria-label="Lebenslauf in Zwischenablage kopieren"
+            aria-label="Copy Lebenslauf to clipboard"
             className={btnClass('primary')}
           >
-            {copyState === 'copied' ? 'Kopiert ✓' : 'Lebenslauf kopieren'}
+            {copyState === 'copied' ? 'Copied ✓' : 'Copy Lebenslauf'}
           </button>
           {/* Start over — D-16 */}
           <button
@@ -602,10 +628,16 @@ function ResultView({
         </div>
       </div>
 
+      {/* Visually-hidden live mirror so screen readers announce copy state changes
+          without making the visible error paragraph itself a chatty aria-live region. */}
+      <span className="sr-only" aria-live="polite">
+        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
+      </span>
+
       {/* Inline copy error (transient 3000ms) */}
       {copyState === 'error' && (
         <p className="text-sm text-red-600">
-          Kopieren fehlgeschlagen — bitte manuell auswählen.
+          Copy failed — please select the text manually.
         </p>
       )}
 
@@ -627,7 +659,7 @@ function ResultView({
       {/* Cover letter CTA — next step in the flow */}
       <div className="rounded-lg border border-hair bg-paper p-5">
         <p className="text-sm font-semibold text-ink mb-1">
-          Anschreiben schreiben
+          Write Anschreiben
         </p>
         <p className="text-sm text-muted mb-4">
           Generate an authentic German cover letter grounded in your Lebenslauf. You will answer
@@ -654,7 +686,7 @@ function ErrorView({
   onRetry: () => void
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" role="alert">
       <div className="rounded-lg border border-red-100 bg-red-50 p-4">
         <p className="text-sm font-semibold text-red-700">
           Something went wrong
@@ -682,7 +714,7 @@ function JunkView({
   onRetry: () => void
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" role="alert">
       <div className="rounded-lg border border-amber-100 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-amber-700">
           That did not look like a CV
@@ -690,6 +722,9 @@ function JunkView({
         <p className="mt-1 text-sm text-amber-600">
           We could not find a recognisable name and work or education history. Try pasting more
           of your resume — include your name, contact info, and at least one job or degree.
+        </p>
+        <p className="mt-2 text-sm text-amber-600">
+          Tip: free generations are limited per hour — make each attempt count.
         </p>
       </div>
 
@@ -764,7 +799,7 @@ function CoverLetterInputView({
         />
         <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-muted'}`}>
           {jobPosting.length.toLocaleString('de-DE')} / 15.000
-          {postingOverLimit && ' — Text zu lang'}
+          {postingOverLimit && ' — too long'}
         </p>
       </div>
 
@@ -784,7 +819,7 @@ function CoverLetterInputView({
             />
             <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
               {a.answer.length.toLocaleString('de-DE')} / 2.000
-              {a.answer.length > ANSWER_LIMIT && ' — Antwort zu lang'}
+              {a.answer.length > ANSWER_LIMIT && ' — answer too long'}
             </p>
           </div>
         ))}
@@ -804,7 +839,7 @@ function CoverLetterInputView({
           disabled={!canSubmit}
           className={btnClass('primary')}
         >
-          Anschreiben schreiben
+          Write my Anschreiben
         </button>
         <button
           onClick={onBack}
@@ -818,8 +853,12 @@ function CoverLetterInputView({
 }
 
 function CoverLetterStreamingView({ letterText }: { letterText: string }) {
+  // Not an aria-live region: the container re-renders on every streamed chunk, and an
+  // aria-live wrapper around that would make screen readers announce the letter
+  // word-by-word as it streams in. Instead, a separate visually-hidden role="status"
+  // below announces only the start/completion transitions.
   return (
-    <div className="flex flex-col gap-4" role="status" aria-label="Generating Anschreiben">
+    <div className="flex flex-col gap-4">
       <p className={EYEBROW}>Anschreiben</p>
       {letterText ? (
         // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
@@ -835,7 +874,12 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
           <div className="h-4 w-3/5 rounded bg-faint" />
         </div>
       )}
-      <p className="text-sm text-muted">Generating Anschreiben…</p>
+      <p className="text-sm text-muted">
+        {letterText ? 'Generating Anschreiben…' : 'Composing… (the first sentences take a few seconds)'}
+      </p>
+      <span className="sr-only" role="status">
+        {letterText ? '' : 'Generating your Anschreiben…'}
+      </span>
     </div>
   )
 }
@@ -857,6 +901,13 @@ function CoverLetterResultView({
   const [humanizerOpen, setHumanizerOpen] = useState(false)
   // Pre-refinement letter, kept so the user can restore (null = not refined yet)
   const [originalLetter, setOriginalLetter] = useState<string | null>(null)
+  // This view only mounts once the letter is done streaming — announce completion
+  // once on mount, then clear so it doesn't linger as stale status text.
+  const [readyAnnouncement, setReadyAnnouncement] = useState('Anschreiben ready.')
+  useEffect(() => {
+    const t = setTimeout(() => setReadyAnnouncement(''), 1000)
+    return () => clearTimeout(t)
+  }, [])
 
   async function handleCopy() {
     try {
@@ -879,14 +930,20 @@ function CoverLetterResultView({
     URL.revokeObjectURL(url)
   }
 
+  const HUMANIZER_LIMIT = 10_000
+  const letterOverHumanizerLimit = letterText.length > HUMANIZER_LIMIT
+
   return (
     <div className="flex flex-col gap-6">
+      {/* Announces the streaming→result transition once, then clears itself */}
+      <span className="sr-only" role="status">{readyAnnouncement}</span>
+
       {/* Header: section label */}
       <p className={EYEBROW}>Anschreiben</p>
 
       {/* One-shot click-to-edit hint — hidden after first interaction */}
       {showEditHint && (
-        <p className="text-sm text-muted">Klicken zum Bearbeiten</p>
+        <p className="text-sm text-muted">Click to edit</p>
       )}
 
       {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
@@ -907,16 +964,22 @@ function CoverLetterResultView({
       {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
       <div className={NORM_NOTE}>
-        <p className={`${EYEBROW} mb-1`}>Hinweis</p>
+        <p className={`${EYEBROW} mb-1`}>Note</p>
         <p className="text-sm text-muted">
-          Bitte lassen Sie dieses Anschreiben von einem Muttersprachler prüfen, bevor Sie es absenden.
+          Before you send it: have a native German speaker review the final letter.
         </p>
       </div>
+
+      {/* Visually-hidden live mirror so screen readers announce copy state changes
+          without making the visible error paragraph itself a chatty aria-live region. */}
+      <span className="sr-only" aria-live="polite">
+        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
+      </span>
 
       {/* Inline copy error (transient 3000ms) */}
       {copyState === 'error' && (
         <p className="text-sm text-red-600">
-          Kopieren fehlgeschlagen — bitte manuell auswählen.
+          Copy failed — please select the text manually.
         </p>
       )}
 
@@ -925,7 +988,8 @@ function CoverLetterResultView({
         {/* Humanizer+ upsell — one-shot purchase, additive refinement (spec D1/D3) */}
         <button
           onClick={() => setHumanizerOpen(true)}
-          aria-label="Feinschliff mit Humanizer+ kaufen"
+          disabled={letterOverHumanizerLimit}
+          aria-label="Buy Feinschliff mit Humanizer+"
           className={btnClass('accent')}
         >
           Feinschliff mit Humanizer+ — 2,99 €
@@ -934,39 +998,52 @@ function CoverLetterResultView({
         {/* Copy — primary button (CL-06) */}
         <button
           onClick={handleCopy}
-          aria-label="Anschreiben in Zwischenablage kopieren"
+          aria-label="Copy Anschreiben to clipboard"
           className={btnClass('primary')}
         >
-          {copyState === 'copied' ? 'Kopiert ✓' : 'Anschreiben kopieren'}
+          {copyState === 'copied' ? 'Copied ✓' : 'Copy Anschreiben'}
         </button>
 
         {/* Download .txt — browser-native Blob, no server round-trip (D-07) */}
         <button
           onClick={handleDownload}
-          aria-label="Anschreiben als .txt herunterladen"
+          aria-label="Download Anschreiben as .txt"
           className={`${btnClass('secondary')} shrink-0`}
         >
-          .txt herunterladen
+          Download .txt
         </button>
 
-        {/* Regenerieren — re-runs same jobPosting + answers from reducer state */}
+        {/* Regenerate — re-runs same jobPosting + answers from reducer state */}
         <button
           onClick={onRegenerate}
-          aria-label="Anschreiben neu generieren"
+          aria-label="Regenerate Anschreiben"
           className={`${btnClass('secondary')} shrink-0`}
         >
-          Regenerieren
+          Regenerate
         </button>
 
         {/* Start over — dispatches RESET; no confirmation (D-06 / D-16) */}
         <button
           onClick={onReset}
-          aria-label="Zurücksetzen und neues Lebenslauf einfügen"
+          aria-label="Reset and paste a new Lebenslauf"
           className={`${btnClass('secondary')} shrink-0`}
         >
           Start over
         </button>
       </div>
+
+      {/* Over-limit hint — only rendered when the letter exceeds the Humanizer+ cap */}
+      {letterOverHumanizerLimit && (
+        <p className="text-sm text-muted">
+          Humanizer+ is available for letters up to 10,000 characters — yours is currently{' '}
+          {letterText.length.toLocaleString('en-US')}.
+        </p>
+      )}
+
+      {/* .txt-only forewarning — sets expectations until PDF export ships */}
+      <p className="text-sm text-muted">
+        .txt for now — paste into your own template. PDF export is coming.
+      </p>
 
       {originalLetter !== null && (
         <button
@@ -976,7 +1053,7 @@ function CoverLetterResultView({
           }}
           className={`${btnClass('secondary')} self-start`}
         >
-          Original wiederherstellen
+          Restore original
         </button>
       )}
 
@@ -1000,6 +1077,32 @@ function CoverLetterResultView({
 }
 
 // ---------------------------------------------------------------------------
+// Fetch failure → client-facing message mapping
+// ---------------------------------------------------------------------------
+
+/**
+ * Maps a non-ok fetch Response to an English client message. Status 429/403 get
+ * dedicated English copy (rate-limit / same-origin block — never server-authored,
+ * so there's no German string to preserve). Everything else falls through to the
+ * server's own `error` field when present (400s are authoritative and already
+ * German-localized for the user) — otherwise `fallback`.
+ */
+async function describeFetchFailure(res: Response, fallback: string): Promise<string> {
+  if (res.status === 429) {
+    const retryAfter = Number(res.headers.get('Retry-After'))
+    const minutes = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.ceil(retryAfter / 60) : null
+    return minutes
+      ? `Too many requests — the free tier is rate-limited. Please try again in about ${minutes} minutes.`
+      : 'Too many requests — the free tier is rate-limited. Please try again in a few minutes.'
+  }
+  if (res.status === 403) {
+    return 'Request blocked. Please use the app directly at this site and try again.'
+  }
+  const body = await res.json().catch(() => ({}))
+  return (body as { error?: string }).error ?? fallback
+}
+
+// ---------------------------------------------------------------------------
 // Main page component
 // ---------------------------------------------------------------------------
 
@@ -1012,6 +1115,26 @@ export default function Home() {
   useEffect(() => {
     return () => abortRef.current?.abort()
   }, [])
+
+  // Warn before leaving the tab once there's real work in progress — anything past
+  // 'input' has either an in-flight request or unsaved generated content the user
+  // would lose on an accidental reload/close.
+  useEffect(() => {
+    const guardedPhases: AppPhase[] = [
+      'result',
+      'cover_letter_input',
+      'cover_letter_streaming',
+      'cover_letter_result',
+    ]
+    if (!guardedPhases.includes(state.phase)) return
+
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [state.phase])
 
   async function handleGenerateLetter() {
     // Explicit guard instead of a non-null assertion: this path is only reachable
@@ -1034,10 +1157,13 @@ export default function Home() {
       if (!res.ok || !res.body) {
         // Surface a controlled message — never render the raw server body, which
         // could be an HTML error page, gateway text, or stack-trace-ish output
-        // from an upstream proxy/5xx (WR-01).
+        // from an upstream proxy/5xx (WR-01). 429/403 get dedicated English copy;
+        // other 4xxs fall back to the server's (German, authoritative) error field.
         dispatch({
           type: 'COVER_LETTER_ERROR',
-          payload: 'Generation failed — please try again.',
+          payload: res.ok
+            ? 'Generation failed — please try again.'
+            : await describeFetchFailure(res, 'Generation failed — please try again.'),
         })
         return
       }
@@ -1066,7 +1192,7 @@ export default function Home() {
         dispatch({
           type: 'COVER_LETTER_ERROR',
           payload:
-            'Die Eingaben wurden nicht als Lebenslauf bzw. Stellenanzeige erkannt. Bitte prüfen Sie, ob beide Felder vollständig eingefügt sind, und versuchen Sie es erneut.',
+            "Your input wasn't recognized as a CV and job posting. Please check that both fields contain the real documents — then try again.",
         })
         return
       }
@@ -1107,10 +1233,9 @@ export default function Home() {
       }
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
         dispatch({
           type: 'PARSE_ERROR',
-          payload: (body as { error?: string }).error ?? 'Failed to parse CV. Please try again.',
+          payload: await describeFetchFailure(res, 'Failed to parse CV. Please try again.'),
         })
         return
       }
