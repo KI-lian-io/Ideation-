@@ -210,6 +210,12 @@ export default function HomePage() {
                   Reverse-chronological DIN layout, correct date format,
                   personal-data block, photo guidance.
                 </p>
+                <p className="text-sm text-muted leading-relaxed mb-4">
+                  The rules aren&rsquo;t what most blogs claim, either: 61% of
+                  German recruiters prefer a <em>two-page</em> CV, and 64% call
+                  spelling errors a dealbreaker — DACH recruiter studies, not
+                  imported one-page lore.
+                </p>
                 <p className="text-sm text-muted italic mb-6">
                   A native German speaker should review the final letter before
                   you send it.
