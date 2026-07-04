@@ -442,7 +442,7 @@ function InputView({
         if (err instanceof CvExtractError) {
           setUploadError(EXTRACT_ERROR_MESSAGES[err.reason])
         } else {
-          setUploadError('Die Datei konnte nicht gelesen werden. Bitte kopieren Sie den Text manuell in das Feld.')
+          setUploadError('The file could not be read. Please copy the text into the field manually.')
         }
       }
     } finally {
@@ -664,6 +664,10 @@ function ResultView({
         <p className="text-sm text-muted mb-4">
           Generate an authentic German cover letter grounded in your Lebenslauf. You will answer
           3–5 short questions so the letter sounds like you, not generic AI prose.
+        </p>
+        <p className="text-sm text-muted mb-4">
+          Free to generate. An optional Humanizer+ polish (one-time 2,99&nbsp;€, no subscription)
+          is available on the finished letter.
         </p>
         <button
           onClick={onStartCoverLetter}

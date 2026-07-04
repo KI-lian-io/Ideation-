@@ -50,10 +50,10 @@ export async function extractCvText(file: File): Promise<string> {
   return cleaned;
 }
 
-/** German user-facing message per failure reason. */
+/** User-facing message per failure reason (English — matches the app's UI chrome language). */
 export const EXTRACT_ERROR_MESSAGES: Record<ExtractError, string> = {
-  too_large: "Die Datei ist zu groß (max. 10 MB).",
-  unsupported_type: "Bitte eine PDF- oder .txt-Datei wählen.",
+  too_large: "The file is too large (max. 10 MB).",
+  unsupported_type: "Please choose a PDF or .txt file.",
   empty_extraction:
-    "Aus dieser Datei ließ sich kein Text lesen — vermutlich ein gescanntes PDF. Bitte kopieren Sie den Text stattdessen manuell in das Feld.",
+    "No text could be read from this file — it's probably a scanned PDF. Please copy the text into the field manually instead.",
 };
