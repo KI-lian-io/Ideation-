@@ -7,7 +7,7 @@
 
 ## TL;DR — what this repo is
 
-An **ideation → execution** repo. We explored "low-barrier tools to build a business online," narrowed through research, and **converged on one thing to build**: an AI tool that helps **expats apply for jobs in Germany** — converts a foreign CV into a proper German **Lebenslauf** and writes an authentic-voice **Anschreiben** (cover letter). The **full product is built, shipped, and live on Vercel** — the four-step flow works end-to-end, security guards are in, the design pass is done, and the distribution artifacts are written. The only roadmap item left is the **optional Phase 6 analytics funnel** (PostHog).
+An **ideation → execution** repo. We explored "low-barrier tools to build a business online," narrowed through research, and **converged on one thing to build**: an AI tool that helps **expats apply for jobs in Germany** — converts a foreign CV into a proper German **Lebenslauf** and writes an authentic-voice **Anschreiben** (cover letter). The **full product is built, shipped, and live on Vercel** — the four-step flow works end-to-end (now incl. **PDF/txt CV upload, client-side extraction**), abuse protection is in (rate limiting, origin check, injection hardening), and **monetization Stage 1 ("Humanizer+" €2.99 one-shot refinement via Stripe) is code-complete on the branch** — gated for go-live only by founder actions (`scanready/docs/humanizer-golive.md`). Analytics (PostHog funnel) remains backlogged.
 
 Working product name: **ScanReady** (placeholder — "win the 8-second German recruiter scan"). Rename freely.
 
@@ -47,10 +47,16 @@ Working product name: **ScanReady** (placeholder — "win the 8-second German re
 - **Design pass + deploy** — trust-forward, German-market-credible landing + tool UI, WCAG-AA; **live on Vercel** with `vercel.json` `maxDuration` and Node pinned. (Phase 4)
 - **Distribution artifacts** under `distribution/` — `community-plan.md` (Reddit-led build-in-public), `seo-keyword-plan.md` (EN + DE clusters, 6-month cadence), `paid-test-spec.md` (one keyword, cost-per-completed-flow, €100 cap, organic-proof gate). (Phase 5)
 
-**⏳ NOT done (all that's left):**
-1. **Phase 6 — Analytics (optional, low-priority, plans TBD).** PostHog funnel (`start`, `parse_done`, `letter_done`, `copy`, `download`), cookieless / zero-PII / EU Cloud, production-only, fails silent. Flagged a post-launch follow-up — the tool can ship without it.
-2. **GTM-03 paid conversion test — BLOCKED on Phase 6** (needs the funnel to measure cost-per-completed-flow) and gated behind organic validation (N≈50).
-3. Deferred to v2 (`.planning/STATE.md`): PDF upload/download + .docx, finish-line paywall (€19–29) + Stripe, B2B channel, LinkedIn import, ATS scoring.
+**✅ Done — post-v1.0 session (2026-07, commits `6e33efb`..`f520e1d`, all reviewed + pushed):**
+- **Monetization Stage 1 — "Humanizer+"** (spec: `docs/superpowers/specs/2026-07-03-monetization-humanizer-design.md`, plan: `docs/superpowers/plans/2026-07-03-humanizer-stage1.md`, tracking: issue #2): €2.99 one-shot refinement of the finished Anschreiben (3 directions: Formeller/Moderner/Prägnanter), Stripe Payment Element in a modal, **stateless Stripe-as-token** fulfillment (`/api/humanizer/intent` + `/api/humanize`; PI marked consumed only after full delivery; disconnect-safe; paid attempt persisted in sessionStorage → no duplicate charge). Legal pages (`/impressum`, `/datenschutz`, `/agb`, §356(5) Widerruf checkbox) + Gehaltsvorstellung/Eintrittstermin conditional questions shipped alongside.
+- **Abuse protection** — per-IP rate limiting (`src/lib/abuse-guards.ts`, Upstash sliding window, hashed IPs, **fail-open when env unset**), same-origin check on all POST routes, prompt-injection hardening with `UNGÜLTIGE EINGABE` sentinel + early stream abort (client shows German error; refusal biased "when in doubt, do the task" after a live false positive — see `src/lib/sentinel.ts`).
+- **CV upload** — PDF (`unpdf`, dynamically imported) + .txt, **extraction fully client-side** (file never leaves the browser; zero-retention intact), drag-and-drop + button in InputView.
+- Pricing/market decisions locked: free tier stays maximally generous (full letter, copy, .txt); paid = one-shot honest pricing (anti trial-trap positioning — competitors' $2-trial→$26/4wks pattern is the foil); print-PDF export will join a "Bewerbungspaket" bundle (~€4.99–7.99/application) when built; **accounts/subscription parked (Stage 3)** until Humanizer+ shows conversion.
+
+**⏳ NOT done:**
+1. **Humanizer+ go-live gates (founder actions)** — `scanready/docs/humanizer-golive.md`: real data in `src/lib/legal-data.ts` (FOUNDER_TODO), VAT decision (§19 UStG vs Stripe Tax), Stripe live keys + purchase/refund drill, native-speaker review of the 3 refinement directions, Anthropic spend cap, Upstash env vars (rate limiting is OFF until set). **Stripe test-mode E2E still unrun** (test keys were never added to `.env.local`).
+2. **Analytics (backlogged)** — PostHog funnel or Vercel Analytics custom events; now doubly needed as the Humanizer+ conversion denominator. GTM-03 paid test blocked on it.
+3. Deferred: PDF **export** templates (design prompt written for claude.ai/design; becomes the paid Bewerbungspaket artifact), Stage 3 accounts/subscription (Supabase + Google OAuth decisions pre-made in the spec), .docx, LinkedIn import, ATS scoring, `lang="en"`→`de` follow-up.
 
 ---
 
@@ -70,8 +76,8 @@ Distribution sequence (agreed, now operationalized in `distribution/`): **(A) Re
 - **Grounded-only generation.** Never fabricate employers/titles/dates/skills — fabrication = fraud + liability. Enforced in `prompts.ts` + the Zod schema; keep it that way.
 - **Native-quality German** + keep the "have a native speaker review" nudge in the cover letter.
 - **Photo guidance is nuanced** — optional by AGG, expected in practice, user's choice. Never mandate.
-- **Zero-retention / GDPR as a feature** — no DB, nothing persisted, no training on user data.
-- **NOT an AI-detection "humanizer."** Our "authentic voice" = personalization from the user's own answers. Never build detection-evasion.
+- **Zero-retention / GDPR as a feature** — no DB, nothing persisted, no training on user data. (Still true for everything shipped. Decision 2026-07: IF Stage-3 accounts ever get built, retention becomes an explicit **opt-in for account holders only**; the anonymous flow stays stateless.)
+- **NOT an AI-detection "humanizer."** Our "authentic voice" = personalization from the user's own answers. Never build detection-evasion. (The shipped **Humanizer+** honors this: it's a grounded tone/register refinement with a direction picker — additive tailoring, never AI-signature stripping; guardrails asserted in tests.)
 
 ---
 
@@ -113,4 +119,4 @@ A full design pass landed after phases 1–5. Don't re-open the exploration; bui
 - Shell cwd drifts between Bash calls — use absolute paths.
 
 ## Suggested first message for the new session
-> "Continue ScanReady. Product built + deployed (phases 1–5, v1.0 feature-complete); the **Warm Editorial Broadsheet** design system is implemented and committed (see `scanready/DESIGN.md`). Options: (a) build the **backlogged, optional analytics funnel** (PostHog — no longer an active phase, unblocks GTM-03 if picked up); or (b) start distribution from `distribution/`. Either way, clear the native-speaker German quality gate before going public, and `gh auth switch --user KI-lian-io` before pushing."
+> "Continue ScanReady. v1.0 + monetization Stage 1 (Humanizer+ €2.99, Stripe), abuse guards, and client-side CV upload are all code-complete on the branch (see `docs/superpowers/specs+plans/2026-07-03-*`, GitHub issues #2–#9). Options: (a) walk the **Humanizer+ go-live checklist** (`scanready/docs/humanizer-golive.md` — Stripe E2E with test keys, legal data, VAT, Upstash, spend cap); (b) build the **analytics denominator** (backlogged PostHog funnel or Vercel Analytics — needed for Humanizer+ conversion and GTM-03); (c) build the **print-PDF export templates** (paid Bewerbungspaket artifact; design prompt exists); or (d) start distribution from `distribution/`. Clear the native-speaker German quality gate before going public, and `gh auth switch --user KI-lian-io` before pushing."
