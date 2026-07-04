@@ -400,6 +400,54 @@ function LockIcon() {
 }
 
 // ---------------------------------------------------------------------------
+// Goal-gradient step indicator
+// ---------------------------------------------------------------------------
+
+const STEP_LABELS = ['Lebenslauf', 'Questions', 'Anschreiben'] as const
+
+/**
+ * Editorial progress line shown once the user has made some progress — never on
+ * input/loading (no progress claim before any progress exists). Three labeled
+ * steps, mono EYEBROW-style: completed = accent + filled dot, current = ink +
+ * ring dot, upcoming = muted + hollow dot.
+ */
+function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+  return (
+    <div
+      className="flex items-center gap-3 mb-2"
+      aria-label={`Step ${current} of 3: ${STEP_LABELS[current - 1]}`}
+    >
+      {STEP_LABELS.map((label, i) => {
+        const step = (i + 1) as 1 | 2 | 3
+        const status = step < current ? 'done' : step === current ? 'current' : 'upcoming'
+        return (
+          <div key={label} className="flex items-center gap-3">
+            {i > 0 && <span className="h-px w-6 bg-hair" aria-hidden="true" />}
+            <span
+              className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.18em] ${
+                status === 'upcoming' ? 'text-muted' : status === 'current' ? 'text-ink' : 'text-accent'
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={
+                  status === 'done'
+                    ? 'h-1.5 w-1.5 rounded-full bg-accent'
+                    : status === 'current'
+                      ? 'h-1.5 w-1.5 rounded-full border border-ink'
+                      : 'h-1.5 w-1.5 rounded-full border border-muted'
+                }
+              />
+              {label}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Phase views
 // ---------------------------------------------------------------------------
 
@@ -602,8 +650,12 @@ function ResultView({
     }
   }
 
+  const normGapCount = lebenslauf.normGapNotes.length
+
   return (
     <div className="flex flex-col gap-6">
+      <StepIndicator current={1} />
+
       {/* Header: label + action buttons */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <p className={EYEBROW}>
@@ -638,6 +690,15 @@ function ResultView({
       {copyState === 'error' && (
         <p className="text-sm text-red-600">
           Copy failed — please select the text manually.
+        </p>
+      )}
+
+      {/* Quantified norm-gap value — sits directly above the annotation column it
+          summarizes, so the number and the detail it refers to read as one unit. */}
+      {normGapCount > 0 && (
+        <p className="text-sm text-muted">
+          {normGapCount === 1 ? '1 norm gap fixed' : `${normGapCount} norm gaps fixed`} for the German
+          first scan — see what changed below.
         </p>
       )}
 
@@ -779,6 +840,8 @@ function CoverLetterInputView({
 
   return (
     <div className="flex flex-col gap-6">
+      <StepIndicator current={2} />
+
       <div>
         <h2 className="font-serif text-3xl font-semibold text-ink mb-1">
           Anschreiben
@@ -863,6 +926,7 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
   // below announces only the start/completion transitions.
   return (
     <div className="flex flex-col gap-4">
+      <StepIndicator current={3} />
       <p className={EYEBROW}>Anschreiben</p>
       {letterText ? (
         // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
@@ -893,11 +957,13 @@ function CoverLetterResultView({
   setLetterText,
   onRegenerate,
   onReset,
+  onNewLetter,
 }: {
   letterText: string
   setLetterText: (text: string) => void
   onRegenerate: () => void
   onReset: () => void
+  onNewLetter: () => void
 }) {
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
   // One-shot edit hint — dismissed on first interaction (D-06)
@@ -941,6 +1007,19 @@ function CoverLetterResultView({
     <div className="flex flex-col gap-6">
       {/* Announces the streaming→result transition once, then clears itself */}
       <span className="sr-only" role="status">{readyAnnouncement}</span>
+
+      <StepIndicator current={3} />
+
+      {/* Peak-end completion framing — the flow's final view, so it opens on the
+          finish line rather than restating the section label first (D-XX). */}
+      <div>
+        <h2 className="font-serif text-3xl font-semibold text-ink mb-1">
+          Your German application is ready.
+        </h2>
+        <p className="text-sm text-muted">
+          Lebenslauf converted, Anschreiben written — grounded in your facts.
+        </p>
+      </div>
 
       {/* Header: section label */}
       <p className={EYEBROW}>Anschreiben</p>
@@ -1036,6 +1115,12 @@ function CoverLetterResultView({
         </button>
       </div>
 
+      {/* Honest price anchor — one line, muted, sits with the Humanizer+ CTA context */}
+      <p className="text-sm text-muted">
+        One-time 2,99&nbsp;€ — a fraction of what professional rewrite services charge. No
+        subscription.
+      </p>
+
       {/* Over-limit hint — only rendered when the letter exceeds the Humanizer+ cap */}
       {letterOverHumanizerLimit && (
         <p className="text-sm text-muted">
@@ -1060,6 +1145,18 @@ function CoverLetterResultView({
           Restore original
         </button>
       )}
+
+      {/* Continuation path — always shown as the final block, not gated on copyState
+          so it doesn't disappear if the user never uses the copy button (e.g. downloads
+          or copies via keyboard selection instead). */}
+      <div className="border-t border-hair pt-6">
+        <p className="text-sm text-muted mb-3">
+          Applying to more roles? Write another Anschreiben from the same Lebenslauf.
+        </p>
+        <button onClick={onNewLetter} className={btnClass('secondary')}>
+          New Anschreiben
+        </button>
+      </div>
 
       {/* Rendered only once opened — next/dynamic's import() fires on first render of this
           element, and the module-level loadStripe() call would fetch Stripe.js (and its
@@ -1337,6 +1434,14 @@ export default function Home() {
             setLetterText={setLetterText}
             onRegenerate={handleGenerateLetter}
             onReset={() => dispatch({ type: 'RESET' })}
+            onNewLetter={() => {
+              // Clear only the posting — SET_JOB_POSTING('') resyncs the answer list
+              // by question identity, so typed base answers (style/motivation) survive
+              // and only job-specific questions reset. Answers are intentionally left
+              // untouched otherwise.
+              dispatch({ type: 'SET_JOB_POSTING', payload: '' })
+              dispatch({ type: 'START_COVER_LETTER' })
+            }}
           />
         )}
 

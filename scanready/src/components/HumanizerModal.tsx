@@ -317,6 +317,9 @@ function PaymentForm({
         right ends once delivery begins — German consumer law, § 356(5) BGB.)
       </p>
       {error && <p className="text-sm text-red-600">{error}</p>}
+      <p className="text-xs text-muted">
+        Delivered in seconds. If the refinement fails, you can retry free — or get a refund.
+      </p>
       <button
         onClick={pay}
         disabled={!widerrufOk || paying || !stripeJs || !elements}
