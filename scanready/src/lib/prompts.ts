@@ -26,7 +26,7 @@ GERMAN NORMS to apply (and explain in normGapNotes):
   nationality / date of birth ONLY if present in the source).
 - Explain employment gaps if the dates reveal one.
 - normGapNotes: for each structural or content change made, write ONE line in English:
-  "[Change made] — [why this matters in the 8-second German recruiter scan]".
+  "[Change made] — [why this matters in the German recruiter's first scan]".
   Example: "Added personal-data block — recruiters look for name, address, phone in the top section."
   Be concise. Do not repeat content already visible in the Lebenslauf.
   GROUNDING: notes must describe actual changes made, not fabricate improvements that were not possible.

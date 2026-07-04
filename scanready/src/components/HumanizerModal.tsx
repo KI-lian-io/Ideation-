@@ -135,7 +135,7 @@ export default function HumanizerModal({
       setClientSecret(data.clientSecret)
       setStep('payment')
     } catch {
-      setError('Zahlung konnte nicht initialisiert werden. Bitte später erneut versuchen.')
+      setError('Payment could not be initialized. Please try again later.')
     }
   }
 
@@ -157,7 +157,7 @@ export default function HumanizerModal({
       })
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error ?? 'Verfeinerung fehlgeschlagen.')
+        throw new Error(data.error ?? 'Refinement failed. Your payment stays valid — please try again.')
       }
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -169,15 +169,15 @@ export default function HumanizerModal({
       }
       if (refined.trimStart().startsWith(INVALID_INPUT_SENTINEL)) {
         throw new Error(
-          'Der Text wurde nicht als Anschreiben erkannt. Ihre Zahlung bleibt gültig — bitte versuchen Sie es erneut.'
+          'The text was not recognized as an Anschreiben. Your payment stays valid — please try again.'
         )
       }
-      if (!refined.trim()) throw new Error('Leere Antwort.')
+      if (!refined.trim()) throw new Error('Empty response. Your payment stays valid — please try again.')
       sessionStorage.removeItem(PAID_ATTEMPT_KEY)
       onDone(refined)
     } catch (e) {
       setFailCount((n) => n + 1)
-      setError(e instanceof Error ? e.message : 'Verfeinerung fehlgeschlagen.')
+      setError(e instanceof Error ? e.message : 'Refinement failed. Your payment stays valid — please try again.')
       setStep('error')
     }
   }
@@ -286,7 +286,7 @@ function PaymentForm({
     const result = await stripeJs.confirmPayment({ elements, redirect: 'if_required' })
     setPaying(false)
     if (result.error) {
-      setError(result.error.message ?? 'Zahlung fehlgeschlagen.')
+      setError(result.error.message ?? 'Payment failed. You were not charged — please try again.')
       return
     }
     if (result.paymentIntent?.status === 'succeeded') {
