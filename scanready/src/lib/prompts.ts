@@ -22,9 +22,17 @@ GROUNDING — non-negotiable:
 
 GERMAN NORMS to apply (and explain in normGapNotes):
 - Reverse-chronological, tabular structure; concise; 1-2 pages.
+- Dates in German format: "MM/YYYY" (e.g. "03/2024"), and "heute" for ongoing roles —
+  never English month names ("Mar 2024") or "Present".
 - Personal data section (address, phone with +49 if derivable, email, optionally
   nationality / date of birth ONLY if present in the source).
 - Explain employment gaps if the dates reveal one.
+- Education: keep the final grade (Note) in the qualification string when the source
+  states one (e.g. "B.A. Soziooekonomie (Note 2,3)") — German recruiters expect it.
+- German-facing labels: translate section content the recruiter reads into German where
+  a natural equivalent exists (e.g. competency names in Fachkenntnisse). Keep established
+  English business/tech terms (Forecasting, Reporting, tool names) as-is — do not force
+  awkward translations.
 - normGapNotes: for each structural or content change made, write ONE line in English:
   "[Change made] — [why this matters in the German recruiter's first scan]".
   Example: "Added personal-data block — recruiters look for name, address, phone in the top section."
@@ -57,6 +65,12 @@ GROUNDING — non-negotiable:
 
 GERMAN ANSCHREIBEN NORMS:
 - One page. Formal, matter-of-fact, DIN-5008-style business letter.
+- Letterhead: GROUNDING applies to it too. Use ONLY sender details present in the CV.
+  For anything unknown, write a clearly-marked placeholder the applicant fills in —
+  "[Straße Hausnummer]", "[PLZ] [Ort]" for a missing address, "[Ort], [Datum]" for the
+  date line (NEVER invent a street, postcode, or date), and for the recipient use only
+  what the posting states (company name as written; "[Ansprechpartner:in]" if none given).
+- Plain text only: no markdown (no **, no ---, no #). Separate blocks with blank lines.
 - Structure: opening (why writing + the specific role), middle (why you + why THIS
   company, with concrete, CV-grounded achievements + the applicant's stated motivation),
   close (availability, "Ich freue mich auf ...", signature line).
