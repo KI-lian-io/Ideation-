@@ -14,6 +14,40 @@ import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
 
 // ---------------------------------------------------------------------------
+// Stable identity keys for editable list entries
+// ---------------------------------------------------------------------------
+
+/**
+ * Client-side-only stable id, attached to every experience/education entry
+ * when it enters state (PARSE_SUCCESS or an ADD action). React list keys
+ * must track logical identity, not array position — otherwise a reorder or
+ * remove dispatch shifts indices while EditableField's internal `draft`
+ * (which only resyncs when NOT editing — see EditableField.tsx) stays mounted
+ * against the same DOM node, silently attaching an in-flight edit to a
+ * DIFFERENT entry (bug: index-keyed lists cross-write on reorder/remove).
+ *
+ * `_uid` is never sent to the API and never appears in copy/download output —
+ * see handleGenerateLetter (uses toPlainText, field-by-field) and toPlainText
+ * itself in lebenslauf-utils.ts (also field-by-field, never spreads the entry).
+ */
+type WithUid<T> = T & { _uid: string }
+
+type LebenslaufWithUids = Omit<Lebenslauf, 'experience' | 'education' | 'languages'> & {
+  experience: WithUid<Lebenslauf['experience'][number]>[]
+  education: WithUid<Lebenslauf['education'][number]>[]
+  languages: WithUid<Lebenslauf['languages'][number]>[]
+}
+
+function withUids(l: Lebenslauf): LebenslaufWithUids {
+  return {
+    ...l,
+    experience: l.experience.map((e) => ({ ...e, _uid: crypto.randomUUID() })),
+    education: l.education.map((e) => ({ ...e, _uid: crypto.randomUUID() })),
+    languages: l.languages.map((lang) => ({ ...lang, _uid: crypto.randomUUID() })),
+  }
+}
+
+// ---------------------------------------------------------------------------
 // State machine types
 // ---------------------------------------------------------------------------
 
@@ -31,7 +65,7 @@ type AppPhase =
 type AppState = {
   phase: AppPhase
   resumeText: string // persists through all phases — needed for /api/cover-letter
-  lebenslauf: Lebenslauf | null
+  lebenslauf: LebenslaufWithUids | null
   sectionOrder: string[]
   errorMessage: string | null
   jobPosting: string
@@ -76,7 +110,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     case 'SUBMIT':
       return { ...state, phase: 'loading', errorMessage: null }
     case 'PARSE_SUCCESS':
-      return { ...state, phase: 'result', lebenslauf: action.payload }
+      return { ...state, phase: 'result', lebenslauf: withUids(action.payload) }
     case 'PARSE_ERROR':
       return { ...state, phase: 'error', errorMessage: action.payload }
     case 'PARSE_JUNK':
@@ -111,7 +145,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     }
     case 'ADD_EXPERIENCE': {
       if (!state.lebenslauf) return state
-      const blank = { role: '', company: '', location: null, start: null, end: null, bullets: [] }
+      const blank = { role: '', company: '', location: null, start: null, end: null, bullets: [], _uid: crypto.randomUUID() }
       return {
         ...state,
         lebenslauf: {
@@ -182,7 +216,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     }
     case 'ADD_EDUCATION': {
       if (!state.lebenslauf) return state
-      const blank = { qualification: '', institution: '', location: null, start: null, end: null }
+      const blank = { qualification: '', institution: '', location: null, start: null, end: null, _uid: crypto.randomUUID() }
       return {
         ...state,
         lebenslauf: {
@@ -286,7 +320,7 @@ function reducer(state: AppState, action: AppAction): AppState {
         ...state,
         lebenslauf: {
           ...state.lebenslauf,
-          languages: [...state.lebenslauf.languages, { language: '', level: null }],
+          languages: [...state.lebenslauf.languages, { language: '', level: null, _uid: crypto.randomUUID() }],
         },
       }
     }
@@ -521,7 +555,7 @@ function ResultView({
   onReset,
   onStartCoverLetter,
 }: {
-  lebenslauf: Lebenslauf
+  lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
   dispatch: React.Dispatch<AppAction>
   onReset: () => void

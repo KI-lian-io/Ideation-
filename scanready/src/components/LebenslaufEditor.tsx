@@ -7,6 +7,18 @@ import type { Lebenslauf } from '@/lib/schema'
 import { EYEBROW } from '@/components/ui'
 
 /**
+ * Stable-id-augmented entry types. `_uid` is assigned once per entry (on parse
+ * or ADD action) in page.tsx's reducer and used as the React list key here
+ * instead of the array index — index keys break when a reorder or remove
+ * shifts positions, because EditableField's internal edit-draft state stays
+ * attached to the DOM node at that position rather than following the entry.
+ */
+type WithUid<T> = T & { _uid: string }
+type ExperienceEntry = WithUid<Lebenslauf['experience'][number]>
+type EducationEntry = WithUid<Lebenslauf['education'][number]>
+type LanguageEntry = WithUid<Lebenslauf['languages'][number]>
+
+/**
  * LebenslaufAction union — all edit/add/remove/reorder actions for the WYSIWYG
  * Lebenslauf editor. Imported by page.tsx and extended by Plan 04 for skill chips.
  *
@@ -59,7 +71,11 @@ export function reorder<T>(arr: T[], from: number, to: number): T[] {
 // ---------------------------------------------------------------------------
 
 interface LebenslaufEditorProps {
-  lebenslauf: Lebenslauf
+  lebenslauf: Omit<Lebenslauf, 'experience' | 'education' | 'languages'> & {
+    experience: ExperienceEntry[]
+    education: EducationEntry[]
+    languages: LanguageEntry[]
+  }
   sectionOrder: string[]
   dispatch: React.Dispatch<LebenslaufAction>
   /** Model-produced photo guidance (verbatim). Rendered near the personal-data block.
@@ -150,13 +166,13 @@ function ExperienceSection({
   experience,
   dispatch,
 }: {
-  experience: Lebenslauf['experience']
+  experience: ExperienceEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
   return (
     <div className="flex flex-col gap-4">
       {experience.map((exp, i) => (
-        <div key={i} className="group relative rounded-lg border border-hair bg-card p-4">
+        <div key={exp._uid} className="group relative rounded-lg border border-hair bg-card p-4">
           {/* On-hover controls: remove + reorder */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
@@ -272,13 +288,13 @@ function EducationSection({
   education,
   dispatch,
 }: {
-  education: Lebenslauf['education']
+  education: EducationEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
   return (
     <div className="flex flex-col gap-4">
       {education.map((edu, i) => (
-        <div key={i} className="group relative rounded-lg border border-hair bg-card p-4">
+        <div key={edu._uid} className="group relative rounded-lg border border-hair bg-card p-4">
           {/* On-hover controls */}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
@@ -372,13 +388,13 @@ function LanguagesSection({
   languages,
   dispatch,
 }: {
-  languages: Lebenslauf['languages']
+  languages: LanguageEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
   return (
     <div className="flex flex-col gap-2">
       {languages.map((lang, i) => (
-        <div key={i} className="group flex items-center gap-2">
+        <div key={lang._uid} className="group flex items-center gap-2">
           {/* Language name — free-text editable */}
           <EditableField
             value={lang.language}
