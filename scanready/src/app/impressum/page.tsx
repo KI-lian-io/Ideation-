@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Impressum — ScanReady" };
 
 export default function ImpressumPage() {
   return (
-    <main className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6">
+    <main lang="de" className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6">
       <h1 className="font-serif text-3xl font-semibold text-ink">Impressum</h1>
       <section className="flex flex-col gap-1 text-sm text-ink">
         <p className="font-semibold">Angaben gemäß § 5 DDG</p>

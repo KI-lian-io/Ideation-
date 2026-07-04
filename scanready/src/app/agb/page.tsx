@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "AGB & Widerrufsbelehrung — ScanRea
  */
 export default function AgbPage() {
   return (
-    <main className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6 text-sm text-ink leading-relaxed">
+    <main lang="de" className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6 text-sm text-ink leading-relaxed">
       <h1 className="font-serif text-3xl font-semibold">AGB &amp; Widerrufsbelehrung</h1>
 
       <section className="flex flex-col gap-2">

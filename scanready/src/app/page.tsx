@@ -3,11 +3,11 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Btn, CARD, EYEBROW } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "ScanReady — Win the 8-Second German Recruiter Scan",
+  title: "ScanReady — Win the German Recruiter's First Scan",
   description:
     "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
   openGraph: {
-    title: "ScanReady — Win the 8-Second German Recruiter Scan",
+    title: "ScanReady — Win the German Recruiter's First Scan",
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",
@@ -119,10 +119,9 @@ export default function HomePage() {
               id={SECTION_IDS.hero}
               className="font-serif text-4xl sm:text-5xl font-semibold text-ink leading-[1.15] mb-6"
             >
-              {/* Headline: Win the 8-second German recruiter scan. */}
-              Win the{" "}
-              <span className="relative inline-block">8-second<span className="absolute bottom-0 left-0 right-0 border-b-2 border-ink/30" aria-hidden="true" /></span>{" "}
-              German recruiter scan.
+              {/* Headline: Win the German recruiter's first scan. */}
+              Win the German recruiter&rsquo;s{" "}
+              <span className="relative inline-block">first scan<span className="absolute bottom-0 left-0 right-0 border-b-2 border-ink/30" aria-hidden="true" /></span>.
             </h1>
 
             <p className="text-base text-muted leading-relaxed max-w-2xl mx-auto mb-10">

@@ -17,11 +17,11 @@ export const metadata: Metadata = {
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000",
   ),
-  title: "ScanReady — Win the 8-Second German Recruiter Scan",
+  title: "ScanReady — Win the German Recruiter's First Scan",
   description:
     "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
   openGraph: {
-    title: "ScanReady — Win the 8-Second German Recruiter Scan",
+    title: "ScanReady — Win the German Recruiter's First Scan",
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",
