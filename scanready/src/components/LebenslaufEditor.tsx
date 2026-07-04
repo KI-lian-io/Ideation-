@@ -173,8 +173,9 @@ function ExperienceSection({
     <div className="flex flex-col gap-4">
       {experience.map((exp, i) => (
         <div key={exp._uid} className="group relative rounded-lg border border-hair bg-card p-4">
-          {/* On-hover controls: remove + reorder */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
+          {/* Reveal on hover AND focus-within (never display:none) so keyboard users
+              tabbing into the entry can still reach + use these controls. */}
+          <div className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EXPERIENCE', from: i, to: i - 1 })}
               disabled={i === 0}
@@ -224,7 +225,7 @@ function ExperienceSection({
               />
             </div>
             {/* Dates */}
-            <div className="flex gap-2 text-sm text-muted">
+            <div className="flex gap-2 text-sm text-muted tabular-nums">
               <EditableField
                 value={exp.start}
                 placeholder="+ Datum"
@@ -256,7 +257,7 @@ function ExperienceSection({
                   <button
                     onClick={() => dispatch({ type: 'REMOVE_BULLET', expIndex: i, bulletIndex: bi })}
                     aria-label="Eintrag entfernen"
-                    className="opacity-0 group-hover/bullet:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
+                    className="opacity-0 group-hover/bullet:opacity-100 focus-within:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
                   >
                     ×
                   </button>
@@ -295,8 +296,9 @@ function EducationSection({
     <div className="flex flex-col gap-4">
       {education.map((edu, i) => (
         <div key={edu._uid} className="group relative rounded-lg border border-hair bg-card p-4">
-          {/* On-hover controls */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
+          {/* Reveal on hover AND focus-within (never display:none) so keyboard users
+              tabbing into the entry can still reach + use these controls. */}
+          <div className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1">
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EDUCATION', from: i, to: i - 1 })}
               disabled={i === 0}
@@ -343,7 +345,7 @@ function EducationSection({
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'location', value: v })}
               />
             </div>
-            <div className="flex gap-2 text-sm text-muted">
+            <div className="flex gap-2 text-sm text-muted tabular-nums">
               <EditableField
                 value={edu.start}
                 placeholder="+ Datum"
@@ -413,7 +415,7 @@ function LanguagesSection({
           <button
             onClick={() => dispatch({ type: 'REMOVE_LANGUAGE', index: i })}
             aria-label="Eintrag entfernen"
-            className="opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
+            className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
           >
             ×
           </button>
@@ -483,41 +485,43 @@ export function LebenslaufEditor({
   }
 
   return (
-    <div className="flex flex-col gap-6 font-serif-text">
-      {sectionOrder.map((key, i) => {
-        const label = SECTION_LABELS[key]
-        if (!label) return null
-        return (
-          <section key={key}>
-            {/* Section header with always-visible reorder buttons (D-12) */}
-            <div className="flex items-center gap-2 mb-2">
-              <p className={`${EYEBROW} flex-1`}>
-                {label}
-              </p>
-              {/* Section ↑/↓ are always visible — deliberate navigation action */}
-              <button
-                onClick={() => i > 0 && dispatch({ type: 'REORDER_SECTION', from: i, to: i - 1 })}
-                disabled={i === 0}
-                aria-label="Abschnitt nach oben"
-                className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
-              >
-                ↑
-              </button>
-              <button
-                onClick={() => i < sectionOrder.length - 1 && dispatch({ type: 'REORDER_SECTION', from: i, to: i + 1 })}
-                disabled={i === sectionOrder.length - 1}
-                aria-label="Abschnitt nach unten"
-                className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
-              >
-                ↓
-              </button>
-            </div>
+    <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14" lang="de">
+      <div className="flex flex-col gap-6 font-serif-text">
+        {sectionOrder.map((key, i) => {
+          const label = SECTION_LABELS[key]
+          if (!label) return null
+          return (
+            <section key={key} className="reveal-stagger" style={{ '--i': i } as React.CSSProperties}>
+              {/* Section header with always-visible reorder buttons (D-12) */}
+              <div className="flex items-center gap-2 mb-2">
+                <p className={`${EYEBROW} flex-1`}>
+                  {label}
+                </p>
+                {/* Section ↑/↓ are always visible — deliberate navigation action */}
+                <button
+                  onClick={() => i > 0 && dispatch({ type: 'REORDER_SECTION', from: i, to: i - 1 })}
+                  disabled={i === 0}
+                  aria-label="Abschnitt nach oben"
+                  className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
+                >
+                  ↑
+                </button>
+                <button
+                  onClick={() => i < sectionOrder.length - 1 && dispatch({ type: 'REORDER_SECTION', from: i, to: i + 1 })}
+                  disabled={i === sectionOrder.length - 1}
+                  aria-label="Abschnitt nach unten"
+                  className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
+                >
+                  ↓
+                </button>
+              </div>
 
-            {/* Section content */}
-            {renderSection(key)}
-          </section>
-        )
-      })}
+              {/* Section content */}
+              {renderSection(key)}
+            </section>
+          )
+        })}
+      </div>
     </div>
   )
 }

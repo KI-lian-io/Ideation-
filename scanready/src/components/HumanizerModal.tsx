@@ -188,8 +188,8 @@ export default function HumanizerModal({
     // this component. Minimum acceptable a11y bar instead: a full Tab focus trap (below)
     // plus `aria-modal="true"`, which instructs screen readers to ignore the background
     // even though it isn't structurally inert.
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" role="dialog" aria-modal="true" aria-labelledby={headingId}>
-      <div ref={dialogRef} tabIndex={-1} className="w-full max-w-lg rounded-xl border border-hair bg-paper p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto focus:outline-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 modal-overlay-enter" role="dialog" aria-modal="true" aria-labelledby={headingId}>
+      <div ref={dialogRef} tabIndex={-1} className="w-full max-w-lg rounded-xl border border-hair bg-paper p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto focus:outline-none modal-dialog-enter">
         <div className="flex items-start justify-between">
           <div>
             <p className={EYEBROW}>Humanizer+</p>

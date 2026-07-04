@@ -462,6 +462,7 @@ function InputView({
 }) {
   const RESUME_LIMIT = 30_000
   const resumeOverLimit = resumeText.length > RESUME_LIMIT
+  const resumeNearLimit = resumeText.length > RESUME_LIMIT * 0.8
   const isSubmitDisabled = resumeText.trim().length === 0 || resumeOverLimit
 
   const [extracting, setExtracting] = useState(false)
@@ -501,7 +502,7 @@ function InputView({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-1">
+        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">
           Convert your CV to a German Lebenslauf
         </h1>
         <p className="text-sm text-muted">
@@ -565,10 +566,13 @@ function InputView({
         className={`w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${dragOver ? 'border-accent ring-2 ring-accent/30' : ''}`}
         aria-label="Resume text"
       />
-      <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
-        {resumeText.length.toLocaleString('de-DE')} / 30.000
-        {resumeOverLimit && ' — too long'}
-      </p>
+      {/* Counter only appears once it's actually useful — past 80% of the limit, or over it. */}
+      {resumeNearLimit && (
+        <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
+          {resumeText.length.toLocaleString('de-DE')} / 30.000
+          {resumeOverLimit && ' — too long'}
+        </p>
+      )}
 
       <button
         onClick={onSubmit}
@@ -615,7 +619,9 @@ function LoadingView() {
         <div className="h-4 w-3/5 rounded bg-faint" />
         <div className="h-4 w-1/2 rounded bg-faint" />
       </div>
-      <p className="text-sm text-muted">
+      {/* Keyed by message index so each swap remounts and replays a 150ms crossfade
+          instead of the text silently jumping to the next message. */}
+      <p key={messageIndex} className="text-sm text-muted phase-enter">
         {LOADING_MESSAGES[messageIndex]}
       </p>
     </div>
@@ -693,14 +699,19 @@ function ResultView({
         </p>
       )}
 
-      {/* Quantified norm-gap value — sits directly above the annotation column it
-          summarizes, so the number and the detail it refers to read as one unit. */}
-      {normGapCount > 0 && (
+      {/* Display-serif header — the norm-gap count doubles as its subtitle instead of
+          repeating as a separate paragraph, so the number and the detail it refers to
+          read as one unit directly above the document + annotation column. */}
+      <div className="flex flex-col gap-2">
+        <h2 className="font-serif text-3xl font-semibold text-ink">
+          Your Lebenslauf
+        </h2>
         <p className="text-sm text-muted">
-          {normGapCount === 1 ? '1 norm gap fixed' : `${normGapCount} norm gaps fixed`} for the German
-          first scan — see what changed below.
+          {normGapCount > 0
+            ? `${normGapCount === 1 ? '1 norm gap fixed' : `${normGapCount} norm gaps fixed`} for the German first scan — see what changed below.`
+            : 'Grounded strictly in your real CV facts.'}
         </p>
-      )}
+      </div>
 
       {/* Two-column: document (Lebenslauf) left, bilingual annotation right at desktop;
           stacks on mobile. Print-proof "document + margin notes" layout (DESIGN.md). */}
@@ -713,8 +724,12 @@ function ResultView({
           photoAdvice={lebenslauf.photoAdvice}
         />
 
-        {/* Bilingual norm-gap panel (D-05 / LL-02) — the annotation column */}
-        <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
+        {/* Bilingual norm-gap panel (D-05 / LL-02) — the annotation column. Staggered
+            in after the five Lebenslauf sections (index 5) so the whole result view
+            reveals as one continuous sequence on first mount. */}
+        <div className="reveal-stagger" style={{ '--i': 5 } as React.CSSProperties}>
+          <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
+        </div>
       </div>
 
       {/* Cover letter CTA — next step in the flow */}
@@ -835,6 +850,7 @@ function CoverLetterInputView({
   const POSTING_LIMIT = 15_000
   const ANSWER_LIMIT = 2_000
   const postingOverLimit = jobPosting.length > POSTING_LIMIT
+  const postingNearLimit = jobPosting.length > POSTING_LIMIT * 0.8
   const anyAnswerOverLimit = answers.some((a) => a.answer.length > ANSWER_LIMIT)
   const canSubmit = jobPosting.trim().length > 0 && !postingOverLimit && !anyAnswerOverLimit
 
@@ -843,7 +859,7 @@ function CoverLetterInputView({
       <StepIndicator current={2} />
 
       <div>
-        <h2 className="font-serif text-3xl font-semibold text-ink mb-1">
+        <h2 className="font-serif text-3xl font-semibold text-ink mb-2">
           Anschreiben
         </h2>
         <p className="text-sm text-muted">
@@ -864,10 +880,12 @@ function CoverLetterInputView({
           className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
           aria-label="Job posting"
         />
-        <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-muted'}`}>
-          {jobPosting.length.toLocaleString('de-DE')} / 15.000
-          {postingOverLimit && ' — too long'}
-        </p>
+        {postingNearLimit && (
+          <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-muted'}`}>
+            {jobPosting.length.toLocaleString('de-DE')} / 15.000
+            {postingOverLimit && ' — too long'}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -884,17 +902,21 @@ function CoverLetterInputView({
               className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               aria-label={`Answer to question ${i + 1}`}
             />
-            <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
-              {a.answer.length.toLocaleString('de-DE')} / 2.000
-              {a.answer.length > ANSWER_LIMIT && ' — answer too long'}
-            </p>
+            {a.answer.length > ANSWER_LIMIT * 0.8 && (
+              <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
+                {a.answer.length.toLocaleString('de-DE')} / 2.000
+                {a.answer.length > ANSWER_LIMIT && ' — answer too long'}
+              </p>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Native-speaker nudge (D-09 moved from prompt to UI) */}
-      <div className="rounded-lg border border-amber-100 bg-amber-50 p-4">
-        <p className="text-sm text-amber-700">
+      {/* Native-speaker nudge (D-09 moved from prompt to UI) — same advisory callout role
+          as the identical note in CoverLetterResultView, so both use NORM_NOTE rather
+          than a one-off amber treatment. */}
+      <div className={NORM_NOTE}>
+        <p className="text-sm text-ink-soft">
           Native-quality German is the goal — but before sending to a real recruiter, have a native
           German speaker review the final letter.
         </p>
@@ -925,21 +947,28 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
   // word-by-word as it streams in. Instead, a separate visually-hidden role="status"
   // below announces only the start/completion transitions.
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <StepIndicator current={3} />
       <p className={EYEBROW}>Anschreiben</p>
       {letterText ? (
-        // Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard)
-        <pre className="whitespace-pre-wrap font-serif-text text-base text-ink leading-[1.65]">
-          {letterText}
-        </pre>
+        // Same print-sheet presentation as the result view, so the transition from
+        // streaming → result doesn't change the document's visual identity.
+        <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14" lang="de">
+          {/* Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard) */}
+          <pre className="whitespace-pre-wrap font-serif-text text-lg leading-[1.7] text-ink [hyphens:auto]">
+            {letterText}
+            <span aria-hidden="true" className="stream-caret">▍</span>
+          </pre>
+        </div>
       ) : (
-        <div className="animate-pulse flex flex-col gap-3">
-          <div className="h-4 w-3/4 rounded bg-faint" />
-          <div className="h-4 w-2/3 rounded bg-faint" />
-          <div className="h-4 w-1/2 rounded bg-faint" />
-          <div className="mt-3 h-4 w-4/5 rounded bg-faint" />
-          <div className="h-4 w-3/5 rounded bg-faint" />
+        <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14">
+          <div className="animate-pulse flex flex-col gap-3">
+            <div className="h-4 w-3/4 rounded bg-faint" />
+            <div className="h-4 w-2/3 rounded bg-faint" />
+            <div className="h-4 w-1/2 rounded bg-faint" />
+            <div className="mt-3 h-4 w-4/5 rounded bg-faint" />
+            <div className="h-4 w-3/5 rounded bg-faint" />
+          </div>
         </div>
       )}
       <p className="text-sm text-muted">
@@ -1011,9 +1040,10 @@ function CoverLetterResultView({
       <StepIndicator current={3} />
 
       {/* Peak-end completion framing — the flow's final view, so it opens on the
-          finish line rather than restating the section label first (D-XX). */}
-      <div>
-        <h2 className="font-serif text-3xl font-semibold text-ink mb-1">
+          finish line rather than restating the section label first (D-XX). One-time
+          rise-in on mount underscores the completion moment. */}
+      <div className="phase-enter">
+        <h2 className="font-serif text-3xl font-semibold text-ink mb-2">
           Your German application is ready.
         </h2>
         <p className="text-sm text-muted">
@@ -1029,20 +1059,25 @@ function CoverLetterResultView({
         <p className="text-sm text-muted">Click to edit</p>
       )}
 
-      {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
-          Letter is read-only during streaming; editing available only here in cover_letter_result (D-06)
-          No dangerouslySetInnerHTML — XSS guard (T-02-05) */}
-      <textarea
-        value={letterText}
-        onChange={(e) => {
-          setLetterText(e.target.value)
-          if (showEditHint) setShowEditHint(false)
-        }}
-        onFocus={() => { if (showEditHint) setShowEditHint(false) }}
-        rows={18}
-        className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 font-serif-text text-base text-ink leading-[1.65] placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-        aria-label="Anschreiben"
-      />
+      {/* Print-sheet presentation — the letter reads like a document, not a form field.
+          Textarea inside is borderless/transparent; the sheet itself carries the focus
+          ring via focus-within (hairline → accent, see .doc-sheet in globals.css). */}
+      <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14 phase-enter" lang="de">
+        {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
+            Letter is read-only during streaming; editing available only here in cover_letter_result (D-06)
+            No dangerouslySetInnerHTML — XSS guard (T-02-05) */}
+        <textarea
+          value={letterText}
+          onChange={(e) => {
+            setLetterText(e.target.value)
+            if (showEditHint) setShowEditHint(false)
+          }}
+          onFocus={() => { if (showEditHint) setShowEditHint(false) }}
+          rows={18}
+          className="w-full resize-y border-0 bg-transparent px-0 py-0 font-serif-text text-lg leading-[1.7] text-ink [hyphens:auto] placeholder:text-muted focus:outline-none focus:ring-0"
+          aria-label="Anschreiben"
+        />
+      </div>
 
       {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
@@ -1367,92 +1402,119 @@ export default function Home() {
 
   return (
     <>
-      {/* Top-bar wordmark — links back to the landing (UI-SPEC §F item 2) */}
-      <div className="border-b border-hair h-14 flex items-center px-6">
-        <a href="/" className="text-sm font-semibold text-ink tracking-tight">
-          ScanReady
-          <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
-        </a>
+      {/* Top-bar wordmark — links back to the landing (UI-SPEC §F item 2). Same centered
+          max-w-4xl container as the landing nav (src/app/page.tsx) for visual parity
+          between marketing and tool. */}
+      <div className="border-b border-hair h-14 flex items-center">
+        <div className="max-w-4xl mx-auto px-6 w-full flex items-center">
+          <a href="/" className="text-sm font-semibold text-ink tracking-tight">
+            ScanReady
+            <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
+          </a>
+        </div>
       </div>
 
       <div className="flex flex-col flex-1 items-center bg-paper font-sans px-4 py-8 sm:py-12">
       <main aria-label="ScanReady tool" className={`w-full max-w-3xl flex-col ${CARD} px-6 py-10 sm:px-12 sm:py-12`}>
+        {/* Each phase view's root is keyed by phase + wrapped in .phase-enter so a phase
+            transition always mounts fresh and replays the 200ms rise-in (shared motion
+            pattern with the reveal-stagger / doc-sheet completion moments above). */}
         {state.phase === 'input' && (
-          <InputView
-            resumeText={state.resumeText}
-            onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
-            onSubmit={handleSubmit}
-          />
+          <div key={state.phase} className="phase-enter">
+            <InputView
+              resumeText={state.resumeText}
+              onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
+              onSubmit={handleSubmit}
+            />
+          </div>
         )}
 
-        {state.phase === 'loading' && <LoadingView />}
+        {state.phase === 'loading' && (
+          <div key={state.phase} className="phase-enter">
+            <LoadingView />
+          </div>
+        )}
 
         {state.phase === 'result' && state.lebenslauf && (
-          <ResultView
-            lebenslauf={state.lebenslauf}
-            sectionOrder={state.sectionOrder}
-            dispatch={dispatch}
-            onReset={() => dispatch({ type: 'RESET' })}
-            onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
-          />
+          <div key={state.phase} className="phase-enter">
+            <ResultView
+              lebenslauf={state.lebenslauf}
+              sectionOrder={state.sectionOrder}
+              dispatch={dispatch}
+              onReset={() => dispatch({ type: 'RESET' })}
+              onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
+            />
+          </div>
         )}
 
         {state.phase === 'error' && (
-          <ErrorView
-            message={state.errorMessage ?? 'An unexpected error occurred.'}
-            resumeText={state.resumeText}
-            onRetry={handleRetry}
-          />
+          <div key={state.phase} className="phase-enter">
+            <ErrorView
+              message={state.errorMessage ?? 'An unexpected error occurred.'}
+              resumeText={state.resumeText}
+              onRetry={handleRetry}
+            />
+          </div>
         )}
 
         {state.phase === 'junk' && (
-          <JunkView
-            resumeText={state.resumeText}
-            onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
-            onRetry={handleRetry}
-          />
+          <div key={state.phase} className="phase-enter">
+            <JunkView
+              resumeText={state.resumeText}
+              onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
+              onRetry={handleRetry}
+            />
+          </div>
         )}
 
         {state.phase === 'cover_letter_input' && (
-          <CoverLetterInputView
-            jobPosting={state.jobPosting}
-            answers={state.answers}
-            onJobPostingChange={(v) => dispatch({ type: 'SET_JOB_POSTING', payload: v })}
-            onAnswerChange={(i, v) => dispatch({ type: 'SET_ANSWER', payload: { index: i, answer: v } })}
-            onSubmit={handleGenerateLetter}
-            onBack={() => dispatch({ type: 'BACK_TO_RESULT' })}
-          />
+          <div key={state.phase} className="phase-enter">
+            <CoverLetterInputView
+              jobPosting={state.jobPosting}
+              answers={state.answers}
+              onJobPostingChange={(v) => dispatch({ type: 'SET_JOB_POSTING', payload: v })}
+              onAnswerChange={(i, v) => dispatch({ type: 'SET_ANSWER', payload: { index: i, answer: v } })}
+              onSubmit={handleGenerateLetter}
+              onBack={() => dispatch({ type: 'BACK_TO_RESULT' })}
+            />
+          </div>
         )}
 
         {state.phase === 'cover_letter_streaming' && (
-          <CoverLetterStreamingView letterText={letterText} />
+          <div key={state.phase} className="phase-enter">
+            <CoverLetterStreamingView letterText={letterText} />
+          </div>
         )}
 
         {state.phase === 'cover_letter_result' && (
-          <CoverLetterResultView
-            letterText={letterText}
-            setLetterText={setLetterText}
-            onRegenerate={handleGenerateLetter}
-            onReset={() => dispatch({ type: 'RESET' })}
-            onNewLetter={() => {
-              // Clear only the posting — SET_JOB_POSTING('') resyncs the answer list
-              // by question identity, so typed base answers (style/motivation) survive
-              // and only job-specific questions reset. Answers are intentionally left
-              // untouched otherwise.
-              dispatch({ type: 'SET_JOB_POSTING', payload: '' })
-              dispatch({ type: 'START_COVER_LETTER' })
-            }}
-          />
+          <div key={state.phase} className="phase-enter">
+            <CoverLetterResultView
+              letterText={letterText}
+              setLetterText={setLetterText}
+              onRegenerate={handleGenerateLetter}
+              onReset={() => dispatch({ type: 'RESET' })}
+              onNewLetter={() => {
+                // Clear only the posting — SET_JOB_POSTING('') resyncs the answer list
+                // by question identity, so typed base answers (style/motivation) survive
+                // and only job-specific questions reset. Answers are intentionally left
+                // untouched otherwise.
+                dispatch({ type: 'SET_JOB_POSTING', payload: '' })
+                dispatch({ type: 'START_COVER_LETTER' })
+              }}
+            />
+          </div>
         )}
 
         {/* cover_letter_error: reuse ErrorView — onRetry re-runs same inputs losslessly
             (jobPosting + answers persist in reducer through streaming/error phases) */}
         {state.phase === 'cover_letter_error' && (
-          <ErrorView
-            message={state.errorMessage ?? 'Cover letter generation failed.'}
-            resumeText={state.jobPosting}
-            onRetry={handleGenerateLetter}
-          />
+          <div key={state.phase} className="phase-enter">
+            <ErrorView
+              message={state.errorMessage ?? 'Cover letter generation failed.'}
+              resumeText={state.jobPosting}
+              onRetry={handleGenerateLetter}
+            />
+          </div>
         )}
       </main>
       </div>
