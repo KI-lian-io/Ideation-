@@ -192,6 +192,12 @@ body {
     transform: translateY(350%);
   }
 }
+/* Looping variant for the tool's parse loading state (Typesetting Theater
+   Phase 2): same band, continuous passes while the skeleton is visible. The
+   reduced-motion block hides .scan-sweep entirely, which covers this too. */
+.scan-sweep-loop::after {
+  animation: scan-sweep-pass 1.8s var(--ease-out) infinite;
+}
 
 /* ── Hero typesetting theater ──────────────────────────────────────────────
    A US résumé card re-typesets into the German Lebenslauf sheet in a
@@ -343,6 +349,80 @@ body {
   right: 2px;
   height: 1px;
   transform: translateY(-50%);
+}
+
+/* ── Folio-style section numbers (Phase 2) ──────────────────────────────────
+   Broadsheet folio voice: a small mono number joined to the section eyebrow,
+   e.g. "01 · PATHWAYS". Decorative sequencing, so the number glyph itself is
+   aria-hidden; the eyebrow text remains the accessible label. */
+.folio-eyebrow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+}
+.folio-number {
+  color: var(--color-eyebrow);
+  opacity: 0.6;
+}
+/* On the dark trust band, inherit the surrounding white/40 tone instead of
+   the paper-surface taupe, which would contrast poorly against ink. */
+.bg-ink .folio-number {
+  color: currentColor;
+  opacity: 0.7;
+}
+
+/* ── Drop cap (Phase 2) ──────────────────────────────────────────────────────
+   First letter of the founder's note opening paragraph: display serif, sized
+   to roughly three text-lines, floated so body copy wraps around it. Ink by
+   default; scoped narrower on small screens so it never crowds the column. */
+.drop-cap::first-letter {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--color-ink);
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.86;
+  padding-right: 0.08em;
+  padding-top: 0.02em;
+}
+@media (max-width: 640px) {
+  .drop-cap::first-letter {
+    font-size: 2.6em;
+  }
+}
+
+/* ── Pull quote with hanging punctuation (Phase 2) ────────────────────────────
+   Broadsheet pull quote: large reading-serif, hairline rules above/below, the
+   opening quote mark hangs into the margin. `hanging-punctuation` is a
+   progressive enhancement (Safari); the negative text-indent + relative
+   quote-mark span is the fallback for browsers that ignore it. */
+.pull-quote {
+  position: relative;
+  hanging-punctuation: first;
+  text-indent: -0.5em;
+}
+/* Where hanging-punctuation is supported (Safari), drop the manual indent so
+   the opening quote mark doesn't hang twice. */
+@supports (hanging-punctuation: first) {
+  .pull-quote {
+    text-indent: 0;
+  }
+}
+.pull-quote-mark {
+  color: var(--color-accent);
+}
+
+/* ── Proof panel print surfaces (Phase 2) ─────────────────────────────────────
+   Static (non-animated) reuse of the hero theater's visual language for the
+   illustrative before/after card: a deliberately "wrong" sans source panel
+   and a doc-sheet destination panel with mono DIN pins + hairline leaders. */
+.proof-source {
+  transform: rotate(-1.2deg);
+}
+.proof-pin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

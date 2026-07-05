@@ -138,6 +138,22 @@ const SECTION_IDS = {
   proof: "section-proof-heading",
 };
 
+// Folio-style section number: broadsheet page-numbering voice joined to the
+// section eyebrow label ("01 · PATHWAYS"). The digit is decorative sequencing
+// (aria-hidden); the label text is what screen readers announce. Chrome copy
+// stays English per the design system (German lives only inside document
+// mockups).
+function FolioEyebrow({ folio, label }: { folio: string; label: string }) {
+  return (
+    <p className={`${EYEBROW} folio-eyebrow justify-center`}>
+      <span className="folio-number" aria-hidden="true">
+        {folio}
+      </span>
+      <span>{label}</span>
+    </p>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -293,9 +309,10 @@ export default function HomePage() {
           aria-labelledby={SECTION_IDS.pathways}
         >
           <div className="max-w-4xl mx-auto px-6">
+            <FolioEyebrow folio="01" label="Pathways" />
             <h2
               id={SECTION_IDS.pathways}
-              className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mb-12"
+              className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mt-3 mb-12"
             >
               Two documents. Both have to survive the scan.
             </h2>
@@ -358,10 +375,8 @@ export default function HomePage() {
                   personal-data block, photo guidance.
                 </p>
                 <p className="text-sm text-muted leading-relaxed mb-4">
-                  The rules aren&rsquo;t what most blogs claim, either: 61% of
-                  German recruiters prefer a <em>two-page</em> CV, and 64% call
-                  spelling errors a dealbreaker (DACH recruiter studies, not
-                  imported one-page lore).
+                  The rules aren&rsquo;t what most blogs claim, either, and the
+                  numbers below explain why.
                 </p>
                 <p className="text-sm text-muted italic mb-6">
                   A native German speaker should review the final letter before
@@ -400,6 +415,26 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Editorial pull quote: the DACH recruiter stats, upgraded from a
+                cramped card paragraph into a broadsheet pull quote. Hanging
+                opening quote (progressive enhancement via hanging-punctuation,
+                negative text-indent fallback), hairline rules, reading serif.
+                No new claims: same two evidenced numbers already on the page. */}
+            <figure className="max-w-2xl mx-auto mt-16 text-center">
+              <div className="h-px w-16 bg-ink/30 mx-auto mb-8" aria-hidden="true" />
+              <blockquote className="pull-quote font-serif-text text-2xl sm:text-3xl text-ink leading-snug">
+                <span className="pull-quote-mark" aria-hidden="true">
+                  &ldquo;
+                </span>
+                61% of German recruiters prefer a two-page CV, and 64% call
+                spelling errors a dealbreaker.
+              </blockquote>
+              <figcaption className="mt-5 text-sm text-muted">
+                DACH recruiter studies, not imported one-page lore.
+              </figcaption>
+              <div className="h-px w-16 bg-ink/30 mx-auto mt-8" aria-hidden="true" />
+            </figure>
+
             <div className="text-center mt-12">
               <CtaLink href="/app">Convert your CV – it&rsquo;s free</CtaLink>
             </div>
@@ -412,9 +447,10 @@ export default function HomePage() {
           aria-labelledby={SECTION_IDS.howItWorks}
         >
           <div className="max-w-4xl mx-auto px-6">
+            <FolioEyebrow folio="02" label="How it works" />
             <h2
               id={SECTION_IDS.howItWorks}
-              className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mb-14"
+              className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mt-3 mb-14"
             >
               Three steps. One honest output.
             </h2>
@@ -474,6 +510,13 @@ export default function HomePage() {
           aria-labelledby={SECTION_IDS.trust}
         >
           <div className="max-w-4xl mx-auto px-6 text-center">
+            <p className="folio-eyebrow justify-center font-mono text-xs uppercase tracking-[0.18em] text-white/40 mb-5">
+              <span className="folio-number" aria-hidden="true">
+                03
+              </span>
+              <span>Trust</span>
+            </p>
+
             <div
               className="mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white"
               aria-hidden="true"
@@ -517,16 +560,17 @@ export default function HomePage() {
         >
           <div className="max-w-2xl mx-auto px-6">
             <div className="w-8 h-0.5 bg-ink mb-6" aria-hidden="true" />
+            <FolioEyebrow folio="04" label="Founder's note" />
 
             <h2
               id={SECTION_IDS.founder}
-              className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-6"
+              className="font-serif text-3xl font-semibold text-ink leading-[1.2] mt-3 mb-6"
             >
               Built by a German, for everyone applying here.
             </h2>
 
             <div className="text-base text-muted leading-relaxed space-y-4">
-              <p>
+              <p className="drop-cap">
                 I&rsquo;m German, born and raised, living in Hamburg. I know the
                 Lebenslauf and Anschreiben conventions from the inside: what a
                 recruiter here expects to see, and what quietly signals
@@ -561,9 +605,12 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <p
               id={SECTION_IDS.proof}
-              className={`${EYEBROW} mb-4`}
+              className={`${EYEBROW} folio-eyebrow justify-center mb-4`}
             >
-              What actually changes
+              <span className="folio-number" aria-hidden="true">
+                05
+              </span>
+              <span>What actually changes</span>
             </p>
             <h2 className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-12">
               Three mechanical fixes, every time.
@@ -616,50 +663,76 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Illustrative example: labeled honestly, not attributed to the founder's real CV */}
-            <p className={`${EYEBROW} mt-10 mb-4`}>Illustrative example</p>
+            {/* Illustrative example: labeled honestly, not attributed to the founder's real CV.
+                Upgraded to hero-theater fidelity (static, no animation needed here): the
+                Before panel stays a deliberately "wrong" rotated sans card (same -1.2deg
+                tilt as the hero source card); the After panel is a real .doc-sheet print
+                surface with mono DIN annotation pins + hairline leader lines. */}
+            <p className={`${EYEBROW} mt-10 mb-6`}>Illustrative example</p>
             <div
-              className={`${CARD} overflow-hidden mx-auto max-w-2xl text-left`}
+              className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-4 mx-auto max-w-2xl text-left"
               role="img"
-              aria-label="Illustrative before and after example: a generic English-format résumé section on top, converted to a norm-correct German Lebenslauf below, with an English norm-gap annotation note under the German output"
+              aria-label="Illustrative before and after example: a generic English-format résumé section, deliberately mis-formatted, converted to a norm-correct German Lebenslauf with DIN annotation pins and an English norm-gap note"
             >
-              {/* Before panel */}
-              <div className="border-b border-hair px-6 py-5">
-                <p className={`${EYEBROW} mb-3`}>
+              {/* Before panel: deliberately "wrong" - sans, card surface, slight tilt */}
+              <div
+                className="proof-source bg-card border border-hair rounded-lg px-5 py-6 shadow-sm"
+                aria-hidden="true"
+              >
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted mb-3">
                   Original CV (English)
                 </p>
-                <p className="text-sm text-muted italic leading-relaxed">
-                  &ldquo;Senior Product Manager | Jan 2021–Present | Drove
+                <p className="text-sm text-muted italic leading-relaxed font-sans">
+                  &ldquo;Senior Product Manager | Jan 2021&ndash;Present | Drove
                   cross-functional alignment across engineering and design to
                   ship three core product features, increasing activation rate
                   by 18%.&rdquo;
                 </p>
               </div>
 
-              {/* After panel */}
-              <div className="px-6 py-5">
-                <p className={`${EYEBROW} mb-3`}>
+              {/* Center arrow, hidden on mobile stack (matches hero theater) */}
+              <div className="hidden sm:flex items-center justify-center text-muted" aria-hidden="true">
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 8H26M26 8L19 1M26 8L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+
+              {/* After panel: real print surface, mono DIN pins with hairline leaders */}
+              <div className="doc-sheet px-5 py-6" aria-hidden="true">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-eyebrow mb-3">
                   Lebenslauf Output (German)
                 </p>
-                <p className="text-sm text-ink leading-relaxed mb-3">
-                  Senior Product Manager | 01/2021 – heute
+                <p className="text-sm text-ink leading-relaxed mb-4 font-serif-text">
+                  Senior Product Manager | 01/2021 &ndash; heute
                   <br />
                   Führte die bereichsübergreifende Zusammenarbeit zwischen
                   Engineering und Design, um drei Kernproduktfunktionen
                   einzuführen. Aktivierungsrate um 18&nbsp;% gesteigert.
                 </p>
-                <div className="rounded-md bg-paper border border-hair px-3 py-2">
-                  <p className="text-sm text-muted">
-                    <span className="font-semibold text-ink">
-                      Norm note:
-                    </span>{" "}
-                    Date reformatted to the German MM/YYYY convention;
-                    &ldquo;Present&rdquo; replaced with &ldquo;heute&rdquo;; percentage
-                    formatted with a non-breaking space before the symbol.
-                  </p>
+
+                <div className="proof-pin mt-4 pt-3 border-t border-hair">
+                  <span className="inline-block h-px w-4 bg-hair" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
+                    MM/JJJJ Datumsformat
+                  </span>
+                </div>
+                <div className="proof-pin mt-2">
+                  <span className="inline-block h-px w-4 bg-hair" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
+                    &ldquo;Present&rdquo; &rarr; &ldquo;heute&rdquo;
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Accessible equivalent of the norm note dropped from the visual panel above:
+                same content, plain text, always announced regardless of aria-hidden siblings. */}
+            <p className="mt-6 mx-auto max-w-2xl text-sm text-muted text-left">
+              <span className="font-semibold text-ink">Norm note:</span> date
+              reformatted to the German MM/YYYY convention, &ldquo;Present&rdquo;
+              replaced with &ldquo;heute&rdquo;, percentage formatted with a
+              non-breaking space before the symbol.
+            </p>
 
             <p className="mt-8 text-sm text-muted max-w-xl mx-auto">
               No testimonials yet: the tool is new. Judge the output yourself.

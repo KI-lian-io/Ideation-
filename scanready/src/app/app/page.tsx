@@ -642,7 +642,11 @@ function LoadingView() {
 
   return (
     <div className="flex flex-col gap-4" role="status" aria-label={t.loadingAriaLabel}>
-      <div className="animate-pulse flex flex-col gap-3">
+      <div className="relative animate-pulse flex flex-col gap-3">
+        {/* Brand scan-sweep over the skeleton: looping variant of the hero's
+            signature motion (Typesetting Theater Phase 2). Decorative; hidden
+            entirely under prefers-reduced-motion via the .scan-sweep rule. */}
+        <div className="scan-sweep scan-sweep-loop" aria-hidden="true" />
         {/* Skeleton blocks simulating the Lebenslauf layout (D-15 / INPUT-03) */}
         <div className="h-6 w-1/3 rounded bg-faint" />
         <div className="h-4 w-1/2 rounded bg-faint" />
