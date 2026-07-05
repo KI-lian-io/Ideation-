@@ -209,6 +209,11 @@ type Dict = {
   photoStaysLocal: string
   photoTooLarge: string
   photoBadType: string
+  // Photo crop (pan/zoom)
+  photoFrameAria: string
+  photoZoomAria: string
+  photoDragHint: string
+  photoReset: string
 
   // Extract-cv error messages (reason -> localized string)
   extractErrors: {
@@ -407,6 +412,10 @@ const en = {
   photoStaysLocal: 'Stays in your browser. Never uploaded.',
   photoTooLarge: 'The photo is too large (max. 8 MB).',
   photoBadType: 'Please choose a JPEG, PNG, or WebP image.',
+  photoFrameAria: 'Application photo. Drag or use the arrow keys to reposition it inside the frame.',
+  photoZoomAria: 'Zoom photo',
+  photoDragHint: 'Drag to reposition, slider to zoom.',
+  photoReset: 'Reset crop',
 
   extractErrors: {
     too_large: 'The file is too large (max. 10 MB).',
@@ -605,6 +614,10 @@ const de = {
   photoStaysLocal: 'Bleibt in Ihrem Browser. Wird nie hochgeladen.',
   photoTooLarge: 'Das Foto ist zu groß (max. 8 MB).',
   photoBadType: 'Bitte wählen Sie ein JPEG-, PNG- oder WebP-Bild.',
+  photoFrameAria: 'Bewerbungsfoto. Zum Ausrichten ziehen oder Pfeiltasten verwenden.',
+  photoZoomAria: 'Foto zoomen',
+  photoDragHint: 'Zum Ausrichten ziehen, Regler zum Zoomen.',
+  photoReset: 'Ausschnitt zurücksetzen',
 
   extractErrors: {
     too_large: 'Die Datei ist zu groß (max. 10 MB).',

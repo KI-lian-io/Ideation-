@@ -62,6 +62,7 @@ export type LebenslaufAction =
   // Photo (client-side-only, display-only – never sent to any API, see PersonalSection)
   | { type: 'SET_PHOTO'; url: string }
   | { type: 'REMOVE_PHOTO' }
+  | { type: 'SET_PHOTO_TRANSFORM'; transform: PhotoTransform }
 
 /**
  * Pure array reorder helper – no mutation, no external library.
@@ -93,6 +94,8 @@ interface LebenslaufEditorProps {
   /** Client-side-only object URL for the uploaded photo (see page.tsx SET_PHOTO /
    * REMOVE_PHOTO). Display-only – never serialized by toPlainText or sent to any API. */
   photoUrl: string | null
+  /** Display crop (pan/zoom) applied inside the photo frame – see PhotoTransform. */
+  photoTransform: PhotoTransform
 }
 
 // ---------------------------------------------------------------------------
@@ -111,6 +114,35 @@ const MAX_PHOTO_BYTES = 8 * 1024 * 1024 // 8 MB
 const PHOTO_ACCEPT = 'image/jpeg,image/png,image/webp'
 
 // ---------------------------------------------------------------------------
+// Photo crop – CSS-transform pan/zoom inside the fixed 3:4 frame. Display-only,
+// like the photo itself; the numbers become the canvas crop when PDF export ships.
+// ---------------------------------------------------------------------------
+
+/** x/y are translate percentages of the frame box; zoom is 1..PHOTO_MAX_ZOOM. */
+export type PhotoTransform = { zoom: number; x: number; y: number }
+export const DEFAULT_PHOTO_TRANSFORM: PhotoTransform = { zoom: 1, x: 0, y: 0 }
+const PHOTO_MAX_ZOOM = 3
+
+/**
+ * Clamps zoom and pan. On-screen displacement is x% * zoom (translate composes
+ * inside the scale), and the coverage headroom of a zoomed cover-fit image is
+ * (zoom - 1) * 50% per side, so |x| <= 50 * (zoom - 1) / zoom keeps the frame
+ * covered.
+ * ponytail: at zoom 1 the source's own object-cover overflow (non-3:4 images)
+ * is not pannable; read naturalWidth/Height for exact per-axis bounds if that
+ * ever matters. Zooming slightly unlocks panning.
+ */
+function clampPhotoTransform(tr: PhotoTransform): PhotoTransform {
+  const zoom = Math.min(Math.max(tr.zoom, 1), PHOTO_MAX_ZOOM)
+  const limit = (50 * (zoom - 1)) / zoom
+  return {
+    zoom,
+    x: Math.min(Math.max(tr.x, -limit), limit),
+    y: Math.min(Math.max(tr.y, -limit), limit),
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Section renderers
 // ---------------------------------------------------------------------------
 
@@ -119,11 +151,13 @@ function PersonalSection({
   dispatch,
   photoAdvice,
   photoUrl,
+  photoTransform,
 }: {
   personal: Lebenslauf['personal']
   dispatch: React.Dispatch<LebenslaufAction>
   photoAdvice?: { en: string; de: string } | null
   photoUrl: string | null
+  photoTransform: PhotoTransform
 }) {
   const { lang, t } = useLang()
   // Optional fields (Nationalität/Geburtsdatum) start collapsed unless already filled:
@@ -134,6 +168,9 @@ function PersonalSection({
   )
   const [photoError, setPhotoError] = useState<string | null>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
+  // Live drag state – ref, not state: pointermove dispatches the clamped transform
+  // to the reducer; nothing here needs a re-render of its own.
+  const dragRef = useRef<{ startX: number; startY: number; base: PhotoTransform } | null>(null)
 
   function handlePhotoFile(file: File) {
     setPhotoError(null)
@@ -148,6 +185,13 @@ function PersonalSection({
     const url = URL.createObjectURL(file)
     dispatch({ type: 'SET_PHOTO', url })
   }
+
+  function setTransform(tr: PhotoTransform) {
+    dispatch({ type: 'SET_PHOTO_TRANSFORM', transform: clampPhotoTransform(tr) })
+  }
+
+  const isCropped =
+    photoTransform.zoom !== 1 || photoTransform.x !== 0 || photoTransform.y !== 0
 
   return (
     <div className="flex flex-col gap-2">
@@ -224,29 +268,95 @@ function PersonalSection({
             }}
           />
           {photoUrl ? (
-            <div className="group relative w-24 sm:w-28 aspect-[3/4] rounded-sm border border-hair overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element -- local blob: URL, next/image cannot optimize it and shouldn't try (zero-retention: no network round-trip for a photo that never leaves the browser) */}
-              <img src={photoUrl} alt={t.photoAria} className="h-full w-full object-cover" />
-              <button
-                type="button"
-                onClick={() => dispatch({ type: 'REMOVE_PHOTO' })}
-                aria-label={t.photoRemoveAria}
-                className="absolute top-0.5 right-0.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+            <>
+              {/* Crop frame: drag to reposition (pointer capture), arrow keys when
+                  focused, zoom via the slider below. The img is pointer-inert; the
+                  frame owns all interaction. touch-none stops page scroll mid-drag. */}
+              <div
+                role="img"
+                aria-label={t.photoFrameAria}
+                tabIndex={0}
+                onPointerDown={(e) => {
+                  try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* capture is best-effort */ }
+                  dragRef.current = { startX: e.clientX, startY: e.clientY, base: photoTransform }
+                }}
+                onPointerMove={(e) => {
+                  const drag = dragRef.current
+                  if (!drag) return
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  // px → frame-%; on-screen displacement composes inside the scale,
+                  // so divide the delta back out by zoom.
+                  const dx = (((e.clientX - drag.startX) / rect.width) * 100) / drag.base.zoom
+                  const dy = (((e.clientY - drag.startY) / rect.height) * 100) / drag.base.zoom
+                  setTransform({ ...drag.base, x: drag.base.x + dx, y: drag.base.y + dy })
+                }}
+                onPointerUp={() => { dragRef.current = null }}
+                onPointerCancel={() => { dragRef.current = null }}
+                onKeyDown={(e) => {
+                  const step = 2
+                  let { x, y } = photoTransform
+                  if (e.key === 'ArrowLeft') x -= step
+                  else if (e.key === 'ArrowRight') x += step
+                  else if (e.key === 'ArrowUp') y -= step
+                  else if (e.key === 'ArrowDown') y += step
+                  else return
+                  e.preventDefault()
+                  setTransform({ ...photoTransform, x, y })
+                }}
+                className="group relative w-32 sm:w-40 aspect-[3/4] rounded-sm border border-hair overflow-hidden cursor-grab active:cursor-grabbing touch-none select-none focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink/70 text-sm leading-none">×</span>
-              </button>
-            </div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- local blob: URL, next/image cannot optimize it and shouldn't try (zero-retention: no network round-trip for a photo that never leaves the browser) */}
+                <img
+                  src={photoUrl}
+                  alt=""
+                  draggable={false}
+                  className="h-full w-full object-cover pointer-events-none"
+                  style={{ transform: `scale(${photoTransform.zoom}) translate(${photoTransform.x}%, ${photoTransform.y}%)` }}
+                />
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: 'REMOVE_PHOTO' })}
+                  onPointerDown={(e) => e.stopPropagation()} // never starts a drag
+                  aria-label={t.photoRemoveAria}
+                  className="absolute top-0.5 right-0.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink/70 text-sm leading-none">×</span>
+                </button>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={PHOTO_MAX_ZOOM}
+                step={0.05}
+                value={photoTransform.zoom}
+                onChange={(e) => setTransform({ ...photoTransform, zoom: Number(e.target.value) })}
+                aria-label={t.photoZoomAria}
+                className="w-32 sm:w-40 accent-accent"
+              />
+              <p className="text-xs text-muted text-center max-w-32 sm:max-w-40">{t.photoDragHint}</p>
+              {isCropped && (
+                <button
+                  type="button"
+                  onClick={() => setTransform(DEFAULT_PHOTO_TRANSFORM)}
+                  className="text-xs text-muted hover:text-ink underline underline-offset-2"
+                >
+                  {t.photoReset}
+                </button>
+              )}
+            </>
           ) : (
             <button
               type="button"
               onClick={() => photoInputRef.current?.click()}
-              className="w-24 sm:w-28 aspect-[3/4] rounded-sm border border-dashed border-hair flex flex-col items-center justify-center gap-0.5 text-muted hover:text-ink hover:border-ink/30 transition-colors"
+              className="w-32 sm:w-40 aspect-[3/4] rounded-sm border border-dashed border-hair flex flex-col items-center justify-center gap-0.5 text-muted hover:text-ink hover:border-ink/30 transition-colors"
             >
               <span className="text-sm">{t.photoAddLabel}</span>
               <span className="text-xs italic">{t.photoOptionalSub}</span>
             </button>
           )}
-          <p className="text-xs text-muted text-center max-w-24 sm:max-w-28">{t.photoStaysLocal}</p>
+          {!photoUrl && (
+            <p className="text-xs text-muted text-center max-w-32 sm:max-w-40">{t.photoStaysLocal}</p>
+          )}
         </div>
       </div>
       {photoError && <p className="text-sm text-red-600">{photoError}</p>}
@@ -553,6 +663,7 @@ export function LebenslaufEditor({
   dispatch,
   photoAdvice,
   photoUrl,
+  photoTransform,
 }: LebenslaufEditorProps) {
   const { t } = useLang()
   const renderSection = (key: string) => {
@@ -564,6 +675,7 @@ export function LebenslaufEditor({
             dispatch={dispatch}
             photoAdvice={photoAdvice}
             photoUrl={photoUrl}
+            photoTransform={photoTransform}
           />
         )
       case 'experience':

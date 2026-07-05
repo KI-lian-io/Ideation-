@@ -10,8 +10,8 @@ import {
   withSkillCategoryUids,
 } from '@/lib/lebenslauf-utils'
 import type { LebenslaufEditorState } from '@/lib/lebenslauf-utils'
-import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
-import type { LebenslaufAction } from '@/components/LebenslaufEditor'
+import { LebenslaufEditor, reorder, DEFAULT_PHOTO_TRANSFORM } from '@/components/LebenslaufEditor'
+import type { LebenslaufAction, PhotoTransform } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS, questionsForPosting, recommendDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
@@ -86,6 +86,10 @@ type AppState = {
    * any API – see LebenslaufEditor's PersonalSection and toPlainText, neither of
    * which reference it. Revoked on replace/remove/reset to avoid blob URL leaks. */
   photoUrl: string | null
+  /** Display crop for the photo: CSS-transform pan/zoom applied inside the fixed
+   * 3:4 frame. x/y are translate percentages of the frame, zoom is 1..3. Purely
+   * visual – when PDF export ships, the same numbers drive the canvas crop. */
+  photoTransform: PhotoTransform
 }
 
 // AppAction union: page lifecycle actions + all Lebenslauf editor actions
@@ -115,6 +119,7 @@ const initialState: AppState = {
   jobPosting: '',
   answers: PERSONALIZATION_QUESTIONS.map((q) => ({ id: q.id, answer: '' })),
   photoUrl: null,
+  photoTransform: DEFAULT_PHOTO_TRANSFORM,
 }
 
 // Revokes a photo object URL if one exists – best-effort, no-op on null/undefined.
@@ -147,10 +152,12 @@ function reducer(state: AppState, action: AppAction): AppState {
     // -------------------------------------------------------------------------
     case 'SET_PHOTO':
       revokePhoto(state.photoUrl) // replacing: revoke the previous URL first
-      return { ...state, photoUrl: action.url }
+      return { ...state, photoUrl: action.url, photoTransform: DEFAULT_PHOTO_TRANSFORM }
     case 'REMOVE_PHOTO':
       revokePhoto(state.photoUrl)
-      return { ...state, photoUrl: null }
+      return { ...state, photoUrl: null, photoTransform: DEFAULT_PHOTO_TRANSFORM }
+    case 'SET_PHOTO_TRANSFORM':
+      return { ...state, photoTransform: action.transform }
 
     // -------------------------------------------------------------------------
     // Personal data
@@ -675,6 +682,7 @@ function ResultView({
   lebenslauf,
   sectionOrder,
   photoUrl,
+  photoTransform,
   dispatch,
   onReset,
   onStartCoverLetter,
@@ -682,6 +690,7 @@ function ResultView({
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
   photoUrl: string | null
+  photoTransform: PhotoTransform
   dispatch: React.Dispatch<AppAction>
   onReset: () => void
   onStartCoverLetter: () => void
@@ -747,6 +756,7 @@ function ResultView({
         dispatch={dispatch}
         photoAdvice={lebenslauf.photoAdvice}
         photoUrl={photoUrl}
+        photoTransform={photoTransform}
       />
 
       {/* Visually-hidden live mirror so screen readers announce copy state changes
@@ -1527,6 +1537,7 @@ function AppShell() {
               lebenslauf={state.lebenslauf}
               sectionOrder={state.sectionOrder}
               photoUrl={state.photoUrl}
+              photoTransform={state.photoTransform}
               dispatch={dispatch}
               onReset={() => dispatch({ type: 'RESET' })}
               onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
