@@ -59,6 +59,15 @@ Working product name: **ScanReady** (placeholder — "win the 8-second German re
 - **Humanizer picker de-paralyzed** (founder churn feedback): `recommendDirection()` heuristic recommends per-posting (badge + accent border, first position), German register samples on each card, restore-reassurance line.
 - **Prompt grounding hardened after real-CV verification** (founder's actual CV, all 3 paths): DIN letterhead placeholders (model had invented a street address + date — now `[Straße Hausnummer]`, `[Ort], [Datum]`), no-markdown rule, German dates (`03/2024 – heute`), Abschlussnote retained, competency labels Germanized.
 
+**✅ Done — cleanup session (2026-07-05, UAT'd via live parse):**
+- **Complete EN/DE UI language toggle** (`src/lib/i18n.tsx`, ~160 keys, localStorage-persisted, top-bar toggle on `/app`): all tool chrome switches; documents/DIN section labels stay German; Widerruf checkbox stays German (legal text). Personalization questions refactored to `{id, en, de}` — answers keyed by id, wire contract to `/api/cover-letter` unchanged (English question text resolved at request boundary).
+- **Bilingual generated notes**: `normGapNotes` and `photoAdvice` are now `{en, de}` objects (schema + PARSE_SYSTEM change) so DE mode shows native-German notes. Verified live: parse returns natural German.
+- **Result-view layout**: norm-gap panel is a collapsed full-width strip ABOVE the document; two-column grid removed; tool card widened to `max-w-4xl`. Fixes the "narrow document" complaint.
+- **Photo upload (display-only)**: dashed 3:4 frame top-right of Persönliche Daten, client-side object URL only (never uploaded, never serialized — zero-retention intact), 8 MB/type validation, removable.
+- **Landing fixed for honesty**: founder story rewritten — Kilian is GERMAN, not an expat ("Built by a German, for everyone applying here"); proof section is now a "What actually changes" norm-transform grid + honestly-labeled illustrative example + explicit "no testimonials yet" line. Never fabricate testimonials.
+- **Em-dash ban (site-wide convention going forward)**: all "—" removed from src/public (76 replaced; landing/layout separately); `TYPOGRAPHY_RULES` block added to all three system prompts so generated documents avoid them too. Only allowed occurrence: the prompt rule itself in `prompts.ts`.
+- **Naming research done** → [`naming-shortlist.md`](naming-shortlist.md). Finalists (all .de+.com free at research time): Bewerbungsfertig, CV Broadsheet, German CV Co. "Scan-" naming should be dropped (Jobscan owns the pattern). Founder decision pending; DPMA/EUIPO check before committing.
+
 **⏳ NOT done:**
 1. **Humanizer+ go-live gates (founder actions)** — `scanready/docs/humanizer-golive.md`: real data in `src/lib/legal-data.ts` (FOUNDER_TODO), VAT decision (§19 UStG vs Stripe Tax), Stripe live keys + purchase/refund drill, native-speaker review of the 3 refinement directions, Anthropic spend cap, Upstash env vars (rate limiting is OFF until set). **Stripe test-mode E2E still unrun** (test keys were never added to `.env.local`).
 2. **Analytics (backlogged)** — PostHog funnel or Vercel Analytics custom events; now doubly needed as the Humanizer+ conversion denominator. GTM-03 paid test blocked on it.
@@ -70,7 +79,7 @@ Working product name: **ScanReady** (placeholder — "win the 8-second German re
 
 1. **Output language:** ✅ **Bilingual** — German documents plus an English explanation of each change/choice, so the applicant trusts and learns from the result. (A German-*or*-English content mode is logged as an optional near-term item, not the USP.)
 2. **Beachhead:** ✅ **B2C-first**, founder-led; parallel B2B pilot deferred. Customer was also broadened (2026-06-23) to **"internationals applying for jobs in Germany"** with nationality-neutral landing copy; launch motion stays on the reachable cohort (US/UK expats + intl uni grads).
-3. **Working name:** ✅ **Keep *ScanReady* as a placeholder; revisit pre-launch.** Not a blocker.
+3. **Working name:** ✅ **Keep *ScanReady* as a placeholder; revisit pre-launch.** Naming research is now done (`naming-shortlist.md`, 2026-07-05); founder pick + DPMA check pending.
 
 Distribution sequence (agreed, now operationalized in `distribution/`): **(A) Reddit/build-in-public first** (Kilian is applying now → his story is the content), **SEO second**, **(C) €50–100 paid LAST as a conversion test, not a channel.**
 
