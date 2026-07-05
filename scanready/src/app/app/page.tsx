@@ -6,7 +6,7 @@ import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
-import { PERSONALIZATION_QUESTIONS, questionsForPosting } from '@/lib/prompts'
+import { PERSONALIZATION_QUESTIONS, questionsForPosting, recommendDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 
@@ -995,12 +995,14 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
 function CoverLetterResultView({
   letterText,
   setLetterText,
+  jobPosting,
   onRegenerate,
   onReset,
   onNewLetter,
 }: {
   letterText: string
   setLetterText: (text: string) => void
+  jobPosting: string
   onRegenerate: () => void
   onReset: () => void
   onNewLetter: () => void
@@ -1211,6 +1213,7 @@ function CoverLetterResultView({
       {humanizerOpen && (
         <HumanizerModal
           letterText={letterText}
+          recommended={recommendDirection(jobPosting, letterText)}
           onClose={() => setHumanizerOpen(false)}
           onDone={(refined) => {
             setOriginalLetter((prev) => prev ?? letterText)
@@ -1502,6 +1505,7 @@ export default function Home() {
             <CoverLetterResultView
               letterText={letterText}
               setLetterText={setLetterText}
+              jobPosting={state.jobPosting}
               onRegenerate={handleGenerateLetter}
               onReset={() => dispatch({ type: 'RESET' })}
               onNewLetter={() => {

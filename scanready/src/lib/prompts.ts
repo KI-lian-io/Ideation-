@@ -167,3 +167,24 @@ ${UNTRUSTED_INPUT_RULES}`;
 export function buildHumanizerUser(letterText: string, direction: HumanizerDirection): string {
   return `REFINEMENT DIRECTION:\n${HUMANIZER_DIRECTIONS[direction]}\n\n---LETTER---\n${letterText}\n---END---\n\nWrite the refined Anschreiben now.`;
 }
+
+/**
+ * Client-side heuristic: which refinement direction fits this application?
+ * Grounded in the posting's own register signals. Precedence: an over-long
+ * letter needs tightening first; startup register beats the formal default.
+ */
+export function recommendDirection(jobPosting: string, letterText: string): HumanizerDirection {
+  if (letterText.length > 3200) return "praegnanter";
+  const p = jobPosting.toLowerCase();
+  const MODERN_SIGNALS = /startup|scale-?up|\bdu\b|\bdich\b|\bdein/;
+  const FORMAL_SIGNALS = /konzern|bank|versicherung|behörde|öffentlicher dienst|kanzlei/;
+  if (MODERN_SIGNALS.test(p) && !FORMAL_SIGNALS.test(p)) return "moderner";
+  return "formeller"; // the safe German default
+}
+
+/** One closing sentence rendered in each register — shown in the picker so the choice is audible. */
+export const DIRECTION_SAMPLES: Record<HumanizerDirection, string> = {
+  formeller: "Über die Gelegenheit zu einem persönlichen Gespräch würde ich mich sehr freuen.",
+  moderner: "Lassen Sie uns sprechen — am liebsten direkt über die nächsten Schritte.",
+  praegnanter: "Ich freue mich auf ein Gespräch.",
+};

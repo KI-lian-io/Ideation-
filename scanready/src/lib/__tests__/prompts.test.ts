@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 
 import { questionsForPosting, PERSONALIZATION_QUESTIONS, SALARY_QUESTION, START_DATE_QUESTION } from '../prompts.ts'
 import { HUMANIZER_DIRECTIONS, buildHumanizerUser, HUMANIZER_SYSTEM, COVER_LETTER_SYSTEM } from '../prompts.ts'
+import { recommendDirection, DIRECTION_SAMPLES } from '../prompts.ts'
 
 test('plain posting returns only the base questions', () => {
   const qs = questionsForPosting('Wir suchen eine:n Frontend-Entwickler:in in Berlin.')
@@ -65,5 +66,38 @@ test('cover-letter and humanizer prompts carry the untrusted-input rules + senti
 test('hardening rules bias against false refusals', () => {
   for (const p of [COVER_LETTER_SYSTEM, HUMANIZER_SYSTEM]) {
     assert.ok(p.includes('when in doubt, do the task'))
+  }
+})
+
+test('recommendDirection: an over-long letter recommends praegnanter even with a startup posting', () => {
+  const longLetter = 'x'.repeat(3201)
+  const startupPosting = 'Wir sind ein Startup und suchen dich — sei Teil unseres Teams.'
+  assert.equal(recommendDirection(startupPosting, longLetter), 'praegnanter')
+})
+
+test('recommendDirection: du-form/startup posting recommends moderner', () => {
+  const posting = 'Unser Scale-up sucht dich! Schreib uns, wenn du Lust hast.'
+  assert.equal(recommendDirection(posting, 'short letter'), 'moderner')
+})
+
+test('recommendDirection: Konzern/bank posting recommends formeller', () => {
+  const posting = 'Die Deutsche Bank AG sucht eine:n Sachbearbeiter:in im Konzern.'
+  assert.equal(recommendDirection(posting, 'short letter'), 'formeller')
+})
+
+test('recommendDirection: mixed signals (startup AND bank) fall back to formeller', () => {
+  const posting = 'Unser Startup, eine Tochtergesellschaft der Bank, sucht dich.'
+  assert.equal(recommendDirection(posting, 'short letter'), 'formeller')
+})
+
+test('recommendDirection: empty posting recommends formeller', () => {
+  assert.equal(recommendDirection('', 'short letter'), 'formeller')
+})
+
+test('DIRECTION_SAMPLES has exactly one sample sentence per direction', () => {
+  assert.deepEqual(Object.keys(DIRECTION_SAMPLES).sort(), ['formeller', 'moderner', 'praegnanter'])
+  for (const v of Object.values(DIRECTION_SAMPLES)) {
+    assert.equal(typeof v, 'string')
+    assert.ok(v.length > 0)
   }
 })

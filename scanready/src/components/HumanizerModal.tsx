@@ -11,7 +11,7 @@
 import { useState, useRef, useEffect, useId } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { HUMANIZER_DIRECTIONS, type HumanizerDirection } from '@/lib/prompts'
+import { HUMANIZER_DIRECTIONS, DIRECTION_SAMPLES, type HumanizerDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, EYEBROW } from '@/components/ui'
 
@@ -49,10 +49,12 @@ function readPaidAttempt(): PaidAttempt | null {
 
 export default function HumanizerModal({
   letterText,
+  recommended,
   onClose,
   onDone,
 }: {
   letterText: string
+  recommended: HumanizerDirection
   onClose: () => void
   onDone: (refined: string) => void
 }) {
@@ -204,16 +206,38 @@ export default function HumanizerModal({
               Your Anschreiben is ready. The Feinschliff tunes tone and register to the
               company&rsquo;s culture — your facts and voice stay unchanged.
             </p>
-            {(Object.keys(DIRECTION_LABELS) as HumanizerDirection[]).map((d) => (
-              <button
-                key={d}
-                onClick={() => pickDirection(d)}
-                className="rounded-xl border border-hair bg-card p-4 text-left transition-colors hover:border-accent"
-              >
-                <p className="font-semibold text-ink">{DIRECTION_LABELS[d].title}</p>
-                <p className="text-sm text-muted">{DIRECTION_LABELS[d].blurb}</p>
-              </button>
-            ))}
+            {/* Recommended direction first (personalized from the job posting), then the
+                remaining two in their original relative order — defuses choice paralysis
+                without hiding the alternatives. */}
+            {(Object.keys(DIRECTION_LABELS) as HumanizerDirection[])
+              .slice()
+              .sort((a, b) => (a === recommended ? -1 : b === recommended ? 1 : 0))
+              .map((d) => {
+                const isRecommended = d === recommended
+                return (
+                  <button
+                    key={d}
+                    onClick={() => pickDirection(d)}
+                    className={`rounded-xl border bg-card p-4 text-left transition-colors hover:border-accent ${
+                      isRecommended ? 'border-2 border-accent' : 'border-hair'
+                    }`}
+                  >
+                    {isRecommended && (
+                      <span className="mb-2 inline-block rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
+                        Recommended for this posting
+                      </span>
+                    )}
+                    <p className="font-semibold text-ink">{DIRECTION_LABELS[d].title}</p>
+                    <p className="text-sm text-muted">{DIRECTION_LABELS[d].blurb}</p>
+                    <p lang="de" className="font-serif-text italic text-sm text-muted mt-2">
+                      „{DIRECTION_SAMPLES[d]}"
+                    </p>
+                  </button>
+                )
+              })}
+            <p className="text-sm text-muted">
+              Your original letter stays — you can restore it anytime after the refinement.
+            </p>
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
         )}
