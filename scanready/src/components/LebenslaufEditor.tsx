@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { EditableField } from '@/components/EditableField'
 import { SkillChips, LanguageLevelSelect } from '@/components/SkillChips'
 import { softFormatDate } from '@/lib/lebenslauf-utils'
@@ -107,6 +107,13 @@ function PersonalSection({
   dispatch: React.Dispatch<LebenslaufAction>
   photoAdvice?: string | null
 }) {
+  // Optional fields (Nationalität/Geburtsdatum) start collapsed unless already filled —
+  // so a returning/edited CV with real values doesn't hide them, but a fresh parse
+  // doesn't interrupt name→experience with two "+ add" rows (churn-risk fix).
+  const [showOptionalFields, setShowOptionalFields] = useState(
+    Boolean(personal.nationality || personal.dateOfBirth)
+  )
+
   return (
     <div className="flex flex-col gap-2">
       <div className="text-2xl font-semibold text-ink">
@@ -133,30 +140,49 @@ function PersonalSection({
           placeholder="+ E-Mail-Adresse"
           onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'email', value: v })}
         />
-        <EditableField
-          value={personal.nationality}
-          placeholder="+ Nationalität"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'nationality', value: v })}
-        />
-        <EditableField
-          value={personal.dateOfBirth}
-          placeholder="+ Geburtsdatum"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'dateOfBirth', value: v })}
-          onBlurFormat={softFormatDate}
-        />
+        {showOptionalFields && (
+          <>
+            <EditableField
+              value={personal.nationality}
+              placeholder="+ Nationalität"
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'nationality', value: v })}
+            />
+            <EditableField
+              value={personal.dateOfBirth}
+              placeholder="+ Geburtsdatum"
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'dateOfBirth', value: v })}
+              onBlurFormat={softFormatDate}
+            />
+          </>
+        )}
       </div>
 
-      {/* Optional photo callout (D-06 / LL-03) — rendered verbatim from model output.
-          Framed as legally optional under the AGG; user's choice; never mandated.
-          The tool does NOT accept, upload, or process photos (zero-retention / T-01-11). */}
+      {/* Single subtle disclosure instead of two standalone "+ add" rows sitting between
+          name and experience — collapses the meta-affordance into one line (churn-risk fix). */}
+      {!showOptionalFields && (
+        <button
+          type="button"
+          onClick={() => setShowOptionalFields(true)}
+          className="self-start text-sm text-muted hover:text-ink cursor-pointer mt-1"
+        >
+          + Add optional fields (Nationalität, Geburtsdatum)
+        </button>
+      )}
+
+      {/* Optional photo callout (D-06 / LL-03) — quieter single-line summary with the
+          full advice behind a disclosure, placed at the END of the personal block so it
+          reads as an edge note rather than interrupting name→experience flow. Rendered
+          verbatim from model output. Framed as legally optional under the AGG; user's
+          choice; never mandated. The tool does NOT accept, upload, or process photos
+          (zero-retention / T-01-11). */}
       {photoAdvice && (
-        <div className="mt-4 rounded-lg border border-hair bg-paper px-4 py-3">
-          <p className={`${EYEBROW} mb-1`}>
-            Foto (optional)
-          </p>
+        <details className="mt-4 group">
+          <summary className={`${EYEBROW} cursor-pointer select-none list-none`}>
+            Foto (optional) — details
+          </summary>
           {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
-          <p className="text-sm text-muted">{photoAdvice}</p>
-        </div>
+          <p className="mt-1 text-sm text-muted">{photoAdvice}</p>
+        </details>
       )}
     </div>
   )

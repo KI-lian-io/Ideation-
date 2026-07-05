@@ -658,50 +658,24 @@ function ResultView({
 
   const normGapCount = lebenslauf.normGapNotes.length
 
+  // Exit ramp is demoted to a confirm-guarded text link (churn-risk fix) — reset
+  // discards the converted Lebenslauf, so a deliberate confirm step replaces the
+  // old always-available secondary button that sat above the document.
+  function handleResetClick() {
+    if (window.confirm('This discards your converted Lebenslauf. Start over?')) {
+      onReset()
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <StepIndicator current={1} />
 
-      {/* Header: label + action buttons */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <p className={EYEBROW}>
-          Lebenslauf
-        </p>
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Copy button — D-04 / LL-04 */}
-          <button
-            onClick={handleCopy}
-            aria-label="Copy Lebenslauf to clipboard"
-            className={btnClass('primary')}
-          >
-            {copyState === 'copied' ? 'Copied ✓' : 'Copy Lebenslauf'}
-          </button>
-          {/* Start over — D-16 */}
-          <button
-            onClick={onReset}
-            className={`${btnClass('secondary')} shrink-0`}
-          >
-            Start over / paste a new CV
-          </button>
-        </div>
-      </div>
-
-      {/* Visually-hidden live mirror so screen readers announce copy state changes
-          without making the visible error paragraph itself a chatty aria-live region. */}
-      <span className="sr-only" aria-live="polite">
-        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
-      </span>
-
-      {/* Inline copy error (transient 3000ms) */}
-      {copyState === 'error' && (
-        <p className="text-sm text-red-600">
-          Copy failed — please select the text manually.
-        </p>
-      )}
-
-      {/* Display-serif header — the norm-gap count doubles as its subtitle instead of
-          repeating as a separate paragraph, so the number and the detail it refers to
-          read as one unit directly above the document + annotation column. */}
+      {/* Display-serif header — value first. The norm-gap count doubles as its subtitle
+          instead of repeating as a separate paragraph, so the number and the detail it
+          refers to read as one unit directly above the document. The duplicate "LEBENSLAUF"
+          eyebrow that used to sit above this is gone — the step indicator already carries
+          that label (churn-risk fix). */}
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-3xl font-semibold text-ink">
           Your Lebenslauf
@@ -714,7 +688,9 @@ function ResultView({
       </div>
 
       {/* Two-column: document (Lebenslauf) left, bilingual annotation right at desktop;
-          stacks on mobile. Print-proof "document + margin notes" layout (DESIGN.md). */}
+          stacks on mobile. Print-proof "document + margin notes" layout (DESIGN.md).
+          The document is now the first content block after the header — no button row
+          sits above it (churn-risk fix: value before any ask). */}
       <div className="grid gap-8 lg:grid-cols-[1.7fr_1fr] lg:items-start">
         {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) */}
         <LebenslaufEditor
@@ -732,7 +708,22 @@ function ResultView({
         </div>
       </div>
 
-      {/* Cover letter CTA — next step in the flow */}
+      {/* Visually-hidden live mirror so screen readers announce copy state changes
+          without making the visible error paragraph itself a chatty aria-live region. */}
+      <span className="sr-only" aria-live="polite">
+        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
+      </span>
+
+      {/* Inline copy error (transient 3000ms) */}
+      {copyState === 'error' && (
+        <p className="text-sm text-red-600">
+          Copy failed — please select the text manually.
+        </p>
+      )}
+
+      {/* Actions after value: Copy + Write Anschreiben live together as the natural next
+          steps, right below the document (churn-risk fix — was a button row above the
+          header, asking for copy before the value was even visible). */}
       <div className="rounded-lg border border-hair bg-paper p-5">
         <p className="text-sm font-semibold text-ink mb-1">
           Write Anschreiben
@@ -745,13 +736,33 @@ function ResultView({
           Free to generate. An optional Humanizer+ polish (one-time 2,99&nbsp;€, no subscription)
           is available on the finished letter.
         </p>
-        <button
-          onClick={onStartCoverLetter}
-          className={btnClass('primary')}
-        >
-          Write Anschreiben →
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={onStartCoverLetter}
+            className={btnClass('primary')}
+          >
+            Write Anschreiben →
+          </button>
+          {/* Copy button — D-04 / LL-04 — moved beside Write Anschreiben so the forward
+              path dominates instead of competing with it above the document. */}
+          <button
+            onClick={handleCopy}
+            aria-label="Copy Lebenslauf to clipboard"
+            className={btnClass('secondary')}
+          >
+            {copyState === 'copied' ? 'Copied ✓' : 'Copy Lebenslauf'}
+          </button>
+        </div>
       </div>
+
+      {/* Exit ramp — demoted to a small muted text link at the very bottom of the view,
+          guarded by a confirm dialog (D-16 revised / churn-risk fix). */}
+      <button
+        onClick={handleResetClick}
+        className="self-start text-sm text-muted hover:text-ink cursor-pointer underline underline-offset-2"
+      >
+        Start over / paste a new CV
+      </button>
     </div>
   )
 }
