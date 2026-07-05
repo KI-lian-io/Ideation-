@@ -3,17 +3,17 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Btn, CARD, EYEBROW } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "ScanReady: Win the German Recruiter's First Scan",
+  title: "ScanReady: Bestehen Sie den ersten Blick",
   description:
-    "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
+    "Wandeln Sie Ihren Lebenslauf in einen normgerechten deutschen Lebenslauf um und erhalten Sie ein authentisches Anschreiben, ausschließlich auf Basis Ihrer echten Angaben. Ohne Konto werden keine Daten gespeichert.",
   alternates: {
-    canonical: "/",
+    canonical: "/de",
     languages: { en: "/", de: "/de" },
   },
   openGraph: {
-    title: "ScanReady: Win the German Recruiter's First Scan",
+    title: "ScanReady: Bestehen Sie den ersten Blick",
     description:
-      "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
+      "Normgerechter deutscher Lebenslauf und authentisches Anschreiben, ausschließlich auf Basis Ihrer echten Angaben. Ohne Konto zustandslos.",
     type: "website",
     images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
   },
@@ -58,12 +58,9 @@ function CheckIcon() {
   );
 }
 
-// Hero typesetting theater: tiny orchestration script (toggles .theater-playing on
-// the stage element; all actual motion is CSS keyframes in globals.css). Deferred,
-// inert until the stage scrolls into view. IntersectionObserver starts/pauses the
-// loop; click/tap/keyboard replays from the start. No React state needed, this is
-// decorative theater, not app logic, so a plain inline script keeps page.tsx a
-// Server Component (metadata export requires it) without adding a new client file.
+// Hero typesetting theater: identical orchestration script to the English landing (see
+// src/app/page.tsx for the full rationale). Kept as an inline script so this page also
+// stays a Server Component (metadata export requires it).
 const TYPESETTING_THEATER_SCRIPT = `(function () {
   var stage = document.getElementById('typesetting-theater');
   if (!stage) return;
@@ -134,19 +131,16 @@ function CtaLink({
 
 // Section IDs for aria-labelledby
 const SECTION_IDS = {
-  hero: "section-hero-heading",
-  pathways: "section-pathways-heading",
-  howItWorks: "section-how-it-works-heading",
-  trust: "section-trust-heading",
-  founder: "section-founder-heading",
-  proof: "section-proof-heading",
+  hero: "section-hero-heading-de",
+  pathways: "section-pathways-heading-de",
+  howItWorks: "section-how-it-works-heading-de",
+  trust: "section-trust-heading-de",
+  founder: "section-founder-heading-de",
+  proof: "section-proof-heading-de",
 };
 
-// Folio-style section number: broadsheet page-numbering voice joined to the
-// section eyebrow label ("01 · PATHWAYS"). The digit is decorative sequencing
-// (aria-hidden); the label text is what screen readers announce. Chrome copy
-// stays English per the design system (German lives only inside document
-// mockups).
+// Folio-style section number: same broadsheet page-numbering voice as the English
+// landing, German labels.
 function FolioEyebrow({ folio, label }: { folio: string; label: string }) {
   return (
     <p className={`${EYEBROW} folio-eyebrow justify-center`}>
@@ -158,15 +152,15 @@ function FolioEyebrow({ folio, label }: { folio: string; label: string }) {
   );
 }
 
-export default function HomePage() {
+export default function GermanHomePage() {
   return (
-    <>
-      {/* Navigation: broadsheet masthead, larger display-serif wordmark, double
-          rule beneath (2px ink + 0.5px hairline, see .masthead-rule), mono dateline. */}
+    <div lang="de">
+      {/* Navigation: same broadsheet masthead as the English landing, EN link mirrors
+          the DE link on that page. */}
       <nav className="sticky top-0 z-50 bg-paper masthead-rule flex items-center">
         <div className="max-w-4xl mx-auto px-6 w-full h-16 flex items-center justify-between gap-4">
           <a
-            href="/"
+            href="/de"
             className="font-serif text-xl sm:text-2xl font-semibold text-ink tracking-tight focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
           >
             ScanReady
@@ -179,68 +173,65 @@ export default function HomePage() {
           </p>
           <div className="flex items-center gap-3">
             <a
-              href="/de"
+              href="/"
               className="font-mono text-xs uppercase tracking-[0.18em] text-muted hover:text-ink transition-colors focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
             >
-              DE
+              EN
             </a>
             <Btn as="a" href="/app" variant="accent">
-              Try it free
+              Kostenlos testen
             </Btn>
           </div>
         </div>
       </nav>
 
       <main>
-        {/* ── Section 1: Hero ── */}
+        {/* ── Abschnitt 1: Hero ── */}
         <section
           className="bg-paper pt-24 pb-20 sm:pt-32 sm:pb-28 section-animate"
           aria-labelledby={SECTION_IDS.hero}
         >
           <div className="max-w-4xl mx-auto px-6 text-center">
             <p className={`${EYEBROW} mb-6`}>
-              For internationals applying in Germany
+              Für Internationals, die sich in Deutschland bewerben
             </p>
 
             <h1
               id={SECTION_IDS.hero}
               className="font-serif text-4xl sm:text-5xl font-semibold text-ink leading-[1.15] mb-6"
             >
-              {/* Headline: Win the German recruiter's first scan. */}
-              Win the German recruiter&rsquo;s{" "}
-              <span className="relative inline-block">first scan<span className="absolute bottom-0 left-0 right-0 border-b-2 border-ink/30" aria-hidden="true" /></span>.
+              Bestehen Sie den{" "}
+              <span className="relative inline-block">ersten Blick<span className="absolute bottom-0 left-0 right-0 border-b-2 border-ink/30" aria-hidden="true" /></span>.
             </h1>
 
             <p className="text-base text-muted leading-relaxed max-w-2xl mx-auto mb-10">
-              Turn your CV into a norm-correct German Lebenslauf and an
-              Anschreiben that sounds like you, grounded only in your real
-              facts, never invented. Bilingual output explains every Lebenslauf
-              change so you trust what you send.
+              Aus Ihrem Lebenslauf wird ein normgerechter deutscher Lebenslauf,
+              dazu ein Anschreiben, das nach Ihnen klingt, nicht nach Vorlage.
+              Ausschließlich auf Basis Ihrer echten Angaben, nie erfunden.
+              Zweisprachige Erklärungen zeigen Ihnen jede Änderung am
+              Lebenslauf, damit Sie dem Ergebnis vertrauen können.
             </p>
 
-            <CtaLink href="/app" variant="accent">Convert your CV – it&rsquo;s free</CtaLink>
+            <CtaLink href="/app" variant="accent">Lebenslauf umwandeln – kostenlos</CtaLink>
 
             <p className="mt-4 flex items-center justify-center gap-2 text-sm text-muted">
               <LockIcon />
-              Nothing is stored. Processing is stateless and zero-retention.
+              Ohne Konto wird nichts gespeichert: zustandslos, per Design.
             </p>
           </div>
 
-          {/* Hero typesetting theater: decorative spectacle, never a substitute for
-              the semantic content above. IntersectionObserver-driven loop (see
-              TYPESETTING_THEATER_SCRIPT): scan sweep → lines re-typeset into the
-              German sheet → date snaps to DIN mono → DIN annotation pins fade in.
-              Click/tap/Enter/Space replays. Static, complete end-state under
-              prefers-reduced-motion (CSS-only, see globals.css). */}
+          {/* Hero typesetting theater: identisch zur englischen Landingpage, siehe
+              TYPESETTING_THEATER_SCRIPT oben. Dekoratives Schauspiel, niemals Ersatz
+              für den semantischen Inhalt darüber. */}
           <div className="max-w-3xl mx-auto px-6 mt-16 sm:mt-20">
             <div
               id="typesetting-theater"
               role="button"
               tabIndex={0}
-              aria-label="Replay the conversion animation"
+              aria-label="Konvertierungs-Animation erneut abspielen"
               className="theater-stage relative grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-4 rounded-xl"
             >
-              {/* Left: source résumé card */}
+              {/* Links: Quelle, ausländischer Lebenslauf */}
               <div
                 className="theater-source relative bg-card border border-hair rounded-lg px-5 py-6 shadow-sm"
                 style={{ transform: "rotate(-1.2deg)" }}
@@ -261,14 +252,14 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Center arrow, hidden on mobile stack */}
+              {/* Mitte: Pfeil, auf Mobile ausgeblendet */}
               <div className="hidden sm:flex items-center justify-center text-muted" aria-hidden="true">
                 <svg width="28" height="16" viewBox="0 0 28 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 8H26M26 8L19 1M26 8L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
 
-              {/* Right: destination Lebenslauf sheet */}
+              {/* Rechts: Ziel-Lebenslauf, DIN-Format */}
               <div className="doc-sheet relative px-5 py-6 text-left" aria-hidden="true">
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-eyebrow mb-4">
                   Lebenslauf
@@ -283,7 +274,7 @@ export default function HomePage() {
                   <div className="theater-line h-2 w-2/3 rounded bg-faint" style={{ "--i": 4 } as React.CSSProperties} />
                 </div>
 
-                {/* DIN annotation pins with hairline leader lines */}
+                {/* DIN-Annotationspins mit Hairline-Leitlinien */}
                 <div className="theater-pin flex items-center gap-2 mt-5 pt-3 border-t border-hair" style={{ "--i": 0 } as React.CSSProperties}>
                   <span className="inline-block h-px w-4 bg-hair" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
@@ -307,52 +298,50 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Orchestration for the hero theater: toggles .theater-playing on the stage
-            node (IntersectionObserver start/pause; click/Enter/Space replay). Tiny,
-            deferred, no-op under prefers-reduced-motion. All motion itself is CSS. */}
+        {/* Orchestrierung für das Hero-Theater: identisch zur englischen Seite. */}
         <script
           defer
           dangerouslySetInnerHTML={{ __html: TYPESETTING_THEATER_SCRIPT }}
         />
 
-        {/* ── Section 2: Two-column pathways ── */}
+        {/* ── Abschnitt 2: Zwei Wege ── */}
         <section
           className="bg-paper py-20 sm:py-28 section-animate"
           aria-labelledby={SECTION_IDS.pathways}
         >
           <div className="max-w-4xl mx-auto px-6">
-            <FolioEyebrow folio="01" label="Pathways" />
+            <FolioEyebrow folio="01" label="Zwei Dokumente" />
             <h2
               id={SECTION_IDS.pathways}
               className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mt-3 mb-12"
             >
-              Two documents. Both have to survive the scan.
+              Zwei Dokumente. Beide müssen den Blick überstehen.
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {/* LEFT: Authentic voice */}
+              {/* LINKS: Authentische Stimme */}
               <div className={`${CARD} px-6 py-8`}>
                 <p className={`${EYEBROW} mb-4`}>
-                  Authentic voice
+                  Authentische Stimme
                 </p>
                 <h3 className="text-3xl font-semibold text-ink mb-3 leading-snug">
-                  Sounds like you, not a template.
+                  Klingt nach Ihnen, nicht nach Vorlage.
                 </h3>
                 <p className="text-sm text-muted leading-relaxed mb-6">
-                  We ask 3–5 questions about your actual motivations, specific
-                  achievements, and what draws you to this role. Your answers
-                  become the letter; we never invent an employer, title, date,
-                  or skill.
+                  Wir stellen Ihnen 3 bis 5 Fragen zu Ihrer echten Motivation,
+                  konkreten Erfolgen und dem, was Sie an dieser Stelle reizt.
+                  Ihre Antworten werden zum Anschreiben. Wir erfinden nie einen
+                  Arbeitgeber, Titel, ein Datum oder eine Fähigkeit.
                 </p>
 
-                {/* Authentic before/after mockup */}
+                {/* Vorher/Nachher-Mockup */}
                 <div
                   className="bg-paper rounded-lg border border-hair p-4 h-40 overflow-hidden text-left"
                   role="img"
-                  aria-label="Before and after: generic filler sentence replaced by grounded, specific language drawn from the applicant's own answers"
+                  aria-label="Vorher und nachher: generischer Füllsatz ersetzt durch konkrete, auf den eigenen Angaben basierende Sprache"
                 >
                   <p className={`${EYEBROW} mb-2`}>
-                    Before
+                    Vorher
                   </p>
                   <p
                     className="text-sm text-muted line-through italic mb-3"
@@ -362,7 +351,7 @@ export default function HomePage() {
                     communication skills…&rdquo;
                   </p>
                   <p className={`${EYEBROW} mb-2`}>
-                    After
+                    Nachher
                   </p>
                   <p className="text-sm text-ink">
                     &ldquo;Ich habe mein Vertriebsziel im dritten Quartal um 23&nbsp;%
@@ -372,34 +361,35 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* RIGHT: German-norm format */}
+              {/* RECHTS: Deutsches Format */}
               <div className={`${CARD} px-6 py-8`}>
                 <p className={`${EYEBROW} mb-4`}>
-                  German-norm format
+                  Deutsches Format
                 </p>
                 <h3 className="text-3xl font-semibold text-ink mb-3 leading-snug">
-                  The format gap, closed.
+                  Die Formatlücke, geschlossen.
                 </h3>
                 <p className="text-sm text-muted leading-relaxed mb-4">
-                  Whether you&rsquo;re on a Chancenkarte or just never learned the
-                  German format, the rules are the gap, not your experience.
-                  Reverse-chronological DIN layout, correct date format,
-                  personal-data block, photo guidance.
+                  Ob mit Chancenkarte eingereist oder einfach nie mit dem
+                  deutschen Format in Berührung gekommen: Die Regeln sind die
+                  Lücke, nicht Ihre Erfahrung. Rückwärts chronologisches
+                  DIN-Layout, korrektes Datumsformat, Block für persönliche
+                  Daten, Foto-Hinweis.
                 </p>
                 <p className="text-sm text-muted leading-relaxed mb-4">
-                  The rules aren&rsquo;t what most blogs claim, either, and the
-                  numbers below explain why.
+                  Die Regeln sind auch nicht das, was die meisten Ratgeber
+                  behaupten. Die Zahlen unten zeigen, warum.
                 </p>
                 <p className="text-sm text-muted italic mb-6">
-                  A native German speaker should review the final letter before
-                  you send it.
+                  Lassen Sie das fertige Anschreiben von einer Muttersprachlerin
+                  oder einem Muttersprachler gegenlesen.
                 </p>
 
-                {/* Mini Lebenslauf mockup with norm-gap pins */}
+                {/* Mini-Lebenslauf mit Norm-Pins */}
                 <div
                   className="bg-paper rounded-lg border border-hair p-4 h-40 overflow-hidden text-left relative"
                   role="img"
-                  aria-label="Mini Lebenslauf card showing correct German DIN layout with norm-gap annotation pins marking the photo guidance and date format fields"
+                  aria-label="Mini-Lebenslauf-Karte im korrekten deutschen DIN-Layout mit Annotationspins für Foto-Hinweis und Datumsformat"
                 >
                   <p className="text-sm font-semibold text-ink mb-1">
                     Lebenslauf
@@ -427,96 +417,97 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Editorial pull quote: the DACH recruiter stats, upgraded from a
-                cramped card paragraph into a broadsheet pull quote. Hanging
-                opening quote (progressive enhancement via hanging-punctuation,
-                negative text-indent fallback), hairline rules, reading serif.
-                No new claims: same two evidenced numbers already on the page. */}
+            {/* Editorial-Zitat: die DACH-Recruiter-Zahlen als Broadsheet-Pull-Quote. */}
             <figure className="max-w-2xl mx-auto mt-16 text-center">
               <div className="h-px w-16 bg-ink/30 mx-auto mb-8" aria-hidden="true" />
               <blockquote className="pull-quote font-serif-text text-2xl sm:text-3xl text-ink leading-snug">
                 <span className="pull-quote-mark" aria-hidden="true">
                   &ldquo;
                 </span>
-                61% of German recruiters prefer a two-page CV, and 64% call
-                spelling errors a dealbreaker.
+                Deutsche Recruiter schauen im Schnitt rund 43 Sekunden auf eine
+                Bewerbung, nicht 8. 61&nbsp;% bevorzugen zwei Seiten, 64&nbsp;%
+                nennen Rechtschreibfehler ein Ausschlusskriterium.
               </blockquote>
               <figcaption className="mt-5 text-sm text-muted">
-                DACH recruiter studies, not imported one-page lore.
+                StepStone/MindTake Eyetracking-Studie, keine importierte
+                Ein-Seiten-Faustregel aus den USA.
               </figcaption>
               <div className="h-px w-16 bg-ink/30 mx-auto mt-8" aria-hidden="true" />
             </figure>
 
             <div className="text-center mt-12">
-              <CtaLink href="/app">Convert your CV – it&rsquo;s free</CtaLink>
+              <CtaLink href="/app">Lebenslauf umwandeln – kostenlos</CtaLink>
             </div>
           </div>
         </section>
 
-        {/* ── Section 3: How it works ── */}
+        {/* ── Abschnitt 3: So funktioniert's ── */}
         <section
           className="bg-paper py-20 sm:py-28 section-animate"
           aria-labelledby={SECTION_IDS.howItWorks}
         >
           <div className="max-w-4xl mx-auto px-6">
-            <FolioEyebrow folio="02" label="How it works" />
+            <FolioEyebrow folio="02" label="So funktioniert's" />
             <h2
               id={SECTION_IDS.howItWorks}
               className="font-serif text-3xl font-semibold text-ink leading-[1.2] text-center mt-3 mb-14"
             >
-              Three steps. One honest output.
+              Drei Schritte. Ein ehrliches Ergebnis.
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
               <div>
                 <p className={`${EYEBROW} mb-3`}>
-                  Step 1
+                  Schritt 1
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
-                  Paste your CV
+                  Lebenslauf einfügen
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">
-                  Paste your résumé text: US, UK, or any English format. No
-                  account, no upload, no storage.
+                  Fügen Sie Ihren Lebenslauf als Text ein, egal ob US-, UK-
+                  oder anderes englischsprachiges Format. Kein Konto, kein
+                  Upload nötig, keine Speicherung.
                 </p>
               </div>
 
               <div>
                 <p className={`${EYEBROW} mb-3`}>
-                  Step 2
+                  Schritt 2
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
-                  Get a Lebenslauf + English notes
+                  Lebenslauf + Erklärungen erhalten
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">
-                  Your CV is restructured into a norm-correct German Lebenslauf.
-                  English annotations explain every formatting change so you
-                  trust what was reformatted and why.
+                  Ihr Lebenslauf wird in einen normgerechten deutschen
+                  Lebenslauf umgewandelt. Zweisprachige Anmerkungen erklären
+                  jede Formatänderung, damit Sie nachvollziehen können, was
+                  angepasst wurde und warum.
                 </p>
               </div>
 
               <div>
                 <p className={`${EYEBROW} mb-3`}>
-                  Step 3
+                  Schritt 3
                 </p>
                 <h3 className="text-base font-semibold text-ink mb-2">
-                  Answer 3–5 questions, get your Anschreiben
+                  Fragen beantworten, Anschreiben erhalten
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">
-                  Paste the job posting and answer a few questions about your
-                  real motivations and experience. The letter streams live,
-                  grounded only in your own facts.
+                  Fügen Sie die Stellenanzeige ein und beantworten Sie ein paar
+                  Fragen zu Ihrer echten Motivation und Erfahrung. Das
+                  Anschreiben entsteht live, ausschließlich auf Basis Ihrer
+                  eigenen Angaben.
                 </p>
               </div>
             </div>
 
             <div className="text-center mt-14">
-              <CtaLink href="/app">Start now – it takes 5 minutes</CtaLink>
+              <CtaLink href="/app">Jetzt starten – dauert 5 Minuten</CtaLink>
             </div>
           </div>
         </section>
 
-        {/* ── Section 4: Trust & privacy band ── */}
+        {/* ── Abschnitt 4: Vertrauen & Datenschutz ── */}
         <section
           className="bg-ink py-20 sm:py-24 section-animate"
           aria-labelledby={SECTION_IDS.trust}
@@ -526,7 +517,7 @@ export default function HomePage() {
               <span className="folio-number" aria-hidden="true">
                 03
               </span>
-              <span>Trust</span>
+              <span>Vertrauen</span>
             </p>
 
             <div
@@ -540,66 +531,70 @@ export default function HomePage() {
               id={SECTION_IDS.trust}
               className="font-serif text-3xl font-semibold text-white leading-[1.2] mb-4"
             >
-              Zero-retention, by design.
+              Zustandslos, per Design.
             </h2>
             <p className="text-base text-white/70 leading-relaxed max-w-2xl mx-auto mb-8">
-              Your CV text is sent to the AI, the output comes back, and nothing
-              is saved. No database. No account. No training on your data. What
-              you paste here stays between you and your application.
+              Ohne Konto werden Ihre Daten nicht gespeichert: keine Datenbank,
+              kein Training, zustandslos. Ihr Lebenslauf-Text wird an die KI
+              gesendet, das Ergebnis kommt zurück, und ohne Konto bleibt
+              nichts liegen. Was Sie hier einfügen, bleibt zwischen Ihnen und
+              Ihrer Bewerbung.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-white/70">
               <span className="flex items-center gap-2">
                 <CheckIcon />
-                No storage, no account
+                Ohne Konto keine Speicherung
               </span>
               <span className="flex items-center gap-2">
                 <CheckIcon />
-                Not used for AI training
+                Kein KI-Training mit Ihren Daten
               </span>
               <span className="flex items-center gap-2">
                 <CheckIcon />
-                Grounded, never fabricated
+                Belegt, nie erfunden
               </span>
             </div>
           </div>
         </section>
 
-        {/* ── Section 5: Founder's note ── */}
+        {/* ── Abschnitt 5: Vom Gründer ── */}
         <section
           className="bg-paper py-20 sm:py-28 section-animate"
           aria-labelledby={SECTION_IDS.founder}
         >
           <div className="max-w-2xl mx-auto px-6">
             <div className="w-8 h-0.5 bg-ink mb-6" aria-hidden="true" />
-            <FolioEyebrow folio="04" label="Founder's note" />
+            <FolioEyebrow folio="04" label="Vom Gründer" />
 
             <h2
               id={SECTION_IDS.founder}
               className="font-serif text-3xl font-semibold text-ink leading-[1.2] mt-3 mb-6"
             >
-              Built by a German, for everyone applying here.
+              Gebaut von einem Hamburger, für alle, die sich hier bewerben.
             </h2>
 
             <div className="text-base text-muted leading-relaxed space-y-4">
               <p className="drop-cap">
-                I&rsquo;m German, born and raised, living in Hamburg. I know the
-                Lebenslauf and Anschreiben conventions from the inside: what a
-                recruiter here expects to see, and what quietly signals
-                &ldquo;this person doesn&rsquo;t know the norms.&rdquo;
+                Ich bin gebürtiger Hamburger und kenne die Konventionen von
+                Lebenslauf und Anschreiben von innen: was ein Recruiter hier
+                erwartet zu sehen, und was still signalisiert, &ldquo;diese
+                Person kennt die Normen nicht.&rdquo;
               </p>
               <p>
-                I&rsquo;m also applying for jobs myself right now, so I test every
-                change against my own real CV and my own live applications
-                before it ships. When I tried existing tools to speed that up,
-                they either invented experience I don&rsquo;t have or produced
-                generic filler that sounded nothing like me. So I built this
-                instead.
+                Ich bewerbe mich gerade selbst, deshalb teste ich jede
+                Änderung an meinem eigenen echten Lebenslauf und meinen
+                laufenden Bewerbungen, bevor sie live geht. Als ich bestehende
+                Tools ausprobiert habe, um das zu beschleunigen, haben sie
+                entweder Erfahrung erfunden, die ich nicht habe, oder
+                generischen Füllsatz produziert, der nach niemandem klang. Also
+                habe ich dieses Tool stattdessen gebaut.
               </p>
               <p>
-                ScanReady never invents facts. The German is native-quality
-                because I&rsquo;m native. The voice is yours, built from your own
-                answers to a few honest questions, not a template.
+                ScanReady erfindet keine Fakten. Das Deutsch ist
+                muttersprachlich, weil ich Muttersprachler bin. Die Stimme
+                bleibt Ihre, aufgebaut aus Ihren eigenen Antworten auf ein paar
+                ehrliche Fragen, nicht aus einer Vorlage.
               </p>
             </div>
 
@@ -609,7 +604,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Section 6: Proof strip + final CTA ── */}
+        {/* ── Abschnitt 6: Beweis + finaler CTA ── */}
         <section
           className="bg-paper py-20 sm:py-28 section-animate"
           aria-labelledby={SECTION_IDS.proof}
@@ -622,77 +617,76 @@ export default function HomePage() {
               <span className="folio-number" aria-hidden="true">
                 05
               </span>
-              <span>What actually changes</span>
+              <span>Was sich wirklich ändert</span>
             </p>
             <h2 className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-12">
-              Three mechanical fixes, every time.
+              Drei mechanische Korrekturen, jedes Mal.
             </h2>
 
-            {/* Norm-transform grid: real, mechanical product behavior, not a testimonial */}
+            {/* Norm-Transform-Raster: echtes, mechanisches Produktverhalten, kein Testimonial */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
               <div className={`${CARD} px-5 py-6`}>
-                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className={`${EYEBROW} mb-2`}>Vorher</p>
                 <p className="text-sm text-muted italic line-through mb-3">
                   Mar 2021 – Present
                 </p>
-                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className={`${EYEBROW} mb-2`}>Nachher</p>
                 <p className="text-sm text-ink font-mono mb-4">
                   03/2021 – heute
                 </p>
                 <p className="text-sm text-muted leading-relaxed">
-                  German date format, and &ldquo;heute&rdquo; instead of
+                  Deutsches Datumsformat, und &ldquo;heute&rdquo; statt
                   &ldquo;Present.&rdquo;
                 </p>
               </div>
 
               <div className={`${CARD} px-5 py-6`}>
-                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className={`${EYEBROW} mb-2`}>Vorher</p>
                 <p className="text-sm text-muted italic line-through mb-3">
                   German: fluent, English: native
                 </p>
-                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className={`${EYEBROW} mb-2`}>Nachher</p>
                 <p className="text-sm text-ink mb-4">
                   Deutsch: Verhandlungssicher · Englisch: Muttersprache
                 </p>
                 <p className="text-sm text-muted leading-relaxed">
-                  German recruiters expect German CV vocabulary, not &ldquo;fluent.&rdquo;
+                  Deutsche Recruiter erwarten deutsches Lebenslauf-Vokabular,
+                  nicht &ldquo;fluent.&rdquo;
                 </p>
               </div>
 
               <div className={`${CARD} px-5 py-6`}>
-                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className={`${EYEBROW} mb-2`}>Vorher</p>
                 <p className="text-sm text-muted italic line-through mb-3">
                   Excel, SQL, Forecasting, Driver&rsquo;s license
                 </p>
-                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className={`${EYEBROW} mb-2`}>Nachher</p>
                 <p className="text-sm text-ink mb-4">
                   IT-Kenntnisse: Excel, SQL · Fachkenntnisse: Forecasting ·
                   Sonstige Kenntnisse: Führerschein Klasse B
                 </p>
                 <p className="text-sm text-muted leading-relaxed">
-                  Skills grouped into the categories German recruiters scan for.
+                  Fähigkeiten gruppiert in die Kategorien, nach denen deutsche
+                  Recruiter scannen.
                 </p>
               </div>
             </div>
 
-            {/* Illustrative example: labeled honestly, not attributed to the founder's real CV.
-                Upgraded to hero-theater fidelity (static, no animation needed here): the
-                Before panel stays a deliberately "wrong" rotated sans card (same -1.2deg
-                tilt as the hero source card); the After panel is a real .doc-sheet print
-                surface with mono DIN annotation pins + hairline leader lines. */}
-            <p className={`${EYEBROW} mt-10 mb-6`}>Illustrative example</p>
+            {/* Beispielhafte Darstellung: ehrlich gekennzeichnet, nicht dem echten
+                Lebenslauf des Gründers zugeschrieben. */}
+            <p className={`${EYEBROW} mt-10 mb-6`}>Beispielhafte Darstellung</p>
             <div
               className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-4 mx-auto max-w-2xl text-left"
               role="img"
-              aria-label="Illustrative before and after example: a generic English-format résumé section, deliberately mis-formatted, converted to a norm-correct German Lebenslauf with DIN annotation pins and an English norm-gap note"
+              aria-label="Beispielhaftes Vorher-Nachher: ein generischer englischsprachiger Lebenslaufabschnitt, absichtlich falsch formatiert, umgewandelt in einen normgerechten deutschen Lebenslauf mit DIN-Annotationspins und einer Norm-Erklärung"
             >
-              {/* Before panel: deliberately "wrong" - sans, card surface, slight tilt */}
+              {/* Vorher-Panel: absichtlich "falsch" formatiert */}
               <div
                 className="proof-source bg-card border border-hair rounded-lg px-5 py-6 shadow-sm"
                 aria-hidden="true"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted mb-3">
-                  Original CV (English)
+                  Original-Lebenslauf (Englisch)
                 </p>
                 <p className="text-sm text-muted italic leading-relaxed font-sans">
                   &ldquo;Senior Product Manager | Jan 2021&ndash;Present | Drove
@@ -702,17 +696,17 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Center arrow, hidden on mobile stack (matches hero theater) */}
+              {/* Mitte: Pfeil, auf Mobile ausgeblendet */}
               <div className="hidden sm:flex items-center justify-center text-muted" aria-hidden="true">
                 <svg width="28" height="16" viewBox="0 0 28 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 8H26M26 8L19 1M26 8L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
 
-              {/* After panel: real print surface, mono DIN pins with hairline leaders */}
+              {/* Nachher-Panel: echte Druck-Oberfläche mit DIN-Pins */}
               <div className="doc-sheet px-5 py-6" aria-hidden="true">
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-eyebrow mb-3">
-                  Lebenslauf Output (German)
+                  Lebenslauf-Ergebnis (Deutsch)
                 </p>
                 <p className="text-sm text-ink leading-relaxed mb-4 font-serif-text">
                   Senior Product Manager | 01/2021 &ndash; heute
@@ -737,24 +731,24 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Accessible equivalent of the norm note dropped from the visual panel above:
-                same content, plain text, always announced regardless of aria-hidden siblings. */}
+            {/* Barrierefreies Äquivalent zur Norm-Anmerkung */}
             <p className="mt-6 mx-auto max-w-2xl text-sm text-muted text-left">
-              <span className="font-semibold text-ink">Norm note:</span> date
-              reformatted to the German MM/YYYY convention, &ldquo;Present&rdquo;
-              replaced with &ldquo;heute&rdquo;, percentage formatted with a
-              non-breaking space before the symbol.
+              <span className="font-semibold text-ink">Norm-Hinweis:</span>{" "}
+              Datum auf die deutsche Konvention MM/JJJJ umgestellt,
+              &ldquo;Present&rdquo; durch &ldquo;heute&rdquo; ersetzt,
+              Prozentzahl mit geschütztem Leerzeichen vor dem Symbol
+              formatiert.
             </p>
 
             <p className="mt-8 text-sm text-muted max-w-xl mx-auto">
-              No testimonials yet: the tool is new. Judge the output yourself.
-              The first conversion is free.
+              Noch keine Erfahrungsberichte: das Tool ist neu. Beurteilen Sie
+              das Ergebnis selbst. Die erste Umwandlung ist kostenlos.
             </p>
 
             <div className="mt-12">
-              <CtaLink href="/app">Convert your CV, it&rsquo;s free</CtaLink>
+              <CtaLink href="/app">Lebenslauf umwandeln, kostenlos</CtaLink>
               <p className="mt-3 text-sm text-muted">
-                No account. No storage. Takes 5 minutes.
+                Kein Konto. Keine Speicherung. Dauert 5 Minuten.
               </p>
             </div>
           </div>
@@ -764,7 +758,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-ink py-10">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Print folio line: mono, broadsheet page-foot convention */}
+          {/* Folio-Fußzeile: mono, Broadsheet-Konvention */}
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40 mb-4">
             ScanReady · Seite 1
           </p>
@@ -772,18 +766,18 @@ export default function HomePage() {
             <p>ScanReady</p>
             <div className="flex items-center gap-4">
               <a className="hover:text-white transition-colors" href="/preise">
-                Pricing
+                Preise
               </a>
               <p>© 2026</p>
-              {/* Registration-mark corner ornament: decorative print detail */}
+              {/* Registrierungsmarke: dekoratives Druckdetail */}
               <span className="reg-mark" aria-hidden="true" />
             </div>
           </div>
         </div>
       </footer>
 
-      {/* Scroll micro-motion: hydration-safe driver (no inline script, no SSR mismatch) */}
+      {/* Scroll-Mikrobewegung: hydration-sicherer Treiber */}
       <ScrollReveal />
-    </>
+    </div>
   );
 }
