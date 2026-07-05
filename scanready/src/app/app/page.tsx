@@ -17,6 +17,7 @@ import { PERSONALIZATION_QUESTIONS, questionsForPosting, recommendDirection } fr
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 import { LangProvider, useLang } from '@/lib/i18n'
+import { track } from '@/lib/analytics'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
@@ -693,6 +694,7 @@ function ResultView({
     const text = toPlainText(stripUids(lebenslauf), sectionOrder)
     try {
       await navigator.clipboard.writeText(text)
+      track('copy_download', { kind: 'lebenslauf_copy' })
       setCopyState('copied')
       setTimeout(() => setCopyState('idle'), 1500)
     } catch {
@@ -1073,6 +1075,7 @@ function CoverLetterResultView({
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(letterText)
+      track('copy_download', { kind: 'letter_copy' })
       setCopyState('copied')
       setTimeout(() => setCopyState('idle'), 1500)
     } catch {
@@ -1089,6 +1092,7 @@ function CoverLetterResultView({
     a.download = 'anschreiben.txt'
     a.click()
     URL.revokeObjectURL(url)
+    track('copy_download', { kind: 'letter_download' })
   }
 
   const HUMANIZER_LIMIT = 10_000
@@ -1420,6 +1424,7 @@ function AppShell() {
         })
         return
       }
+      track('letter_done')
       dispatch({ type: 'COVER_LETTER_DONE' })
     } catch (err) {
       if ((err as Error).name === 'AbortError') return
@@ -1433,6 +1438,7 @@ function AppShell() {
   // silently diverge between the two callers.
   async function runParse() {
     dispatch({ type: 'SUBMIT' })
+    track('cv_submitted')
 
     try {
       const res = await fetch('/api/parse', {
@@ -1461,6 +1467,7 @@ function AppShell() {
         return
       }
 
+      track('parse_done')
       dispatch({ type: 'PARSE_SUCCESS', payload: data.lebenslauf })
     } catch {
       dispatch({

@@ -20,6 +20,7 @@ import { HUMANIZER_DIRECTIONS, DIRECTION_SAMPLES, type HumanizerDirection } from
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, EYEBROW } from '@/components/ui'
 import { useLang } from '@/lib/i18n'
+import { track } from '@/lib/analytics'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
 
@@ -85,6 +86,13 @@ export default function HumanizerModal({
     return () => {
       previouslyFocused?.focus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Mount = modal opened (no portal, see file header) - fire once, deliberately
+  // separate from the focus-management effect above so the two concerns don't mix.
+  useEffect(() => {
+    track('humanizer_opened')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -173,6 +181,7 @@ export default function HumanizerModal({
       }
       if (!refined.trim()) throw new Error(t.humanizerEmptyResponseError)
       sessionStorage.removeItem(PAID_ATTEMPT_KEY)
+      track('humanizer_done')
       onDone(refined)
     } catch (e) {
       setFailCount((n) => n + 1)
@@ -311,6 +320,7 @@ function PaymentForm({
       return
     }
     if (result.paymentIntent?.status === 'succeeded') {
+      track('humanizer_paid')
       onPaid(result.paymentIntent.id)
     } else {
       setError(t.humanizerPaymentNotCompleted)

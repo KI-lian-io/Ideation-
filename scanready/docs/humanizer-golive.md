@@ -24,6 +24,33 @@ Humanizer+ button ships to production traffic.
 - [ ] Landing page copy check: zero-retention claim still accurate (it is — no storage
       was added), but mention that payment uses Stripe
 
+### Analytics setup (PostHog)
+
+Client-side-only, cookieless PostHog is wired but OFF until configured - see
+`src/instrumentation-client.ts` and `src/lib/analytics.ts`. Setup steps:
+
+1. Create an EU Cloud project at eu.posthog.com (data residency - do not use the US cloud).
+2. In Vercel, set `NEXT_PUBLIC_POSTHOG_KEY` to the project API key. Optionally set
+   `NEXT_PUBLIC_POSTHOG_HOST` if not using the default `https://eu.i.posthog.com`.
+3. Redeploy. Until the key is set, `track()` calls are no-ops and nothing is sent - no
+   code change is needed to turn analytics on or off, only the env var.
+
+Event list (all anonymous, no PII/user content in props - see the doc comment in
+`src/lib/analytics.ts`):
+
+| Event | Fires when |
+|---|---|
+| `cv_submitted` | user submits a CV for parsing |
+| `parse_done` | parse succeeds |
+| `letter_done` | cover letter stream completes successfully - **denominator** |
+| `copy_download` | Lebenslauf/letter copied or letter downloaded (`kind` prop) |
+| `humanizer_opened` | Humanizer+ modal mounts |
+| `humanizer_paid` | Stripe payment succeeds - **numerator** |
+| `humanizer_done` | refined letter fully delivered |
+
+Conversion = `humanizer_paid` / `letter_done`, which is exactly the "Measurement
+denominator live" checkbox above.
+
 ## Abuse protection
 - [ ] Anthropic console: set a monthly spend cap + email alerts (the hard ceiling)
 - [ ] Create an Upstash Redis database (free tier) and set UPSTASH_REDIS_REST_URL /

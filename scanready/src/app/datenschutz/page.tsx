@@ -49,12 +49,34 @@ export default function DatenschutzPage() {
           Bei normaler Nutzung setzt diese Website <strong>keine Cookies</strong>. Erst wenn Sie
           eine kostenpflichtige Funktion (Humanizer+) nutzen, wird der Zahlungsdienstleister
           Stripe geladen, der technisch notwendige Cookies zur Betrugsprävention setzt
-          (Art. 6 Abs. 1 lit. b und f DSGVO).
+          (Art. 6 Abs. 1 lit. b und f DSGVO). Auch die in Abschnitt 4 beschriebene
+          Reichweitenmessung setzt keine Cookies.
         </p>
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">4. Zahlungsabwicklung (Stripe)</h2>
+        <h2 className="font-semibold">4. Reichweitenmessung (PostHog)</h2>
+        <p>
+          Diese Website nutzt, sofern der Betreiber einen Analyse-Schlüssel konfiguriert hat,
+          eine cookielose Reichweitenmessung über PostHog EU Cloud (Hosting in der EU). Es
+          werden <strong>keine Cookies</strong> gesetzt und nicht auf den Gerätespeicher (z.&nbsp;B.
+          localStorage) zugegriffen; die Messwerte liegen nur im Arbeitsspeicher der jeweiligen
+          Sitzung. Es findet keine sitzungsübergreifende Wiedererkennung statt, und es werden
+          keine Eingaben oder Dokumentinhalte aufgezeichnet, weder Lebenslauf noch
+          Stellenanzeige noch Anschreiben. Erfasst werden ausschließlich anonyme Ereignisse wie
+          &bdquo;Dokument erstellt&ldquo; oder &bdquo;Anschreiben fertiggestellt&ldquo;. Ihre
+          IP-Adresse wird bei der Übermittlung technisch verarbeitet, aber nicht gespeichert.
+        </p>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der
+          Verbesserung des Dienstes). Diese Messung ist nur aktiv, wenn der Betreiber einen
+          Analyse-Schlüssel konfiguriert hat; ohne konfigurierten Schlüssel findet keinerlei
+          Reichweitenmessung statt.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="font-semibold">5. Zahlungsabwicklung (Stripe)</h2>
         <p>
           Kostenpflichtige Funktionen werden über Stripe Payments Europe, Ltd. abgewickelt. Ihre
           Zahlungsdaten werden direkt von Stripe verarbeitet; wir erhalten und speichern keine
@@ -63,7 +85,7 @@ export default function DatenschutzPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">5. Ihre Rechte</h2>
+        <h2 className="font-semibold">6. Ihre Rechte</h2>
         <p>
           Sie haben die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der
           Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht
