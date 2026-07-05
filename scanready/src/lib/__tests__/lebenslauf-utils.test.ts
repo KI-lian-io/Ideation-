@@ -28,6 +28,7 @@ function makeLebenslauf(overrides: {
     skills: [],
     languages: [],
     normGapNotes: [],
+    profil: null,
     photoAdvice: { en: '', de: '' },
   }
 }
@@ -124,6 +125,7 @@ test('toPlainText: includes full name and experience role and company in section
     skills: [],
     languages: [],
     normGapNotes: [],
+    profil: null,
     photoAdvice: { en: '', de: '' },
   }
   const sectionOrder = ['personal', 'experience', 'education', 'skills', 'languages']
@@ -133,4 +135,22 @@ test('toPlainText: includes full name and experience role and company in section
   assert.ok(text.includes('Tech GmbH'), 'should include experience company')
   // personal section should appear before experience section in output
   assert.ok(text.indexOf('Max Mustermann') < text.indexOf('Software Engineer'), 'personal before experience')
+})
+
+// toPlainText: Kurzprofil serialization
+test('toPlainText: emits Kurzprofil between personal and experience, skips it when null', () => {
+  const base = makeLebenslauf({
+    fullName: 'Jane Doe',
+    experience: [{ role: 'Engineer', company: 'Acme', location: null, start: null, end: null, bullets: [] }],
+  })
+  const order = ['personal', 'profil', 'experience', 'education', 'skills', 'languages']
+
+  const withProfil = { ...base, profil: 'Operations-Managerin mit 8 Jahren Erfahrung.' }
+  const text = toPlainText(withProfil, order)
+  assert.ok(text.includes('Kurzprofil\nOperations-Managerin mit 8 Jahren Erfahrung.'), 'profil section emitted with heading')
+  assert.ok(text.indexOf('Jane Doe') < text.indexOf('Kurzprofil'), 'profil after personal')
+  assert.ok(text.indexOf('Kurzprofil') < text.indexOf('Engineer'), 'profil before experience')
+
+  const withoutProfil = toPlainText(base, order)
+  assert.ok(!withoutProfil.includes('Kurzprofil'), 'no empty Kurzprofil heading when profil is null')
 })

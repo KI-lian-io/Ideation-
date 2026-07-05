@@ -31,6 +31,12 @@ GERMAN NORMS to apply (and explain in normGapNotes):
   never English month names ("Mar 2024") or "Present".
 - Personal data section (address, phone with +49 if derivable, email, optionally
   nationality / date of birth ONLY if present in the source).
+- profil: if the source CV contains a professional summary, profile, or objective
+  statement, convert it into a concise German "Kurzprofil": 2-4 lines, matter-of-fact,
+  no hype adjectives, grounded strictly in what the source summary says. Preserve its
+  substance; drop English-style self-praise that German recruiters read as empty
+  ("results-driven", "passionate"). If the source has NO such section, return null.
+  Never compose a Kurzprofil from scratch.
 - Explain employment gaps if the dates reveal one.
 - Education: keep the final grade (Note) in the qualification string when the source
   states one (e.g. "B.A. Soziooekonomie (Note 2,3)"): German recruiters expect it.

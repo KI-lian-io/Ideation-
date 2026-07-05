@@ -114,7 +114,7 @@ const initialState: AppState = {
   phase: 'input',
   resumeText: '',
   lebenslauf: null,
-  sectionOrder: ['personal', 'experience', 'education', 'skills', 'languages'],
+  sectionOrder: ['personal', 'profil', 'experience', 'education', 'skills', 'languages'],
   errorMessage: null,
   jobPosting: '',
   answers: PERSONALIZATION_QUESTIONS.map((q) => ({ id: q.id, answer: '' })),
@@ -170,6 +170,17 @@ function reducer(state: AppState, action: AppAction): AppState {
           ...state.lebenslauf,
           personal: { ...state.lebenslauf.personal, [action.field]: action.value },
         },
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Kurzprofil (professional summary)
+    // -------------------------------------------------------------------------
+    case 'UPDATE_PROFIL': {
+      if (!state.lebenslauf) return state
+      return {
+        ...state,
+        lebenslauf: { ...state.lebenslauf, profil: action.value || null },
       }
     }
 

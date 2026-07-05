@@ -27,6 +27,10 @@ export const LebenslaufSchema = z.object({
     nationality: z.string().nullable(),
     dateOfBirth: z.string().nullable(),
   }),
+  /** Concise German Kurzprofil (2-4 lines). ONLY derived from a professional
+   * summary / profile / objective present in the source CV, reworded into
+   * German; null when the source has none. Never composed from scratch. */
+  profil: z.string().nullable(),
   experience: z.array(
     z.object({
       role: z.string(),

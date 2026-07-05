@@ -102,6 +102,7 @@ export function stripUids(l: LebenslaufEditorState): Lebenslauf {
 // ---------------------------------------------------------------------------
 const SECTION_HEADINGS: Record<string, string> = {
   personal: 'Persönliche Daten',
+  profil: 'Kurzprofil',
   experience: 'Berufserfahrung',
   education: 'Bildung',
   skills: 'Kenntnisse',
@@ -169,6 +170,12 @@ export function toPlainText(l: Lebenslauf, sectionOrder: string[]): string {
         if (p.dateOfBirth?.trim()) lines.push(`Geburtsdatum: ${p.dateOfBirth.trim()}`)
         if (lines.length > 0) {
           parts.push(`${heading}\n${lines.join('\n')}`)
+        }
+        break
+      }
+      case 'profil': {
+        if (l.profil?.trim()) {
+          parts.push(`${heading}\n${l.profil.trim()}`)
         }
         break
       }

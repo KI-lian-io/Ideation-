@@ -198,6 +198,7 @@ type Dict = {
   placeholderQualification: string
   placeholderInstitution: string
   placeholderCategoryName: string
+  placeholderProfil: string
   placeholderSkill: string
   placeholderLanguageName: string
 
@@ -402,6 +403,7 @@ const en = {
   placeholderQualification: '+ Qualification',
   placeholderInstitution: '+ Institution',
   placeholderCategoryName: '+ Category name',
+  placeholderProfil: '+ Add a short profile (2-4 lines: who you are, your strongest expertise)',
   placeholderSkill: '+ Skill',
   placeholderLanguageName: '+ Add language',
 
@@ -604,6 +606,7 @@ const de = {
   placeholderQualification: '+ Abschluss',
   placeholderInstitution: '+ Bildungseinrichtung',
   placeholderCategoryName: '+ Kategoriename',
+  placeholderProfil: '+ Kurzprofil hinzufügen (2-4 Zeilen: wer Sie sind, Ihre stärkste Expertise)',
   placeholderSkill: '+ Kenntnis',
   placeholderLanguageName: '+ Sprache hinzufügen',
 

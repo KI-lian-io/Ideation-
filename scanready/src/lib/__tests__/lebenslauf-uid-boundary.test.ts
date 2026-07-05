@@ -179,6 +179,7 @@ function makeEditorState(): LebenslaufEditorState {
       { _uid: 'lang-uid-2', language: 'Englisch', level: 'Fließend' },
     ],
     normGapNotes: [],
+    profil: null,
     photoAdvice: { en: '', de: '' },
   }
 }
@@ -254,6 +255,7 @@ test('toPlainText(stripUids(state)) produces the same output as toPlainText on t
       { language: 'Englisch', level: 'Fließend' },
     ],
     normGapNotes: [],
+    profil: null,
     photoAdvice: { en: '', de: '' },
   }
   const viaPlain = toPlainText(plainEquivalent, sectionOrder)

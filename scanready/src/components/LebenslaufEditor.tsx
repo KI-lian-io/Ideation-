@@ -32,6 +32,8 @@ type LanguageEntry = WithUid<Lebenslauf['languages'][number]>
 export type LebenslaufAction =
   // Personal data
   | { type: 'UPDATE_PERSONAL'; field: keyof Lebenslauf['personal']; value: string }
+  // Kurzprofil (professional summary)
+  | { type: 'UPDATE_PROFIL'; value: string }
   // Experience
   | { type: 'UPDATE_EXPERIENCE'; index: number; field: keyof Lebenslauf['experience'][number]; value: string }
   | { type: 'ADD_EXPERIENCE' }
@@ -104,6 +106,7 @@ interface LebenslaufEditorProps {
 // ---------------------------------------------------------------------------
 const SECTION_LABELS: Record<string, string> = {
   personal: 'Persönliche Daten',
+  profil: 'Kurzprofil',
   experience: 'Berufserfahrung',
   education: 'Bildung',
   skills: 'Kenntnisse',
@@ -377,6 +380,32 @@ function PersonalSection({
           <p className="mt-1 text-sm text-muted">{photoAdvice[lang]}</p>
         </details>
       )}
+    </div>
+  )
+}
+
+/**
+ * Kurzprofil – the German professional summary (2-4 lines under the personal
+ * block). Parse fills it ONLY from a summary present in the source CV; the
+ * placeholder lets the user add one manually when the source had none.
+ */
+function ProfilSection({
+  profil,
+  dispatch,
+}: {
+  profil: string | null
+  dispatch: React.Dispatch<LebenslaufAction>
+}) {
+  const { t } = useLang()
+  return (
+    <div className="text-sm text-ink leading-relaxed">
+      <EditableField
+        value={profil}
+        placeholder={t.placeholderProfil}
+        multiline
+        onSave={(v) => dispatch({ type: 'UPDATE_PROFIL', value: v })}
+        className="text-sm"
+      />
     </div>
   )
 }
@@ -676,6 +705,13 @@ export function LebenslaufEditor({
             photoAdvice={photoAdvice}
             photoUrl={photoUrl}
             photoTransform={photoTransform}
+          />
+        )
+      case 'profil':
+        return (
+          <ProfilSection
+            profil={lebenslauf.profil}
+            dispatch={dispatch}
           />
         )
       case 'experience':
