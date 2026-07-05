@@ -3,10 +3,15 @@
 /**
  * Humanizer+ purchase + refinement modal. Loaded via next/dynamic from the page
  * so Stripe.js (which sets fraud-prevention cookies) is only fetched when the
- * user opens the modal — anonymous browsing stays cookie-free.
+ * user opens the modal, anonymous browsing stays cookie-free.
  *
- * Steps: direction → payment (Widerruf checkbox + Payment Element) → refining (stream).
+ * Steps: direction -> payment (Widerruf checkbox + Payment Element) -> refining (stream).
  * No redirect: allow_redirects: 'never' on the PI + redirect: 'if_required' here.
+ *
+ * Localization: all non-legal chrome (headings, buttons, direction labels, reassurance
+ * lines) follows the active UI language via useLang(). The Widerruf checkbox text in
+ * PaymentForm stays German deliberately: it is the exact wording of a §356(5) BGB legal
+ * declaration, not UI copy, and must not vary with the interface language.
  */
 import { useState, useRef, useEffect, useId } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
@@ -14,19 +19,14 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { HUMANIZER_DIRECTIONS, DIRECTION_SAMPLES, type HumanizerDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, EYEBROW } from '@/components/ui'
+import { useLang } from '@/lib/i18n'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
-
-const DIRECTION_LABELS: Record<HumanizerDirection, { title: string; blurb: string }> = {
-  formeller: { title: 'Formeller', blurb: 'Corporate & Mittelstand — classic, conservative, correct.' },
-  moderner: { title: 'Moderner', blurb: 'Startup & scale-up — direct, energetic, no ceremony.' },
-  praegnanter: { title: 'Prägnanter', blurb: 'Tighten & condense — every line earns its place.' },
-}
 
 type Step = 'direction' | 'payment' | 'refining' | 'error'
 
 /** sessionStorage key for a paid-but-unconsumed refinement attempt.
- * Stores ONLY the PaymentIntent id + chosen direction — never letter content —
+ * Stores ONLY the PaymentIntent id + chosen direction, never letter content,
  * so reopening the modal after a failed stream resumes instead of re-charging. */
 const PAID_ATTEMPT_KEY = 'humanizer_paid_attempt'
 
@@ -58,14 +58,13 @@ export default function HumanizerModal({
   onClose: () => void
   onDone: (refined: string) => void
 }) {
+  const { t } = useLang()
   const pendingAttempt = useRef(readPaidAttempt()).current
   const [step, setStep] = useState<Step>(pendingAttempt ? 'error' : 'direction')
   const [direction, setDirection] = useState<HumanizerDirection | null>(pendingAttempt?.direction ?? null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(
-    pendingAttempt
-      ? 'A paid refinement is still open. You can retry without paying again.'
-      : null
+    pendingAttempt ? t.humanizerPendingAttemptNotice : null
   )
   const paymentIntentIdRef = useRef<string | null>(pendingAttempt?.paymentIntentId ?? null)
   const [failCount, setFailCount] = useState(0)
@@ -137,7 +136,7 @@ export default function HumanizerModal({
       setClientSecret(data.clientSecret)
       setStep('payment')
     } catch {
-      setError('Payment could not be initialized. Please try again later.')
+      setError(t.humanizerIntentInitError)
     }
   }
 
@@ -159,7 +158,7 @@ export default function HumanizerModal({
       })
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error ?? 'Refinement failed. Your payment stays valid — please try again.')
+        throw new Error(data.error ?? t.humanizerRefinementFailedGeneric)
       }
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -170,16 +169,14 @@ export default function HumanizerModal({
         refined += decoder.decode(value, { stream: true })
       }
       if (refined.trimStart().startsWith(INVALID_INPUT_SENTINEL)) {
-        throw new Error(
-          'The text was not recognized as an Anschreiben. Your payment stays valid — please try again.'
-        )
+        throw new Error(t.humanizerNotRecognizedError)
       }
-      if (!refined.trim()) throw new Error('Empty response. Your payment stays valid — please try again.')
+      if (!refined.trim()) throw new Error(t.humanizerEmptyResponseError)
       sessionStorage.removeItem(PAID_ATTEMPT_KEY)
       onDone(refined)
     } catch (e) {
       setFailCount((n) => n + 1)
-      setError(e instanceof Error ? e.message : 'Refinement failed. Your payment stays valid — please try again.')
+      setError(e instanceof Error ? e.message : t.humanizerRefinementFailedGeneric)
       setStep('error')
     }
   }
@@ -194,22 +191,21 @@ export default function HumanizerModal({
       <div ref={dialogRef} tabIndex={-1} className="w-full max-w-lg rounded-xl border border-hair bg-paper p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto focus:outline-none modal-dialog-enter">
         <div className="flex items-start justify-between">
           <div>
-            <p className={EYEBROW}>Humanizer+</p>
-            <h2 id={headingId} className="font-serif text-2xl font-semibold text-ink">Feinschliff — 2,99&nbsp;€</h2>
+            <p className={EYEBROW}>{t.humanizerEyebrow}</p>
+            <h2 id={headingId} className="font-serif text-2xl font-semibold text-ink">{t.humanizerTitle}</h2>
           </div>
-          <button onClick={onClose} aria-label="Schließen" className="text-muted hover:text-ink text-xl leading-none">×</button>
+          <button onClick={onClose} aria-label={t.humanizerCloseAria} className="text-muted hover:text-ink text-xl leading-none">×</button>
         </div>
 
         {step === 'direction' && (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-muted">
-              Your Anschreiben is ready. The Feinschliff tunes tone and register to the
-              company&rsquo;s culture — your facts and voice stay unchanged.
+              {t.humanizerDirectionIntro}
             </p>
             {/* Recommended direction first (personalized from the job posting), then the
-                remaining two in their original relative order — defuses choice paralysis
+                remaining two in their original relative order: defuses choice paralysis
                 without hiding the alternatives. */}
-            {(Object.keys(DIRECTION_LABELS) as HumanizerDirection[])
+            {(Object.keys(HUMANIZER_DIRECTIONS) as HumanizerDirection[])
               .slice()
               .sort((a, b) => (a === recommended ? -1 : b === recommended ? 1 : 0))
               .map((d) => {
@@ -224,19 +220,20 @@ export default function HumanizerModal({
                   >
                     {isRecommended && (
                       <span className="mb-2 inline-block rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
-                        Recommended for this posting
+                        {t.humanizerRecommendedBadge}
                       </span>
                     )}
-                    <p className="font-semibold text-ink">{DIRECTION_LABELS[d].title}</p>
-                    <p className="text-sm text-muted">{DIRECTION_LABELS[d].blurb}</p>
+                    <p className="font-semibold text-ink">{t.humanizerDirectionTitle[d]}</p>
+                    <p className="text-sm text-muted">{t.humanizerDirectionBlurb[d]}</p>
+                    {/* Sample sentence is always German (audible register sample, not chrome) */}
                     <p lang="de" className="font-serif-text italic text-sm text-muted mt-2">
-                      „{DIRECTION_SAMPLES[d]}"
+                      „{DIRECTION_SAMPLES[d]}&rdquo;
                     </p>
                   </button>
                 )
               })}
             <p className="text-sm text-muted">
-              Your original letter stays — you can restore it anytime after the refinement.
+              {t.humanizerRestoreReassurance}
             </p>
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
@@ -249,7 +246,7 @@ export default function HumanizerModal({
         )}
 
         {step === 'refining' && (
-          <p className="text-sm text-muted animate-pulse">Processing …</p>
+          <p className="text-sm text-muted animate-pulse">{t.humanizerProcessing}</p>
         )}
 
         {step === 'error' && (
@@ -257,29 +254,28 @@ export default function HumanizerModal({
             <p className="text-sm text-red-600">{error}</p>
             {paymentIntentIdRef.current && (
               <p className="text-sm text-muted">
-                Zahlungsreferenz: <code className="font-mono">{paymentIntentIdRef.current}</code>
+                {t.humanizerPaymentRefLabel(paymentIntentIdRef.current)}
                 {failCount >= 3 && (
                   <>
-                    {' '}— Failed multiple times? We&rsquo;ll refund the purchase — email this reference to
-                    the address listed in the{' '}
-                    <a className="underline" href="/impressum" target="_blank">Impressum</a>.
+                    {' '}{t.humanizerFailedMultipleTimes}{' '}
+                    <a className="underline" href="/impressum" target="_blank">{t.humanizerImprintLink}</a>.
                   </>
                 )}
               </p>
             )}
             {failCount < 3 && paymentIntentIdRef.current && (
               <button className={btnClass('primary')} onClick={() => runRefinement(paymentIntentIdRef.current!)}>
-                Try again (already paid)
+                {t.humanizerRetryPaid}
               </button>
             )}
           </div>
         )}
 
         <p className="text-xs text-muted">
-          One-time payment, no subscription. {' '}
-          <a className="underline" href="/agb" target="_blank">Terms &amp; withdrawal policy</a>{' '}
-          / <a className="underline" href="/datenschutz" target="_blank">Privacy</a>{' '}
-          / <a className="underline" href="/impressum" target="_blank">Imprint</a> apply.
+          {t.humanizerFooterLegal} {' '}
+          <a className="underline" href="/agb" target="_blank">{t.humanizerTermsLink}</a>{' '}
+          / <a className="underline" href="/datenschutz" target="_blank">{t.humanizerPrivacyLink}</a>{' '}
+          / <a className="underline" href="/impressum" target="_blank">{t.humanizerImprintLink}</a>
         </p>
       </div>
     </div>
@@ -299,6 +295,7 @@ function PaymentForm({
   paying: boolean
   setPaying: (p: boolean) => void
 }) {
+  const { t } = useLang()
   const stripeJs = useStripe()
   const elements = useElements()
   const [widerrufOk, setWiderrufOk] = useState(false)
@@ -310,19 +307,23 @@ function PaymentForm({
     const result = await stripeJs.confirmPayment({ elements, redirect: 'if_required' })
     setPaying(false)
     if (result.error) {
-      setError(result.error.message ?? 'Payment failed. You were not charged — please try again.')
+      setError(result.error.message ?? t.humanizerPaymentFailedGeneric)
       return
     }
     if (result.paymentIntent?.status === 'succeeded') {
       onPaid(result.paymentIntent.id)
     } else {
-      setError('Zahlung nicht abgeschlossen. Bitte erneut versuchen.')
+      setError(t.humanizerPaymentNotCompleted)
     }
   }
 
   return (
     <div className="flex flex-col gap-4">
       <PaymentElement />
+      {/* This checkbox's label text is a fixed §356(5) BGB legal declaration and stays
+          German regardless of the active UI language (see file header comment). The
+          English line beneath it is an explanatory gloss, not the declaration itself,
+          so IT follows the toggle. */}
       <label className="flex items-start gap-2 text-xs text-muted">
         <input
           type="checkbox"
@@ -338,18 +339,18 @@ function PaymentForm({
       </label>
       <p className="text-xs text-muted -mt-2 pl-6">
         (I expressly request immediate delivery and acknowledge that my 14-day withdrawal
-        right ends once delivery begins — German consumer law, § 356(5) BGB.)
+        right ends once delivery begins, German consumer law, § 356(5) BGB.)
       </p>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <p className="text-xs text-muted">
-        Delivered in seconds. If the refinement fails, you can retry free — or get a refund.
+        {t.humanizerDeliveredInSeconds}
       </p>
       <button
         onClick={pay}
         disabled={!widerrufOk || paying || !stripeJs || !elements}
         className={btnClass('primary')}
       >
-        {paying ? 'Processing …' : 'Zahlungspflichtig bestellen (2,99 €)'}
+        {paying ? t.humanizerPaying : t.humanizerPayCta}
       </button>
     </div>
   )

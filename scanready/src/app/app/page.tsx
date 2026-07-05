@@ -9,6 +9,7 @@ import { NormGapPanel } from '@/components/NormGapPanel'
 import { PERSONALIZATION_QUESTIONS, questionsForPosting, recommendDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
+import { LangProvider, useLang } from '@/lib/i18n'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
@@ -20,13 +21,13 @@ const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ss
 /**
  * Client-side-only stable id, attached to every experience/education entry
  * when it enters state (PARSE_SUCCESS or an ADD action). React list keys
- * must track logical identity, not array position — otherwise a reorder or
+ * must track logical identity, not array position – otherwise a reorder or
  * remove dispatch shifts indices while EditableField's internal `draft`
- * (which only resyncs when NOT editing — see EditableField.tsx) stays mounted
+ * (which only resyncs when NOT editing – see EditableField.tsx) stays mounted
  * against the same DOM node, silently attaching an in-flight edit to a
  * DIFFERENT entry (bug: index-keyed lists cross-write on reorder/remove).
  *
- * `_uid` is never sent to the API and never appears in copy/download output —
+ * `_uid` is never sent to the API and never appears in copy/download output:
  * see handleGenerateLetter (uses toPlainText, field-by-field) and toPlainText
  * itself in lebenslauf-utils.ts (also field-by-field, never spreads the entry).
  */
@@ -64,12 +65,16 @@ type AppPhase =
 
 type AppState = {
   phase: AppPhase
-  resumeText: string // persists through all phases — needed for /api/cover-letter
+  resumeText: string // persists through all phases – needed for /api/cover-letter
   lebenslauf: LebenslaufWithUids | null
   sectionOrder: string[]
   errorMessage: string | null
   jobPosting: string
-  answers: { question: string; answer: string }[]
+  answers: { id: string; answer: string }[]
+  /** Client-side-only object URL for the uploaded photo (change 4). Never sent to
+   * any API – see LebenslaufEditor's PersonalSection and toPlainText, neither of
+   * which reference it. Revoked on replace/remove/reset to avoid blob URL leaks. */
+  photoUrl: string | null
 }
 
 // AppAction union: page lifecycle actions + all Lebenslauf editor actions
@@ -82,14 +87,14 @@ type AppAction =
   | { type: 'RESET' }
   | { type: 'START_COVER_LETTER' }
   | { type: 'SET_JOB_POSTING'; payload: string }
-  | { type: 'SET_ANSWER'; payload: { index: number; answer: string } }
+  | { type: 'SET_ANSWER'; payload: { id: string; answer: string } }
   | { type: 'COVER_LETTER_STREAMING' }
   | { type: 'COVER_LETTER_DONE' }
   | { type: 'COVER_LETTER_ERROR'; payload: string }
   | { type: 'BACK_TO_RESULT' }
   | LebenslaufAction
 
-// Static, deterministic — no Date.now, Math.random, or window (hydration safety)
+// Static, deterministic – no Date.now, Math.random, or window (hydration safety)
 const initialState: AppState = {
   phase: 'input',
   resumeText: '',
@@ -97,7 +102,13 @@ const initialState: AppState = {
   sectionOrder: ['personal', 'experience', 'education', 'skills', 'languages'],
   errorMessage: null,
   jobPosting: '',
-  answers: PERSONALIZATION_QUESTIONS.map((q) => ({ question: q, answer: '' })),
+  answers: PERSONALIZATION_QUESTIONS.map((q) => ({ id: q.id, answer: '' })),
+  photoUrl: null,
+}
+
+// Revokes a photo object URL if one exists – best-effort, no-op on null/undefined.
+function revokePhoto(url: string | null | undefined) {
+  if (url) URL.revokeObjectURL(url)
 }
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -117,7 +128,18 @@ function reducer(state: AppState, action: AppAction): AppState {
       // Preserve resumeText so user can fix/expand it (D-17)
       return { ...state, phase: 'junk' }
     case 'RESET':
+      revokePhoto(state.photoUrl)
       return initialState
+
+    // -------------------------------------------------------------------------
+    // Photo (client-side-only, display-only – see AppState.photoUrl doc comment)
+    // -------------------------------------------------------------------------
+    case 'SET_PHOTO':
+      revokePhoto(state.photoUrl) // replacing: revoke the previous URL first
+      return { ...state, photoUrl: action.url }
+    case 'REMOVE_PHOTO':
+      revokePhoto(state.photoUrl)
+      return { ...state, photoUrl: null }
 
     // -------------------------------------------------------------------------
     // Personal data
@@ -247,7 +269,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     }
 
     // -------------------------------------------------------------------------
-    // Skills — categorized (D-09)
+    // Skills – categorized (D-09)
     // -------------------------------------------------------------------------
     case 'UPDATE_SKILL': {
       if (!state.lebenslauf) return state
@@ -348,16 +370,17 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, phase: 'cover_letter_input' }
     case 'SET_JOB_POSTING': {
       // Re-derive the question list from the posting (conditional Gehalt/Eintrittstermin
-      // questions) and sync answers by question identity so typed answers survive.
+      // questions) and sync answers by question id so typed answers survive across
+      // language toggles (the label shown changes; the id and the stored answer don't).
       const questions = questionsForPosting(action.payload)
       const answers = questions.map(
-        (q) => state.answers.find((a) => a.question === q) ?? { question: q, answer: '' }
+        (q) => state.answers.find((a) => a.id === q.id) ?? { id: q.id, answer: '' }
       )
       return { ...state, jobPosting: action.payload, answers }
     }
     case 'SET_ANSWER': {
-      const answers = state.answers.map((a, i) =>
-        i === action.payload.index ? { ...a, answer: action.payload.answer } : a
+      const answers = state.answers.map((a) =>
+        a.id === action.payload.id ? { ...a, answer: action.payload.answer } : a
       )
       return { ...state, answers }
     }
@@ -368,7 +391,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     case 'COVER_LETTER_ERROR':
       return { ...state, phase: 'cover_letter_error', errorMessage: action.payload }
     case 'BACK_TO_RESULT':
-      // Dedicated navigation action — clearer than overloading PARSE_SUCCESS and
+      // Dedicated navigation action – clearer than overloading PARSE_SUCCESS and
       // avoids a non-null assertion on state.lebenslauf (IN-01).
       return { ...state, phase: 'result' }
 
@@ -378,7 +401,7 @@ function reducer(state: AppState, action: AppAction): AppState {
 }
 
 // ---------------------------------------------------------------------------
-// Lock icon — inline SVG, no icon library dependency
+// Lock icon – inline SVG, no icon library dependency
 // ---------------------------------------------------------------------------
 
 function LockIcon() {
@@ -403,21 +426,24 @@ function LockIcon() {
 // Goal-gradient step indicator
 // ---------------------------------------------------------------------------
 
-const STEP_LABELS = ['Lebenslauf', 'Questions', 'Anschreiben'] as const
-
 /**
- * Editorial progress line shown once the user has made some progress — never on
+ * Editorial progress line shown once the user has made some progress – never on
  * input/loading (no progress claim before any progress exists). Three labeled
  * steps, mono EYEBROW-style: completed = accent + filled dot, current = ink +
  * ring dot, upcoming = muted + hollow dot.
+ *
+ * Lebenslauf/Anschreiben stay identical in both UI languages (they are the German
+ * document names, not chrome); only "Questions"/"Fragen" is localized.
  */
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+  const { t } = useLang()
+  const stepLabels = [t.stepLebenslauf, t.stepQuestions, t.stepAnschreiben] as const
   return (
     <div
       className="flex items-center gap-3 mb-2"
-      aria-label={`Step ${current} of 3: ${STEP_LABELS[current - 1]}`}
+      aria-label={t.stepAriaLabel(current, stepLabels[current - 1])}
     >
-      {STEP_LABELS.map((label, i) => {
+      {stepLabels.map((label, i) => {
         const step = (i + 1) as 1 | 2 | 3
         const status = step < current ? 'done' : step === current ? 'current' : 'upcoming'
         return (
@@ -460,6 +486,7 @@ function InputView({
   onTextChange: (text: string) => void
   onSubmit: () => void
 }) {
+  const { t } = useLang()
   const RESUME_LIMIT = 30_000
   const resumeOverLimit = resumeText.length > RESUME_LIMIT
   const resumeNearLimit = resumeText.length > RESUME_LIMIT * 0.8
@@ -470,7 +497,7 @@ function InputView({
   const [uploadedName, setUploadedName] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  // Monotonic request id — guards against a slower, earlier extraction overwriting
+  // Monotonic request id – guards against a slower, earlier extraction overwriting
   // a faster, later one (or a stale error clobbering a subsequent success).
   const extractionIdRef = useRef(0)
 
@@ -479,19 +506,22 @@ function InputView({
     setUploadError(null)
     setExtracting(true)
     try {
-      const { extractCvText, CvExtractError, EXTRACT_ERROR_MESSAGES } = await import('@/lib/extract-cv')
+      const { extractCvText, CvExtractError } = await import('@/lib/extract-cv')
       try {
         const text = await extractCvText(file)
-        if (requestId !== extractionIdRef.current) return // superseded — drop this result
+        if (requestId !== extractionIdRef.current) return // superseded – drop this result
         onTextChange(text)
         setUploadedName(file.name)
       } catch (err) {
-        if (requestId !== extractionIdRef.current) return // superseded — drop this result
+        if (requestId !== extractionIdRef.current) return // superseded – drop this result
         setUploadedName(null)
+        // extract-cv keeps its reason codes English/internal; the display site (here)
+        // maps them through the active-language dictionary instead of importing
+        // EXTRACT_ERROR_MESSAGES directly, so upload errors follow the UI toggle.
         if (err instanceof CvExtractError) {
-          setUploadError(EXTRACT_ERROR_MESSAGES[err.reason])
+          setUploadError(t.extractErrors[err.reason])
         } else {
-          setUploadError('The file could not be read. Please copy the text into the field manually.')
+          setUploadError(t.extractGenericError)
         }
       }
     } finally {
@@ -503,21 +533,20 @@ function InputView({
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="font-serif text-3xl font-semibold text-ink mb-2">
-          Convert your CV to a German Lebenslauf
+          {t.inputHeadline}
         </h1>
         <p className="text-sm text-muted">
-          Paste your US or UK resume below — or upload it as PDF. We will reformat it to a norm-correct German
-          tabellarischer Lebenslauf, grounded strictly in your real CV facts.
+          {t.inputIntro}
         </p>
       </div>
 
-      {/* Zero-retention reassurance — calm inline line with lock icon (D-14 / INPUT-02) */}
+      {/* Zero-retention reassurance – calm inline line with lock icon (D-14 / INPUT-02) */}
       <p className="flex items-center gap-2 text-sm text-muted">
         <LockIcon />
-        Your CV is never stored or used for training — processing is stateless and zero-retention.
+        {t.zeroRetention}
       </p>
 
-      {/* CV file upload — extraction runs in the browser; the file is never uploaded (INPUT-02) */}
+      {/* CV file upload – extraction runs in the browser; the file is never uploaded (INPUT-02) */}
       <div className="flex flex-wrap items-center gap-3">
         <input
           ref={fileInputRef}
@@ -536,12 +565,12 @@ function InputView({
           disabled={extracting}
           className={btnClass('secondary')}
         >
-          {extracting ? 'Reading file …' : 'Upload PDF or .txt'}
+          {extracting ? t.uploadButtonBusy : t.uploadButton}
         </button>
         <span className="text-sm text-muted" role="status">
           {uploadedName
-            ? <>Imported from <span className="font-mono">{uploadedName}</span> — review &amp; edit below</>
-            : 'Read locally in your browser — the file never leaves your device.'}
+            ? t.uploadHintImported(uploadedName)
+            : t.uploadHintDefault}
         </span>
       </div>
       {uploadError && (
@@ -561,16 +590,16 @@ function InputView({
           const f = e.dataTransfer.files?.[0]
           if (f) handleFile(f)
         }}
-        placeholder="Paste your resume here — name, contact info, work history, education, skills…"
+        placeholder={t.resumePlaceholder}
         rows={18}
         className={`w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${dragOver ? 'border-accent ring-2 ring-accent/30' : ''}`}
-        aria-label="Resume text"
+        aria-label={t.resumeAriaLabel}
       />
-      {/* Counter only appears once it's actually useful — past 80% of the limit, or over it. */}
+      {/* Counter only appears once it's actually useful – past 80% of the limit, or over it. */}
       {resumeNearLimit && (
         <p className={`text-sm text-right ${resumeOverLimit ? 'text-red-500' : 'text-muted'}`}>
           {resumeText.length.toLocaleString('de-DE')} / 30.000
-          {resumeOverLimit && ' — too long'}
+          {resumeOverLimit && ` – ${t.tooLongSuffix}`}
         </p>
       )}
 
@@ -579,31 +608,25 @@ function InputView({
         disabled={isSubmitDisabled}
         className={`${btnClass('primary')} self-end`}
       >
-        Convert to Lebenslauf
+        {t.submitCta}
       </button>
     </div>
   )
 }
 
-const LOADING_MESSAGES = [
-  'Reading your CV…',
-  'Mapping to German norms…',
-  'Structuring the Lebenslauf…',
-  'Almost there…',
-]
-
 function LoadingView() {
+  const { t } = useLang()
   const [messageIndex, setMessageIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageIndex((i) => (i + 1) % LOADING_MESSAGES.length)
+      setMessageIndex((i) => (i + 1) % t.loadingMessages.length)
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [t.loadingMessages.length])
 
   return (
-    <div className="flex flex-col gap-4" role="status" aria-label="Parsing your CV, please wait">
+    <div className="flex flex-col gap-4" role="status" aria-label={t.loadingAriaLabel}>
       <div className="animate-pulse flex flex-col gap-3">
         {/* Skeleton blocks simulating the Lebenslauf layout (D-15 / INPUT-03) */}
         <div className="h-6 w-1/3 rounded bg-faint" />
@@ -622,7 +645,7 @@ function LoadingView() {
       {/* Keyed by message index so each swap remounts and replays a 150ms crossfade
           instead of the text silently jumping to the next message. */}
       <p key={messageIndex} className="text-sm text-muted phase-enter">
-        {LOADING_MESSAGES[messageIndex]}
+        {t.loadingMessages[messageIndex]}
       </p>
     </div>
   )
@@ -631,17 +654,20 @@ function LoadingView() {
 function ResultView({
   lebenslauf,
   sectionOrder,
+  photoUrl,
   dispatch,
   onReset,
   onStartCoverLetter,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
+  photoUrl: string | null
   dispatch: React.Dispatch<AppAction>
   onReset: () => void
   onStartCoverLetter: () => void
 }) {
-  // Copy button state — local, not in reducer (D-04 / UI-SPEC)
+  const { t } = useLang()
+  // Copy button state – local, not in reducer (D-04 / UI-SPEC)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
 
   async function handleCopy() {
@@ -658,11 +684,11 @@ function ResultView({
 
   const normGapCount = lebenslauf.normGapNotes.length
 
-  // Exit ramp is demoted to a confirm-guarded text link (churn-risk fix) — reset
+  // Exit ramp is demoted to a confirm-guarded text link (churn-risk fix) – reset
   // discards the converted Lebenslauf, so a deliberate confirm step replaces the
   // old always-available secondary button that sat above the document.
   function handleResetClick() {
-    if (window.confirm('This discards your converted Lebenslauf. Start over?')) {
+    if (window.confirm(t.startOverConfirm)) {
       onReset()
     }
   }
@@ -671,97 +697,89 @@ function ResultView({
     <div className="flex flex-col gap-6">
       <StepIndicator current={1} />
 
-      {/* Display-serif header — value first. The norm-gap count doubles as its subtitle
+      {/* Display-serif header – value first. The norm-gap count doubles as its subtitle
           instead of repeating as a separate paragraph, so the number and the detail it
           refers to read as one unit directly above the document. The duplicate "LEBENSLAUF"
-          eyebrow that used to sit above this is gone — the step indicator already carries
+          eyebrow that used to sit above this is gone – the step indicator already carries
           that label (churn-risk fix). */}
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-3xl font-semibold text-ink">
-          Your Lebenslauf
+          {t.resultHeadline}
         </h2>
         <p className="text-sm text-muted">
-          {normGapCount > 0
-            ? `${normGapCount === 1 ? '1 norm gap fixed' : `${normGapCount} norm gaps fixed`} for the German first scan — see what changed below.`
-            : 'Grounded strictly in your real CV facts.'}
+          {normGapCount > 0 ? t.normGapsFixed(normGapCount) : t.resultGroundedOnly}
         </p>
       </div>
 
-      {/* Two-column: document (Lebenslauf) left, bilingual annotation right at desktop;
-          stacks on mobile. Print-proof "document + margin notes" layout (DESIGN.md).
-          The document is now the first content block after the header — no button row
-          sits above it (churn-risk fix: value before any ask). */}
-      <div className="grid gap-8 lg:grid-cols-[1.7fr_1fr] lg:items-start">
-        {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) */}
-        <LebenslaufEditor
-          lebenslauf={lebenslauf}
-          sectionOrder={sectionOrder}
-          dispatch={dispatch}
-          photoAdvice={lebenslauf.photoAdvice}
-        />
-
-        {/* Bilingual norm-gap panel (D-05 / LL-02) — the annotation column. Staggered
-            in after the five Lebenslauf sections (index 5) so the whole result view
-            reveals as one continuous sequence on first mount. */}
-        <div className="reveal-stagger" style={{ '--i': 5 } as React.CSSProperties}>
-          <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
-        </div>
+      {/* Full-width layout: NormGapPanel sits ABOVE the document as its own collapsible
+          strip (collapsed by default), then the full-width Lebenslauf editor. Replaces the
+          former two-column document+notes grid – the document is the hero, and the notes
+          are one click away rather than competing for lg: width (result-view layout change). */}
+      <div className="reveal-stagger" style={{ '--i': 0 } as React.CSSProperties}>
+        <NormGapPanel normGapNotes={lebenslauf.normGapNotes} />
       </div>
+
+      {/* WYSIWYG Lebenslauf editor (D-01 / D-02 / D-03 / D-12) – now full-width */}
+      <LebenslaufEditor
+        lebenslauf={lebenslauf}
+        sectionOrder={sectionOrder}
+        dispatch={dispatch}
+        photoAdvice={lebenslauf.photoAdvice}
+        photoUrl={photoUrl}
+      />
 
       {/* Visually-hidden live mirror so screen readers announce copy state changes
           without making the visible error paragraph itself a chatty aria-live region. */}
       <span className="sr-only" aria-live="polite">
-        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
+        {copyState === 'copied' ? t.copied : copyState === 'error' ? t.copyFailedAria : ''}
       </span>
 
       {/* Inline copy error (transient 3000ms) */}
       {copyState === 'error' && (
         <p className="text-sm text-red-600">
-          Copy failed — please select the text manually.
+          {t.copyFailed}
         </p>
       )}
 
       {/* Actions after value: Copy + Write Anschreiben live together as the natural next
-          steps, right below the document (churn-risk fix — was a button row above the
+          steps, right below the document (churn-risk fix – was a button row above the
           header, asking for copy before the value was even visible). */}
       <div className="rounded-lg border border-hair bg-paper p-5">
         <p className="text-sm font-semibold text-ink mb-1">
-          Write Anschreiben
+          {t.writeAnschreibenTitle}
         </p>
         <p className="text-sm text-muted mb-4">
-          Generate an authentic German cover letter grounded in your Lebenslauf. You will answer
-          3–5 short questions so the letter sounds like you, not generic AI prose.
+          {t.writeAnschreibenBody}
         </p>
         <p className="text-sm text-muted mb-4">
-          Free to generate. An optional Humanizer+ polish (one-time 2,99&nbsp;€, no subscription)
-          is available on the finished letter.
+          {t.writeAnschreibenPrice}
         </p>
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={onStartCoverLetter}
             className={btnClass('primary')}
           >
-            Write Anschreiben →
+            {t.writeAnschreibenCta}
           </button>
-          {/* Copy button — D-04 / LL-04 — moved beside Write Anschreiben so the forward
+          {/* Copy button – D-04 / LL-04 – moved beside Write Anschreiben so the forward
               path dominates instead of competing with it above the document. */}
           <button
             onClick={handleCopy}
-            aria-label="Copy Lebenslauf to clipboard"
+            aria-label={t.copyLebenslaufAria}
             className={btnClass('secondary')}
           >
-            {copyState === 'copied' ? 'Copied ✓' : 'Copy Lebenslauf'}
+            {copyState === 'copied' ? t.copied : t.copyLebenslauf}
           </button>
         </div>
       </div>
 
-      {/* Exit ramp — demoted to a small muted text link at the very bottom of the view,
+      {/* Exit ramp – demoted to a small muted text link at the very bottom of the view,
           guarded by a confirm dialog (D-16 revised / churn-risk fix). */}
       <button
         onClick={handleResetClick}
         className="self-start text-sm text-muted hover:text-ink cursor-pointer underline underline-offset-2"
       >
-        Start over / paste a new CV
+        {t.startOverLink}
       </button>
     </div>
   )
@@ -776,11 +794,12 @@ function ErrorView({
   resumeText: string
   onRetry: () => void
 }) {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-4" role="alert">
       <div className="rounded-lg border border-red-100 bg-red-50 p-4">
         <p className="text-sm font-semibold text-red-700">
-          Something went wrong
+          {t.errorTitle}
         </p>
         <p className="mt-1 text-sm text-red-600">{message}</p>
       </div>
@@ -789,7 +808,7 @@ function ErrorView({
         disabled={resumeText.trim().length === 0}
         className={`${btnClass('primary')} self-start`}
       >
-        Try again
+        {t.tryAgain}
       </button>
     </div>
   )
@@ -804,18 +823,18 @@ function JunkView({
   onTextChange: (text: string) => void
   onRetry: () => void
 }) {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-4" role="alert">
       <div className="rounded-lg border border-amber-100 bg-amber-50 p-4">
         <p className="text-sm font-semibold text-amber-700">
-          That did not look like a CV
+          {t.junkTitle}
         </p>
         <p className="mt-1 text-sm text-amber-600">
-          We could not find a recognisable name and work or education history. Try pasting more
-          of your resume — include your name, contact info, and at least one job or degree.
+          {t.junkBody}
         </p>
         <p className="mt-2 text-sm text-amber-600">
-          Tip: free generations are limited per hour — make each attempt count.
+          {t.junkTip}
         </p>
       </div>
 
@@ -823,17 +842,17 @@ function JunkView({
       <textarea
         value={resumeText}
         onChange={(e) => onTextChange(e.target.value)}
-        placeholder="Paste your resume here…"
+        placeholder={t.junkPlaceholder}
         rows={12}
         className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-        aria-label="Resume text"
+        aria-label={t.resumeAriaLabel}
       />
       <button
         onClick={onRetry}
         disabled={resumeText.trim().length === 0}
         className={`${btnClass('primary')} self-start`}
       >
-        Try again
+        {t.tryAgain}
       </button>
     </div>
   )
@@ -852,12 +871,13 @@ function CoverLetterInputView({
   onBack,
 }: {
   jobPosting: string
-  answers: { question: string; answer: string }[]
+  answers: { id: string; answer: string }[]
   onJobPostingChange: (v: string) => void
-  onAnswerChange: (index: number, v: string) => void
+  onAnswerChange: (id: string, v: string) => void
   onSubmit: () => void
   onBack: () => void
 }) {
+  const { lang, t } = useLang()
   const POSTING_LIMIT = 15_000
   const ANSWER_LIMIT = 2_000
   const postingOverLimit = jobPosting.length > POSTING_LIMIT
@@ -865,71 +885,77 @@ function CoverLetterInputView({
   const anyAnswerOverLimit = answers.some((a) => a.answer.length > ANSWER_LIMIT)
   const canSubmit = jobPosting.trim().length > 0 && !postingOverLimit && !anyAnswerOverLimit
 
+  // Questions re-derived from the current jobPosting (same conditional-question logic
+  // the reducer uses for SET_JOB_POSTING) so the rendered label always matches the
+  // active UI language and the current posting's conditional questions.
+  const questions = questionsForPosting(jobPosting)
+
   return (
     <div className="flex flex-col gap-6">
       <StepIndicator current={2} />
 
       <div>
         <h2 className="font-serif text-3xl font-semibold text-ink mb-2">
-          Anschreiben
+          {t.clHeadline}
         </h2>
         <p className="text-sm text-muted">
-          Paste the job posting and answer the questions below. The letter is grounded strictly in
-          your Lebenslauf facts and your own words.
+          {t.clIntro}
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold text-ink">
-          Job posting <span className="text-red-500">*</span>
+          {t.jobPostingLabel} <span className="text-red-500">*</span>
         </label>
         <textarea
           value={jobPosting}
           onChange={(e) => onJobPostingChange(e.target.value)}
-          placeholder="Paste the full job posting here…"
+          placeholder={t.jobPostingPlaceholder}
           rows={8}
           className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-          aria-label="Job posting"
+          aria-label={t.jobPostingAria}
         />
         {postingNearLimit && (
           <p className={`text-sm text-right ${postingOverLimit ? 'text-red-500' : 'text-muted'}`}>
             {jobPosting.length.toLocaleString('de-DE')} / 15.000
-            {postingOverLimit && ' — too long'}
+            {postingOverLimit && ` – ${t.tooLongSuffix}`}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-4">
         <p className="text-sm font-semibold text-ink">
-          A few quick questions — so the letter sounds like you, not generic AI prose:
+          {t.questionsIntro}
         </p>
-        {answers.map((a, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <label className="text-sm text-muted">{a.question}</label>
-            <textarea
-              value={a.answer}
-              onChange={(e) => onAnswerChange(i, e.target.value)}
-              rows={2}
-              className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label={`Answer to question ${i + 1}`}
-            />
-            {a.answer.length > ANSWER_LIMIT * 0.8 && (
-              <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
-                {a.answer.length.toLocaleString('de-DE')} / 2.000
-                {a.answer.length > ANSWER_LIMIT && ' — answer too long'}
-              </p>
-            )}
-          </div>
-        ))}
+        {answers.map((a, i) => {
+          const question = questions.find((q) => q.id === a.id)
+          return (
+            <div key={a.id} className="flex flex-col gap-1">
+              <label className="text-sm text-muted">{question?.[lang] ?? ''}</label>
+              <textarea
+                value={a.answer}
+                onChange={(e) => onAnswerChange(a.id, e.target.value)}
+                rows={2}
+                className="w-full resize-y rounded-lg border border-hair bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                aria-label={t.answerAria(i + 1)}
+              />
+              {a.answer.length > ANSWER_LIMIT * 0.8 && (
+                <p className={`text-sm text-right ${a.answer.length > ANSWER_LIMIT ? 'text-red-500' : 'text-muted'}`}>
+                  {a.answer.length.toLocaleString('de-DE')} / 2.000
+                  {a.answer.length > ANSWER_LIMIT && ` – ${t.answerTooLong}`}
+                </p>
+              )}
+            </div>
+          )
+        })}
       </div>
 
-      {/* Native-speaker nudge (D-09 moved from prompt to UI) — same advisory callout role
+      {/* Native-speaker nudge (D-09 moved from prompt to UI) – same advisory callout role
           as the identical note in CoverLetterResultView, so both use NORM_NOTE rather
           than a one-off amber treatment. */}
       <div className={NORM_NOTE}>
         <p className="text-sm text-ink-soft">
-          Native-quality German is the goal — but before sending to a real recruiter, have a native
-          German speaker review the final letter.
+          {t.nativeSpeakerNote}
         </p>
       </div>
 
@@ -939,13 +965,13 @@ function CoverLetterInputView({
           disabled={!canSubmit}
           className={btnClass('primary')}
         >
-          Write my Anschreiben
+          {t.submitLetterCta}
         </button>
         <button
           onClick={onBack}
           className={btnClass('secondary')}
         >
-          Back to Lebenslauf
+          {t.backToLebenslauf}
         </button>
       </div>
     </div>
@@ -957,15 +983,16 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
   // aria-live wrapper around that would make screen readers announce the letter
   // word-by-word as it streams in. Instead, a separate visually-hidden role="status"
   // below announces only the start/completion transitions.
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-6">
       <StepIndicator current={3} />
-      <p className={EYEBROW}>Anschreiben</p>
+      <p className={EYEBROW}>{t.streamingSectionLabel}</p>
       {letterText ? (
         // Same print-sheet presentation as the result view, so the transition from
         // streaming → result doesn't change the document's visual identity.
         <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14" lang="de">
-          {/* Render as preformatted text — no dangerouslySetInnerHTML (T-02-01 XSS guard) */}
+          {/* Render as preformatted text – no dangerouslySetInnerHTML (T-02-01 XSS guard) */}
           <pre className="whitespace-pre-wrap font-serif-text text-lg leading-[1.7] text-ink [hyphens:auto]">
             {letterText}
             <span aria-hidden="true" className="stream-caret">▍</span>
@@ -983,10 +1010,10 @@ function CoverLetterStreamingView({ letterText }: { letterText: string }) {
         </div>
       )}
       <p className="text-sm text-muted">
-        {letterText ? 'Generating Anschreiben…' : 'Composing… (the first sentences take a few seconds)'}
+        {letterText ? t.streamingInProgress : t.streamingComposing}
       </p>
       <span className="sr-only" role="status">
-        {letterText ? '' : 'Generating your Anschreiben…'}
+        {letterText ? '' : t.streamingAriaGenerating}
       </span>
     </div>
   )
@@ -1007,18 +1034,21 @@ function CoverLetterResultView({
   onReset: () => void
   onNewLetter: () => void
 }) {
+  const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
-  // One-shot edit hint — dismissed on first interaction (D-06)
+  // One-shot edit hint – dismissed on first interaction (D-06)
   const [showEditHint, setShowEditHint] = useState(true)
   const [humanizerOpen, setHumanizerOpen] = useState(false)
   // Pre-refinement letter, kept so the user can restore (null = not refined yet)
   const [originalLetter, setOriginalLetter] = useState<string | null>(null)
-  // This view only mounts once the letter is done streaming — announce completion
+  // This view only mounts once the letter is done streaming – announce completion
   // once on mount, then clear so it doesn't linger as stale status text.
-  const [readyAnnouncement, setReadyAnnouncement] = useState('Anschreiben ready.')
+  const [readyAnnouncement, setReadyAnnouncement] = useState(t.readyAnnouncement)
+  // Deliberately empty deps: announce-once-on-mount only. t.readyAnnouncement is read
+  // once into initial state above, not referenced here, so no exhaustive-deps issue.
   useEffect(() => {
-    const t = setTimeout(() => setReadyAnnouncement(''), 1000)
-    return () => clearTimeout(t)
+    const timeoutId = setTimeout(() => setReadyAnnouncement(''), 1000)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   async function handleCopy() {
@@ -1052,33 +1082,33 @@ function CoverLetterResultView({
 
       <StepIndicator current={3} />
 
-      {/* Peak-end completion framing — the flow's final view, so it opens on the
+      {/* Peak-end completion framing – the flow's final view, so it opens on the
           finish line rather than restating the section label first (D-XX). One-time
           rise-in on mount underscores the completion moment. */}
       <div className="phase-enter">
         <h2 className="font-serif text-3xl font-semibold text-ink mb-2">
-          Your German application is ready.
+          {t.clResultHeadline}
         </h2>
         <p className="text-sm text-muted">
-          Lebenslauf converted, Anschreiben written — grounded in your facts.
+          {t.clResultSubline}
         </p>
       </div>
 
       {/* Header: section label */}
-      <p className={EYEBROW}>Anschreiben</p>
+      <p className={EYEBROW}>{t.streamingSectionLabel}</p>
 
-      {/* One-shot click-to-edit hint — hidden after first interaction */}
+      {/* One-shot click-to-edit hint – hidden after first interaction */}
       {showEditHint && (
-        <p className="text-sm text-muted">Click to edit</p>
+        <p className="text-sm text-muted">{t.clickToEdit}</p>
       )}
 
-      {/* Print-sheet presentation — the letter reads like a document, not a form field.
+      {/* Print-sheet presentation – the letter reads like a document, not a form field.
           Textarea inside is borderless/transparent; the sheet itself carries the focus
           ring via focus-within (hairline → accent, see .doc-sheet in globals.css). */}
       <div className="doc-sheet px-8 py-10 sm:px-12 sm:py-14 phase-enter" lang="de">
-        {/* Editable letter block — plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
+        {/* Editable letter block – plain controlled textarea, NOT EditableField (rows={3} hardcoded there)
             Letter is read-only during streaming; editing available only here in cover_letter_result (D-06)
-            No dangerouslySetInnerHTML — XSS guard (T-02-05) */}
+            No dangerouslySetInnerHTML – XSS guard (T-02-05) */}
         <textarea
           value={letterText}
           onChange={(e) => {
@@ -1088,98 +1118,96 @@ function CoverLetterResultView({
           onFocus={() => { if (showEditHint) setShowEditHint(false) }}
           rows={18}
           className="w-full resize-y border-0 bg-transparent px-0 py-0 font-serif-text text-lg leading-[1.7] text-ink [hyphens:auto] placeholder:text-muted focus:outline-none focus:ring-0"
-          aria-label="Anschreiben"
+          aria-label={t.letterAria}
         />
       </div>
 
-      {/* Native-speaker trust callout — distinct block below letter (D-09 / CL-05)
+      {/* Native-speaker trust callout – distinct block below letter (D-09 / CL-05)
           This callout (+ grounding in prompts.ts) is how CL-04/CL-05 surface in the UI */}
       <div className={NORM_NOTE}>
-        <p className={`${EYEBROW} mb-1`}>Note</p>
+        <p className={`${EYEBROW} mb-1`}>{t.noteLabel}</p>
         <p className="text-sm text-muted">
-          Before you send it: have a native German speaker review the final letter.
+          {t.noteBody}
         </p>
       </div>
 
       {/* Visually-hidden live mirror so screen readers announce copy state changes
           without making the visible error paragraph itself a chatty aria-live region. */}
       <span className="sr-only" aria-live="polite">
-        {copyState === 'copied' ? 'Copied to clipboard.' : copyState === 'error' ? 'Copy failed.' : ''}
+        {copyState === 'copied' ? t.copied : copyState === 'error' ? t.copyFailedAria : ''}
       </span>
 
       {/* Inline copy error (transient 3000ms) */}
       {copyState === 'error' && (
         <p className="text-sm text-red-600">
-          Copy failed — please select the text manually.
+          {t.copyFailed}
         </p>
       )}
 
-      {/* Action row — flex, gap-3, wraps on mobile (CL-06 / D-07) */}
+      {/* Action row – flex, gap-3, wraps on mobile (CL-06 / D-07) */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Humanizer+ upsell — one-shot purchase, additive refinement (spec D1/D3) */}
+        {/* Humanizer+ upsell – one-shot purchase, additive refinement (spec D1/D3) */}
         <button
           onClick={() => setHumanizerOpen(true)}
           disabled={letterOverHumanizerLimit}
-          aria-label="Buy Feinschliff mit Humanizer+"
+          aria-label={t.humanizerCtaAria}
           className={btnClass('accent')}
         >
-          Feinschliff mit Humanizer+ — 2,99 €
+          {t.humanizerCta}
         </button>
 
-        {/* Copy — primary button (CL-06) */}
+        {/* Copy – primary button (CL-06) */}
         <button
           onClick={handleCopy}
-          aria-label="Copy Anschreiben to clipboard"
+          aria-label={t.copyLetterAria}
           className={btnClass('primary')}
         >
-          {copyState === 'copied' ? 'Copied ✓' : 'Copy Anschreiben'}
+          {copyState === 'copied' ? t.copied : t.copyLetter}
         </button>
 
-        {/* Download .txt — browser-native Blob, no server round-trip (D-07) */}
+        {/* Download .txt – browser-native Blob, no server round-trip (D-07) */}
         <button
           onClick={handleDownload}
-          aria-label="Download Anschreiben as .txt"
+          aria-label={t.downloadAria}
           className={`${btnClass('secondary')} shrink-0`}
         >
-          Download .txt
+          {t.downloadCta}
         </button>
 
-        {/* Regenerate — re-runs same jobPosting + answers from reducer state */}
+        {/* Regenerate – re-runs same jobPosting + answers from reducer state */}
         <button
           onClick={onRegenerate}
-          aria-label="Regenerate Anschreiben"
+          aria-label={t.regenerateAria}
           className={`${btnClass('secondary')} shrink-0`}
         >
-          Regenerate
+          {t.regenerateCta}
         </button>
 
-        {/* Start over — dispatches RESET; no confirmation (D-06 / D-16) */}
+        {/* Start over – dispatches RESET; no confirmation (D-06 / D-16) */}
         <button
           onClick={onReset}
-          aria-label="Reset and paste a new Lebenslauf"
+          aria-label={t.resetAria}
           className={`${btnClass('secondary')} shrink-0`}
         >
-          Start over
+          {t.resetCta}
         </button>
       </div>
 
-      {/* Honest price anchor — one line, muted, sits with the Humanizer+ CTA context */}
+      {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
-        One-time 2,99&nbsp;€ — a fraction of what professional rewrite services charge. No
-        subscription.
+        {t.priceAnchor}
       </p>
 
-      {/* Over-limit hint — only rendered when the letter exceeds the Humanizer+ cap */}
+      {/* Over-limit hint – only rendered when the letter exceeds the Humanizer+ cap */}
       {letterOverHumanizerLimit && (
         <p className="text-sm text-muted">
-          Humanizer+ is available for letters up to 10,000 characters — yours is currently{' '}
-          {letterText.length.toLocaleString('en-US')}.
+          {t.overHumanizerLimit(letterText.length.toLocaleString('en-US'))}
         </p>
       )}
 
-      {/* .txt-only forewarning — sets expectations until PDF export ships */}
+      {/* .txt-only forewarning – sets expectations until PDF export ships */}
       <p className="text-sm text-muted">
-        .txt for now — paste into your own template. PDF export is coming.
+        {t.txtForewarning}
       </p>
 
       {originalLetter !== null && (
@@ -1190,23 +1218,23 @@ function CoverLetterResultView({
           }}
           className={`${btnClass('secondary')} self-start`}
         >
-          Restore original
+          {t.restoreOriginal}
         </button>
       )}
 
-      {/* Continuation path — always shown as the final block, not gated on copyState
+      {/* Continuation path – always shown as the final block, not gated on copyState
           so it doesn't disappear if the user never uses the copy button (e.g. downloads
           or copies via keyboard selection instead). */}
       <div className="border-t border-hair pt-6">
         <p className="text-sm text-muted mb-3">
-          Applying to more roles? Write another Anschreiben from the same Lebenslauf.
+          {t.continuationIntro}
         </p>
         <button onClick={onNewLetter} className={btnClass('secondary')}>
-          New Anschreiben
+          {t.newLetterCta}
         </button>
       </div>
 
-      {/* Rendered only once opened — next/dynamic's import() fires on first render of this
+      {/* Rendered only once opened – next/dynamic's import() fires on first render of this
           element, and the module-level loadStripe() call would fetch Stripe.js (and its
           fraud-prevention cookies) as soon as the letter finishes, not on the actual click,
           if this were mounted unconditionally with open={false}. */}
@@ -1231,22 +1259,29 @@ function CoverLetterResultView({
 // ---------------------------------------------------------------------------
 
 /**
- * Maps a non-ok fetch Response to an English client message. Status 429/403 get
- * dedicated English copy (rate-limit / same-origin block — never server-authored,
- * so there's no German string to preserve). Everything else falls through to the
- * server's own `error` field when present (400s are authoritative and already
- * German-localized for the user) — otherwise `fallback`.
+ * Maps a non-ok fetch Response to a client message in the active UI language.
+ * Status 429/403 get dedicated localized copy (rate-limit / same-origin block:
+ * never server-authored, so there's no German-only string to preserve). Everything
+ * else falls through to the server's own `error` field when present.
+ *
+ * ponytail: the server's 400 error bodies are always German (see api/parse and
+ * api/cover-letter route.ts), even when the active UI language is English. This is
+ * a known simplification: localizing every server-side validation message would
+ * require duplicating them in prompts/route code, which isn't worth it for the
+ * handful of body-shape/length-limit errors that hit this path. Left as-is.
  */
-async function describeFetchFailure(res: Response, fallback: string): Promise<string> {
+async function describeFetchFailure(
+  res: Response,
+  t: ReturnType<typeof useLang>['t'],
+  fallback: string
+): Promise<string> {
   if (res.status === 429) {
     const retryAfter = Number(res.headers.get('Retry-After'))
     const minutes = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.ceil(retryAfter / 60) : null
-    return minutes
-      ? `Too many requests — the free tier is rate-limited. Please try again in about ${minutes} minutes.`
-      : 'Too many requests — the free tier is rate-limited. Please try again in a few minutes.'
+    return t.rateLimited(minutes)
   }
   if (res.status === 403) {
-    return 'Request blocked. Please use the app directly at this site and try again.'
+    return t.requestBlocked
   }
   const body = await res.json().catch(() => ({}))
   return (body as { error?: string }).error ?? fallback
@@ -1256,7 +1291,8 @@ async function describeFetchFailure(res: Response, fallback: string): Promise<st
 // Main page component
 // ---------------------------------------------------------------------------
 
-export default function Home() {
+function AppShell() {
+  const { t } = useLang()
   const [state, dispatch] = useReducer(reducer, initialState)
   const [letterText, setLetterText] = useState('')
   const abortRef = useRef<AbortController | null>(null)
@@ -1266,7 +1302,7 @@ export default function Home() {
     return () => abortRef.current?.abort()
   }, [])
 
-  // Warn before leaving the tab once there's real work in progress — anything past
+  // Warn before leaving the tab once there's real work in progress – anything past
   // 'input' has either an in-flight request or unsaved generated content the user
   // would lose on an accidental reload/close.
   useEffect(() => {
@@ -1298,29 +1334,39 @@ export default function Home() {
     dispatch({ type: 'COVER_LETTER_STREAMING' })
     setLetterText('')
     try {
+      // API contract is {question, answer}[] with the ENGLISH question text
+      // (buildCoverLetterUser in prompts.ts embeds it verbatim): this keeps the
+      // prompt sent to the model deterministic regardless of the applicant's UI
+      // language. Reducer state stores {id, answer}[] so answers survive an EN/DE
+      // toggle; translate to the wire shape here, at the request boundary.
+      const questions = questionsForPosting(state.jobPosting)
+      const wireAnswers = state.answers.map((a) => ({
+        question: questions.find((q) => q.id === a.id)?.en ?? '',
+        answer: a.answer,
+      }))
       const res = await fetch('/api/cover-letter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvText, jobPosting: state.jobPosting, answers: state.answers }),
+        body: JSON.stringify({ cvText, jobPosting: state.jobPosting, answers: wireAnswers }),
         signal: controller.signal,
       })
       if (!res.ok || !res.body) {
-        // Surface a controlled message — never render the raw server body, which
+        // Surface a controlled message – never render the raw server body, which
         // could be an HTML error page, gateway text, or stack-trace-ish output
-        // from an upstream proxy/5xx (WR-01). 429/403 get dedicated English copy;
+        // from an upstream proxy/5xx (WR-01). 429/403 get dedicated localized copy;
         // other 4xxs fall back to the server's (German, authoritative) error field.
         dispatch({
           type: 'COVER_LETTER_ERROR',
           payload: res.ok
-            ? 'Generation failed — please try again.'
-            : await describeFetchFailure(res, 'Generation failed — please try again.'),
+            ? t.generationFailedOk
+            : await describeFetchFailure(res, t, t.generationFailedFallback),
         })
         return
       }
       const reader = res.body.getReader()
-      // stream:true is MANDATORY — prevents umlaut corruption (ä/ö/ü split across chunks)
+      // stream:true is MANDATORY – prevents umlaut corruption (ä/ö/ü split across chunks)
       const decoder = new TextDecoder('utf-8', { fatal: false })
-      // Local mirror of the streamed text — the `letterText` React state is stale
+      // Local mirror of the streamed text – the `letterText` React state is stale
       // inside this closure, so post-stream decisions must read `acc` (WR-05).
       let acc = ''
       while (true) {
@@ -1341,8 +1387,7 @@ export default function Home() {
       if (acc.trimStart().startsWith(INVALID_INPUT_SENTINEL)) {
         dispatch({
           type: 'COVER_LETTER_ERROR',
-          payload:
-            "Your input wasn't recognized as a CV and job posting. Please check that both fields contain the real documents — then try again.",
+          payload: t.invalidInputCoverLetter,
         })
         return
       }
@@ -1352,20 +1397,20 @@ export default function Home() {
       if (acc.trim().length === 0) {
         dispatch({
           type: 'COVER_LETTER_ERROR',
-          payload: 'No letter was generated — please try again.',
+          payload: t.emptyLetter,
         })
         return
       }
       dispatch({ type: 'COVER_LETTER_DONE' })
     } catch (err) {
       if ((err as Error).name === 'AbortError') return
-      dispatch({ type: 'COVER_LETTER_ERROR', payload: 'Network error — please try again.' })
+      dispatch({ type: 'COVER_LETTER_ERROR', payload: t.networkErrorLetter })
     }
   }
 
   // Shared CV-parse driver used by both the initial submit and the retry paths.
   // Both entry points dispatch SUBMIT first, then run identical fetch/parse/dispatch
-  // logic — extracted here so the 422 / empty-Lebenslauf / error handling can never
+  // logic – extracted here so the 422 / empty-Lebenslauf / error handling can never
   // silently diverge between the two callers.
   async function runParse() {
     dispatch({ type: 'SUBMIT' })
@@ -1385,7 +1430,7 @@ export default function Home() {
       if (!res.ok) {
         dispatch({
           type: 'PARSE_ERROR',
-          payload: await describeFetchFailure(res, 'Failed to parse CV. Please try again.'),
+          payload: await describeFetchFailure(res, t, t.parseFailedFallback),
         })
         return
       }
@@ -1401,7 +1446,7 @@ export default function Home() {
     } catch {
       dispatch({
         type: 'PARSE_ERROR',
-        payload: 'Network error — please check your connection and try again.',
+        payload: t.networkErrorParse,
       })
     }
   }
@@ -1416,20 +1461,21 @@ export default function Home() {
 
   return (
     <>
-      {/* Top-bar wordmark — links back to the landing (UI-SPEC §F item 2). Same centered
+      {/* Top-bar wordmark – links back to the landing (UI-SPEC §F item 2). Same centered
           max-w-4xl container as the landing nav (src/app/page.tsx) for visual parity
-          between marketing and tool. */}
+          between marketing and tool. Language toggle sits on the right of the same row. */}
       <div className="border-b border-hair h-14 flex items-center">
-        <div className="max-w-4xl mx-auto px-6 w-full flex items-center">
+        <div className="max-w-4xl mx-auto px-6 w-full flex items-center justify-between">
           <a href="/" className="text-sm font-semibold text-ink tracking-tight">
             ScanReady
             <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
           </a>
+          <LangToggle />
         </div>
       </div>
 
       <div className="flex flex-col flex-1 items-center bg-paper font-sans px-4 py-8 sm:py-12">
-      <main aria-label="ScanReady tool" className={`w-full max-w-3xl flex-col ${CARD} px-6 py-10 sm:px-12 sm:py-12`}>
+      <main aria-label="ScanReady tool" className={`w-full max-w-4xl flex-col ${CARD} px-6 py-10 sm:px-12 sm:py-12`}>
         {/* Each phase view's root is keyed by phase + wrapped in .phase-enter so a phase
             transition always mounts fresh and replays the 200ms rise-in (shared motion
             pattern with the reveal-stagger / doc-sheet completion moments above). */}
@@ -1454,6 +1500,7 @@ export default function Home() {
             <ResultView
               lebenslauf={state.lebenslauf}
               sectionOrder={state.sectionOrder}
+              photoUrl={state.photoUrl}
               dispatch={dispatch}
               onReset={() => dispatch({ type: 'RESET' })}
               onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
@@ -1464,7 +1511,7 @@ export default function Home() {
         {state.phase === 'error' && (
           <div key={state.phase} className="phase-enter">
             <ErrorView
-              message={state.errorMessage ?? 'An unexpected error occurred.'}
+              message={state.errorMessage ?? t.errorGeneric}
               resumeText={state.resumeText}
               onRetry={handleRetry}
             />
@@ -1487,7 +1534,7 @@ export default function Home() {
               jobPosting={state.jobPosting}
               answers={state.answers}
               onJobPostingChange={(v) => dispatch({ type: 'SET_JOB_POSTING', payload: v })}
-              onAnswerChange={(i, v) => dispatch({ type: 'SET_ANSWER', payload: { index: i, answer: v } })}
+              onAnswerChange={(id, v) => dispatch({ type: 'SET_ANSWER', payload: { id, answer: v } })}
               onSubmit={handleGenerateLetter}
               onBack={() => dispatch({ type: 'BACK_TO_RESULT' })}
             />
@@ -1509,7 +1556,7 @@ export default function Home() {
               onRegenerate={handleGenerateLetter}
               onReset={() => dispatch({ type: 'RESET' })}
               onNewLetter={() => {
-                // Clear only the posting — SET_JOB_POSTING('') resyncs the answer list
+                // Clear only the posting – SET_JOB_POSTING('') resyncs the answer list
                 // by question identity, so typed base answers (style/motivation) survive
                 // and only job-specific questions reset. Answers are intentionally left
                 // untouched otherwise.
@@ -1520,12 +1567,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* cover_letter_error: reuse ErrorView — onRetry re-runs same inputs losslessly
+        {/* cover_letter_error: reuse ErrorView – onRetry re-runs same inputs losslessly
             (jobPosting + answers persist in reducer through streaming/error phases) */}
         {state.phase === 'cover_letter_error' && (
           <div key={state.phase} className="phase-enter">
             <ErrorView
-              message={state.errorMessage ?? 'Cover letter generation failed.'}
+              message={state.errorMessage ?? t.generationFailedFallback}
               resumeText={state.jobPosting}
               onRetry={handleGenerateLetter}
             />
@@ -1534,5 +1581,51 @@ export default function Home() {
       </main>
       </div>
     </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Language toggle – EN / DE, top bar right side (change 1)
+// ---------------------------------------------------------------------------
+
+function LangToggle() {
+  const { lang, setLang, t } = useLang()
+  const langBtnClass = (active: boolean) =>
+    `font-mono text-xs uppercase tracking-[0.18em] px-1.5 py-1 min-h-[44px] flex items-center transition-colors ${
+      active ? 'text-ink' : 'text-muted hover:text-ink'
+    }`
+  return (
+    <div className="flex items-center gap-1" role="group" aria-label={t.switchLangLabel}>
+      <button
+        type="button"
+        onClick={() => setLang('en')}
+        aria-pressed={lang === 'en'}
+        className={langBtnClass(lang === 'en')}
+      >
+        EN
+      </button>
+      <span className="text-eyebrow text-xs" aria-hidden="true">/</span>
+      <button
+        type="button"
+        onClick={() => setLang('de')}
+        aria-pressed={lang === 'de'}
+        className={langBtnClass(lang === 'de')}
+      >
+        DE
+      </button>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Main page component – wraps AppShell in LangProvider so every descendant
+// (including the top-bar toggle) can read/set the active UI language.
+// ---------------------------------------------------------------------------
+
+export default function Home() {
+  return (
+    <LangProvider>
+      <AppShell />
+    </LangProvider>
   )
 }

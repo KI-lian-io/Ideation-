@@ -1,6 +1,6 @@
 /**
  * Behavior tests for lebenslauf-utils.ts
- * Uses Node.js built-in test runner (node:test) — no extra dependencies.
+ * Uses Node.js built-in test runner (node:test), no extra dependencies.
  * Run: node --experimental-strip-types src/lib/__tests__/lebenslauf-utils.test.ts
  */
 import { test } from 'node:test'
@@ -28,7 +28,7 @@ function makeLebenslauf(overrides: {
     skills: [],
     languages: [],
     normGapNotes: [],
-    photoAdvice: '',
+    photoAdvice: { en: '', de: '' },
   }
 }
 
@@ -66,7 +66,7 @@ test('returns false when name and at least one education entry', () => {
 })
 
 // ---------------------------------------------------------------------------
-// softFormatDate (D-11) — Behavior Tests
+// softFormatDate (D-11): Behavior Tests
 // ---------------------------------------------------------------------------
 
 // Test 1: ISO YYYY-MM-DD → DD.MM.YYYY
@@ -95,7 +95,7 @@ test('softFormatDate: passes through year-only partial date like "2020"', () => 
 })
 
 // ---------------------------------------------------------------------------
-// toPlainText (D-04) — Behavior Tests
+// toPlainText (D-04): Behavior Tests
 // ---------------------------------------------------------------------------
 
 // Test 5: toPlainText includes the full name and an experience entry's role + company,
@@ -124,7 +124,7 @@ test('toPlainText: includes full name and experience role and company in section
     skills: [],
     languages: [],
     normGapNotes: [],
-    photoAdvice: '',
+    photoAdvice: { en: '', de: '' },
   }
   const sectionOrder = ['personal', 'experience', 'education', 'skills', 'languages']
   const text = toPlainText(l, sectionOrder)

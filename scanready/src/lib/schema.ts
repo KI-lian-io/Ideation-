@@ -4,14 +4,14 @@ import { z } from "zod";
  * Structured shape of a German tabellarischer Lebenslauf.
  *
  * Grounding rule (enforced in the prompt, mirrored here): every field must come
- * from the source CV. Unknown fields are null/empty — the model must NOT invent
+ * from the source CV. Unknown fields are null/empty: the model must NOT invent
  * employers, titles, dates, or skills. `photoAdvice` is guidance, not a claim.
  */
 
 /**
  * A skill category for the German Kenntnisse section (D-09).
  * `category` holds labels such as "IT-Kenntnisse", "Fachkenntnisse", "Sonstige Kenntnisse".
- * `skills` lists entries from the source CV — never invented.
+ * `skills` lists entries from the source CV: never invented.
  */
 export const SkillCategorySchema = z.object({
   category: z.string(),
@@ -50,10 +50,14 @@ export const LebenslaufSchema = z.object({
   languages: z.array(
     z.object({ language: z.string(), level: z.string().nullable() })
   ),
-  /** What changed vs. a US/UK resume and WHY — the norm-gap education. */
-  normGapNotes: z.array(z.string()),
-  /** Nuanced photo guidance — optional by AGG, expected by most recruiters. */
-  photoAdvice: z.string(),
+  /** What changed vs. a US/UK resume and WHY: the norm-gap education. Bilingual so
+   * the UI can render the note in whichever interface language is active (see
+   * src/lib/i18n.tsx); the underlying fact and change described is identical in
+   * both languages, only the wording adapts. */
+  normGapNotes: z.array(z.object({ en: z.string(), de: z.string() })),
+  /** Nuanced photo guidance: optional by AGG, expected by most recruiters. Bilingual
+   * for the same reason as normGapNotes above. */
+  photoAdvice: z.object({ en: z.string(), de: z.string() }),
 });
 
 export type Lebenslauf = z.infer<typeof LebenslaufSchema>;

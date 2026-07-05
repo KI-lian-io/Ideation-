@@ -17,17 +17,17 @@ test('plain posting returns only the base questions', () => {
 test('posting asking for Gehaltsvorstellung appends the salary question', () => {
   const qs = questionsForPosting('Bitte senden Sie uns Ihre Bewerbung mit Gehaltsvorstellung.')
   assert.equal(qs.length, PERSONALIZATION_QUESTIONS.length + 1)
-  assert.equal(qs[qs.length - 1], SALARY_QUESTION)
+  assert.deepEqual(qs[qs.length - 1], SALARY_QUESTION)
 })
 
 test('posting asking for salary expectation in English appends the salary question', () => {
   const qs = questionsForPosting('Please include your salary expectation in the cover letter.')
-  assert.ok(qs.includes(SALARY_QUESTION))
+  assert.ok(qs.some((q) => q.id === SALARY_QUESTION.id))
 })
 
 test('posting asking for Eintrittstermin appends the start-date question', () => {
   const qs = questionsForPosting('Bitte nennen Sie Ihren frühestmöglichen Eintrittstermin.')
-  assert.ok(qs.includes(START_DATE_QUESTION))
+  assert.ok(qs.some((q) => q.id === START_DATE_QUESTION.id))
 })
 
 test('posting asking for both appends both, salary first', () => {
@@ -37,7 +37,16 @@ test('posting asking for both appends both, salary first', () => {
 
 test('matching is case-insensitive', () => {
   const qs = questionsForPosting('GEHALTSVORSTELLUNG erwünscht')
-  assert.ok(qs.includes(SALARY_QUESTION))
+  assert.ok(qs.some((q) => q.id === SALARY_QUESTION.id))
+})
+
+test('every question has a unique id and non-empty en/de text', () => {
+  const ids = new Set(PERSONALIZATION_QUESTIONS.map((q) => q.id))
+  assert.equal(ids.size, PERSONALIZATION_QUESTIONS.length)
+  for (const q of PERSONALIZATION_QUESTIONS) {
+    assert.ok(q.en.length > 0)
+    assert.ok(q.de.length > 0)
+  }
 })
 
 test('humanizer has exactly the three directions', () => {
@@ -71,7 +80,7 @@ test('hardening rules bias against false refusals', () => {
 
 test('recommendDirection: an over-long letter recommends praegnanter even with a startup posting', () => {
   const longLetter = 'x'.repeat(3201)
-  const startupPosting = 'Wir sind ein Startup und suchen dich — sei Teil unseres Teams.'
+  const startupPosting = 'Wir sind ein Startup und suchen dich, sei Teil unseres Teams.'
   assert.equal(recommendDirection(startupPosting, longLetter), 'praegnanter')
 })
 

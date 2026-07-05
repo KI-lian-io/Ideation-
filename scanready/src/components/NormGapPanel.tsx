@@ -1,32 +1,38 @@
 'use client'
 import React from 'react'
+import { useLang } from '@/lib/i18n'
 
 /**
- * NormGapPanel — collapsible "what changed & why" notes from the parse response.
+ * NormGapPanel – collapsible "what changed & why" notes from the parse response.
  *
  * Renders normGapNotes[] inside a native <details>/<summary> collapsible (D-05 / LL-02).
- * Panel open/closed state is managed by the browser's native <details> element —
+ * Panel open/closed state is managed by the browser's native <details> element,
  * no local useState, not stored in the reducer.
  *
- * Placed BELOW LebenslaufEditor in page.tsx so the CV stays the hero (D-05).
+ * Rendered as its own full-width card-like strip ABOVE the LebenslaufEditor document
+ * (result-view layout change) rather than as a side column or a bottom border-t block.
+ *
+ * Each note is bilingual ({en, de}); this component renders note[lang] per the active
+ * UI language from useLang(), so the panel always matches the surrounding chrome.
  *
  * XSS guard: normGapNotes are model-produced strings rendered as text nodes only.
  * dangerouslySetInnerHTML is PROHIBITED per T-01-10.
  */
 
 interface NormGapPanelProps {
-  normGapNotes: string[]
+  normGapNotes: { en: string; de: string }[]
 }
 
 export function NormGapPanel({ normGapNotes }: NormGapPanelProps) {
+  const { lang, t } = useLang()
   if (normGapNotes.length === 0) return null
 
   return (
-    <div className="mt-8 border-t border-hair pt-6">
+    <div className="rounded-lg border border-hair bg-card px-5 py-4">
       <details>
         <summary className="cursor-pointer text-sm font-semibold text-muted hover:text-ink list-none flex items-center justify-between">
-          <span>Was hat sich geändert &amp; warum? ({normGapNotes.length} Hinweise)</span>
-          {/* Visual expand/collapse indicator — inline SVG, no icon library */}
+          <span>{t.normGapSummary(normGapNotes.length)}</span>
+          {/* Visual expand/collapse indicator – inline SVG, no icon library */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -42,10 +48,12 @@ export function NormGapPanel({ normGapNotes }: NormGapPanelProps) {
           </svg>
         </summary>
 
-        {/* Notes list — each note as a text node (no HTML injection) */}
+        {/* Notes list – each note as a text node (no HTML injection) */}
         <ul className="mt-3 space-y-2 text-sm text-muted">
           {normGapNotes.map((note, i) => (
-            <li key={i}>{note}</li>
+            <li key={i} className="reveal-stagger" style={{ '--i': i } as React.CSSProperties}>
+              {note[lang]}
+            </li>
           ))}
         </ul>
       </details>

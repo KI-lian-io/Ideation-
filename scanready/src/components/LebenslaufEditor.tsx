@@ -1,15 +1,16 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { EditableField } from '@/components/EditableField'
 import { SkillChips, LanguageLevelSelect } from '@/components/SkillChips'
 import { softFormatDate } from '@/lib/lebenslauf-utils'
 import type { Lebenslauf } from '@/lib/schema'
 import { EYEBROW } from '@/components/ui'
+import { useLang } from '@/lib/i18n'
 
 /**
  * Stable-id-augmented entry types. `_uid` is assigned once per entry (on parse
  * or ADD action) in page.tsx's reducer and used as the React list key here
- * instead of the array index — index keys break when a reorder or remove
+ * instead of the array index – index keys break when a reorder or remove
  * shifts positions, because EditableField's internal edit-draft state stays
  * attached to the DOM node at that position rather than following the entry.
  */
@@ -19,7 +20,7 @@ type EducationEntry = WithUid<Lebenslauf['education'][number]>
 type LanguageEntry = WithUid<Lebenslauf['languages'][number]>
 
 /**
- * LebenslaufAction union — all edit/add/remove/reorder actions for the WYSIWYG
+ * LebenslaufAction union – all edit/add/remove/reorder actions for the WYSIWYG
  * Lebenslauf editor. Imported by page.tsx and extended by Plan 04 for skill chips.
  *
  * XSS: all values flow through controlled inputs; no HTML injection.
@@ -41,7 +42,7 @@ export type LebenslaufAction =
   | { type: 'ADD_EDUCATION' }
   | { type: 'REMOVE_EDUCATION'; index: number }
   | { type: 'REORDER_EDUCATION'; from: number; to: number }
-  // Skills (categorized — D-09)
+  // Skills (categorized – D-09)
   | { type: 'UPDATE_SKILL'; catIndex: number; skillIndex: number; value: string }
   | { type: 'ADD_SKILL'; catIndex: number }
   | { type: 'REMOVE_SKILL'; catIndex: number; skillIndex: number }
@@ -54,9 +55,12 @@ export type LebenslaufAction =
   | { type: 'REMOVE_LANGUAGE'; index: number }
   // Section order
   | { type: 'REORDER_SECTION'; from: number; to: number }
+  // Photo (client-side-only, display-only – never sent to any API, see PersonalSection)
+  | { type: 'SET_PHOTO'; url: string }
+  | { type: 'REMOVE_PHOTO' }
 
 /**
- * Pure array reorder helper — no mutation, no external library.
+ * Pure array reorder helper – no mutation, no external library.
  * Moves the item at index `from` to index `to`.
  */
 export function reorder<T>(arr: T[], from: number, to: number): T[] {
@@ -78,13 +82,17 @@ interface LebenslaufEditorProps {
   }
   sectionOrder: string[]
   dispatch: React.Dispatch<LebenslaufAction>
-  /** Model-produced photo guidance (verbatim). Rendered near the personal-data block.
-   * Optional — when missing the callout is omitted. */
-  photoAdvice?: string | null
+  /** Model-produced photo guidance (bilingual, verbatim per language). Rendered near
+   * the personal-data block. Optional – when missing the callout is omitted. */
+  photoAdvice?: { en: string; de: string } | null
+  /** Client-side-only object URL for the uploaded photo (see page.tsx SET_PHOTO /
+   * REMOVE_PHOTO). Display-only – never serialized by toPlainText or sent to any API. */
+  photoUrl: string | null
 }
 
 // ---------------------------------------------------------------------------
-// Section heading labels (German DIN)
+// Section heading labels (German DIN) – always German, regardless of UI language:
+// these are the fixed document-section labels, not UI chrome (see src/lib/i18n.tsx).
 // ---------------------------------------------------------------------------
 const SECTION_LABELS: Record<string, string> = {
   personal: 'Persönliche Daten',
@@ -94,6 +102,9 @@ const SECTION_LABELS: Record<string, string> = {
   languages: 'Sprachen',
 }
 
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024 // 8 MB
+const PHOTO_ACCEPT = 'image/jpeg,image/png,image/webp'
+
 // ---------------------------------------------------------------------------
 // Section renderers
 // ---------------------------------------------------------------------------
@@ -102,86 +113,153 @@ function PersonalSection({
   personal,
   dispatch,
   photoAdvice,
+  photoUrl,
 }: {
   personal: Lebenslauf['personal']
   dispatch: React.Dispatch<LebenslaufAction>
-  photoAdvice?: string | null
+  photoAdvice?: { en: string; de: string } | null
+  photoUrl: string | null
 }) {
-  // Optional fields (Nationalität/Geburtsdatum) start collapsed unless already filled —
+  const { lang, t } = useLang()
+  // Optional fields (Nationalität/Geburtsdatum) start collapsed unless already filled:
   // so a returning/edited CV with real values doesn't hide them, but a fresh parse
   // doesn't interrupt name→experience with two "+ add" rows (churn-risk fix).
   const [showOptionalFields, setShowOptionalFields] = useState(
     Boolean(personal.nationality || personal.dateOfBirth)
   )
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  function handlePhotoFile(file: File) {
+    setPhotoError(null)
+    if (!PHOTO_ACCEPT.split(',').includes(file.type)) {
+      setPhotoError(t.photoBadType)
+      return
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setPhotoError(t.photoTooLarge)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    dispatch({ type: 'SET_PHOTO', url })
+  }
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl font-semibold text-ink">
-        <EditableField
-          value={personal.fullName}
-          placeholder="+ Vorname, Nachname"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'fullName', value: v })}
-          className="text-2xl font-semibold"
-        />
-      </div>
-      <div className="flex flex-col gap-1 text-sm text-muted">
-        <EditableField
-          value={personal.address}
-          placeholder="+ Adresse"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'address', value: v })}
-        />
-        <EditableField
-          value={personal.phone}
-          placeholder="+ Telefonnummer"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'phone', value: v })}
-        />
-        <EditableField
-          value={personal.email}
-          placeholder="+ E-Mail-Adresse"
-          onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'email', value: v })}
-        />
-        {showOptionalFields && (
-          <>
+      {/* Fields left, photo frame right – the photo is display-only and never leaves
+          the browser (client-side object URL only; see page.tsx SET_PHOTO/REMOVE_PHOTO
+          and the toPlainText / cover-letter payload, neither of which reference it). */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="text-2xl font-semibold text-ink">
             <EditableField
-              value={personal.nationality}
-              placeholder="+ Nationalität"
-              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'nationality', value: v })}
+              value={personal.fullName}
+              placeholder={t.placeholderFullName}
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'fullName', value: v })}
+              className="text-2xl font-semibold"
+            />
+          </div>
+          <div className="flex flex-col gap-1 text-sm text-muted mt-2">
+            <EditableField
+              value={personal.address}
+              placeholder={t.placeholderAddress}
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'address', value: v })}
             />
             <EditableField
-              value={personal.dateOfBirth}
-              placeholder="+ Geburtsdatum"
-              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'dateOfBirth', value: v })}
-              onBlurFormat={softFormatDate}
+              value={personal.phone}
+              placeholder={t.placeholderPhone}
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'phone', value: v })}
             />
-          </>
-        )}
+            <EditableField
+              value={personal.email}
+              placeholder={t.placeholderEmail}
+              onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'email', value: v })}
+            />
+            {showOptionalFields && (
+              <>
+                <EditableField
+                  value={personal.nationality}
+                  placeholder={t.placeholderNationality}
+                  onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'nationality', value: v })}
+                />
+                <EditableField
+                  value={personal.dateOfBirth}
+                  placeholder={t.placeholderDateOfBirth}
+                  onSave={(v) => dispatch({ type: 'UPDATE_PERSONAL', field: 'dateOfBirth', value: v })}
+                  onBlurFormat={softFormatDate}
+                />
+              </>
+            )}
+          </div>
+
+          {/* Single subtle disclosure instead of two standalone "+ add" rows sitting between
+              name and experience – collapses the meta-affordance into one line (churn-risk fix). */}
+          {!showOptionalFields && (
+            <button
+              type="button"
+              onClick={() => setShowOptionalFields(true)}
+              className="self-start text-sm text-muted hover:text-ink cursor-pointer mt-1"
+            >
+              {t.addOptionalFields}
+            </button>
+          )}
+        </div>
+
+        {/* Photo frame – 3:4 portrait. Client-side only: hidden file input + object URL. */}
+        <div className="flex-shrink-0 flex flex-col items-center gap-1">
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept={PHOTO_ACCEPT}
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) handlePhotoFile(f)
+              e.target.value = '' // same file re-selectable
+            }}
+          />
+          {photoUrl ? (
+            <div className="group relative w-24 sm:w-28 aspect-[3/4] rounded-sm border border-hair overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local blob: URL, next/image cannot optimize it and shouldn't try (zero-retention: no network round-trip for a photo that never leaves the browser) */}
+              <img src={photoUrl} alt={t.photoAria} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => dispatch({ type: 'REMOVE_PHOTO' })}
+                aria-label={t.photoRemoveAria}
+                className="absolute top-0.5 right-0.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink/70 text-sm leading-none">×</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              className="w-24 sm:w-28 aspect-[3/4] rounded-sm border border-dashed border-hair flex flex-col items-center justify-center gap-0.5 text-muted hover:text-ink hover:border-ink/30 transition-colors"
+            >
+              <span className="text-sm">{t.photoAddLabel}</span>
+              <span className="text-xs italic">{t.photoOptionalSub}</span>
+            </button>
+          )}
+          <p className="text-xs text-muted text-center max-w-24 sm:max-w-28">{t.photoStaysLocal}</p>
+        </div>
       </div>
+      {photoError && <p className="text-sm text-red-600">{photoError}</p>}
 
-      {/* Single subtle disclosure instead of two standalone "+ add" rows sitting between
-          name and experience — collapses the meta-affordance into one line (churn-risk fix). */}
-      {!showOptionalFields && (
-        <button
-          type="button"
-          onClick={() => setShowOptionalFields(true)}
-          className="self-start text-sm text-muted hover:text-ink cursor-pointer mt-1"
-        >
-          + Add optional fields (Nationalität, Geburtsdatum)
-        </button>
-      )}
-
-      {/* Optional photo callout (D-06 / LL-03) — quieter single-line summary with the
+      {/* Optional photo callout (D-06 / LL-03) – quieter single-line summary with the
           full advice behind a disclosure, placed at the END of the personal block so it
           reads as an edge note rather than interrupting name→experience flow. Rendered
-          verbatim from model output. Framed as legally optional under the AGG; user's
-          choice; never mandated. The tool does NOT accept, upload, or process photos
-          (zero-retention / T-01-11). */}
+          verbatim from model output (per active UI language). Framed as legally optional
+          under the AGG; user's choice; never mandated. The tool does NOT accept, upload,
+          or process photos server-side (zero-retention / T-01-11) – the frame above is
+          entirely client-side. */}
       {photoAdvice && (
         <details className="mt-4 group">
           <summary className={`${EYEBROW} cursor-pointer select-none list-none`}>
-            Foto (optional) — details
+            {t.photoDetailsSummary}
           </summary>
-          {/* photoAdvice is model-produced text — rendered as a text node, never injected as HTML */}
-          <p className="mt-1 text-sm text-muted">{photoAdvice}</p>
+          {/* photoAdvice is model-produced text – rendered as a text node, never injected as HTML */}
+          <p className="mt-1 text-sm text-muted">{photoAdvice[lang]}</p>
         </details>
       )}
     </div>
@@ -195,6 +273,7 @@ function ExperienceSection({
   experience: ExperienceEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-4">
       {experience.map((exp, i) => (
@@ -205,7 +284,7 @@ function ExperienceSection({
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EXPERIENCE', from: i, to: i - 1 })}
               disabled={i === 0}
-              aria-label="Eintrag nach oben"
+              aria-label={t.removeEntryUp}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↑
@@ -213,14 +292,14 @@ function ExperienceSection({
             <button
               onClick={() => i < experience.length - 1 && dispatch({ type: 'REORDER_EXPERIENCE', from: i, to: i + 1 })}
               disabled={i === experience.length - 1}
-              aria-label="Eintrag nach unten"
+              aria-label={t.removeEntryDown}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↓
             </button>
             <button
               onClick={() => dispatch({ type: 'REMOVE_EXPERIENCE', index: i })}
-              aria-label="Eintrag entfernen"
+              aria-label={t.removeEntryAria}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-sm px-2 py-1"
             >
               ×
@@ -232,7 +311,7 @@ function ExperienceSection({
             <div className="font-semibold text-ink">
               <EditableField
                 value={exp.role}
-                placeholder="+ Berufsbezeichnung"
+                placeholder={t.placeholderRole}
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'role', value: v })}
                 className="font-semibold"
               />
@@ -241,12 +320,12 @@ function ExperienceSection({
             <div className="flex flex-wrap gap-2 text-sm text-muted">
               <EditableField
                 value={exp.company}
-                placeholder="+ Unternehmen"
+                placeholder={t.placeholderCompany}
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'company', value: v })}
               />
               <EditableField
                 value={exp.location}
-                placeholder="+ Standort"
+                placeholder={t.placeholderLocation}
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'location', value: v })}
               />
             </div>
@@ -254,14 +333,14 @@ function ExperienceSection({
             <div className="flex gap-2 text-sm text-muted tabular-nums">
               <EditableField
                 value={exp.start}
-                placeholder="+ Datum"
+                placeholder={t.placeholderDate}
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'start', value: v })}
                 onBlurFormat={softFormatDate}
               />
               <span className="text-muted">–</span>
               <EditableField
                 value={exp.end}
-                placeholder="+ Datum"
+                placeholder={t.placeholderDate}
                 onSave={(v) => dispatch({ type: 'UPDATE_EXPERIENCE', index: i, field: 'end', value: v })}
                 onBlurFormat={softFormatDate}
               />
@@ -274,7 +353,7 @@ function ExperienceSection({
                   <div className="flex-1">
                     <EditableField
                       value={bullet}
-                      placeholder="+ Aufgabe hinzufügen"
+                      placeholder={t.addBullet}
                       multiline
                       onSave={(v) => dispatch({ type: 'UPDATE_BULLET', expIndex: i, bulletIndex: bi, value: v })}
                       className="text-sm"
@@ -282,7 +361,7 @@ function ExperienceSection({
                   </div>
                   <button
                     onClick={() => dispatch({ type: 'REMOVE_BULLET', expIndex: i, bulletIndex: bi })}
-                    aria-label="Eintrag entfernen"
+                    aria-label={t.removeEntryAria}
                     className="opacity-0 group-hover/bullet:opacity-100 focus-within:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
                   >
                     ×
@@ -293,7 +372,7 @@ function ExperienceSection({
                 onClick={() => dispatch({ type: 'ADD_BULLET', expIndex: i })}
                 className="self-start text-sm text-muted hover:text-ink cursor-pointer mt-1"
               >
-                + Aufgabe hinzufügen
+                {t.addBullet}
               </button>
             </div>
           </div>
@@ -305,7 +384,7 @@ function ExperienceSection({
         onClick={() => dispatch({ type: 'ADD_EXPERIENCE' })}
         className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
-        + Berufserfahrung hinzufügen
+        {t.addExperience}
       </button>
     </div>
   )
@@ -318,6 +397,7 @@ function EducationSection({
   education: EducationEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-4">
       {education.map((edu, i) => (
@@ -328,7 +408,7 @@ function EducationSection({
             <button
               onClick={() => i > 0 && dispatch({ type: 'REORDER_EDUCATION', from: i, to: i - 1 })}
               disabled={i === 0}
-              aria-label="Eintrag nach oben"
+              aria-label={t.removeEntryUp}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↑
@@ -336,14 +416,14 @@ function EducationSection({
             <button
               onClick={() => i < education.length - 1 && dispatch({ type: 'REORDER_EDUCATION', from: i, to: i + 1 })}
               disabled={i === education.length - 1}
-              aria-label="Eintrag nach unten"
+              aria-label={t.removeEntryDown}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-ink text-sm px-2 py-1 disabled:opacity-30"
             >
               ↓
             </button>
             <button
               onClick={() => dispatch({ type: 'REMOVE_EDUCATION', index: i })}
-              aria-label="Eintrag entfernen"
+              aria-label={t.removeEntryAria}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-sm px-2 py-1"
             >
               ×
@@ -354,7 +434,7 @@ function EducationSection({
             <div className="font-semibold text-ink">
               <EditableField
                 value={edu.qualification}
-                placeholder="+ Abschluss"
+                placeholder={t.placeholderQualification}
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'qualification', value: v })}
                 className="font-semibold"
               />
@@ -362,26 +442,26 @@ function EducationSection({
             <div className="flex flex-wrap gap-2 text-sm text-muted">
               <EditableField
                 value={edu.institution}
-                placeholder="+ Bildungseinrichtung"
+                placeholder={t.placeholderInstitution}
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'institution', value: v })}
               />
               <EditableField
                 value={edu.location}
-                placeholder="+ Standort"
+                placeholder={t.placeholderLocation}
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'location', value: v })}
               />
             </div>
             <div className="flex gap-2 text-sm text-muted tabular-nums">
               <EditableField
                 value={edu.start}
-                placeholder="+ Datum"
+                placeholder={t.placeholderDate}
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'start', value: v })}
                 onBlurFormat={softFormatDate}
               />
               <span className="text-muted">–</span>
               <EditableField
                 value={edu.end}
-                placeholder="+ Datum"
+                placeholder={t.placeholderDate}
                 onSave={(v) => dispatch({ type: 'UPDATE_EDUCATION', index: i, field: 'end', value: v })}
                 onBlurFormat={softFormatDate}
               />
@@ -394,7 +474,7 @@ function EducationSection({
         onClick={() => dispatch({ type: 'ADD_EDUCATION' })}
         className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
-        + Bildungsabschluss hinzufügen
+        {t.addEducation}
       </button>
     </div>
   )
@@ -419,19 +499,20 @@ function LanguagesSection({
   languages: LanguageEntry[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
+  const { t } = useLang()
   return (
     <div className="flex flex-col gap-2">
       {languages.map((lang, i) => (
         <div key={lang._uid} className="group flex items-center gap-2">
-          {/* Language name — free-text editable */}
+          {/* Language name – free-text editable */}
           <EditableField
             value={lang.language}
-            placeholder="+ Sprache hinzufügen"
+            placeholder={t.placeholderLanguageName}
             onSave={(v) => dispatch({ type: 'UPDATE_LANGUAGE', index: i, field: 'language', value: v })}
             className="text-sm"
           />
-          <span className="text-muted text-sm">—</span>
-          {/* Language level — German-convention dropdown (D-10) */}
+          <span className="text-muted text-sm">:</span>
+          {/* Language level – German-convention dropdown (D-10) */}
           <LanguageLevelSelect
             value={lang.level}
             onChange={(level) =>
@@ -440,7 +521,7 @@ function LanguagesSection({
           />
           <button
             onClick={() => dispatch({ type: 'REMOVE_LANGUAGE', index: i })}
-            aria-label="Eintrag entfernen"
+            aria-label={t.removeEntryAria}
             className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center text-muted hover:text-red-600 text-xs px-1"
           >
             ×
@@ -451,7 +532,7 @@ function LanguagesSection({
         onClick={() => dispatch({ type: 'ADD_LANGUAGE' })}
         className="self-start text-sm text-muted hover:text-ink cursor-pointer"
       >
-        + Sprache hinzufügen
+        {t.addLanguage}
       </button>
     </div>
   )
@@ -466,7 +547,9 @@ export function LebenslaufEditor({
   sectionOrder,
   dispatch,
   photoAdvice,
+  photoUrl,
 }: LebenslaufEditorProps) {
+  const { t } = useLang()
   const renderSection = (key: string) => {
     switch (key) {
       case 'personal':
@@ -475,6 +558,7 @@ export function LebenslaufEditor({
             personal={lebenslauf.personal}
             dispatch={dispatch}
             photoAdvice={photoAdvice}
+            photoUrl={photoUrl}
           />
         )
       case 'experience':
@@ -523,11 +607,11 @@ export function LebenslaufEditor({
                 <p className={`${EYEBROW} flex-1`}>
                   {label}
                 </p>
-                {/* Section ↑/↓ are always visible — deliberate navigation action */}
+                {/* Section ↑/↓ are always visible – deliberate navigation action */}
                 <button
                   onClick={() => i > 0 && dispatch({ type: 'REORDER_SECTION', from: i, to: i - 1 })}
                   disabled={i === 0}
-                  aria-label="Abschnitt nach oben"
+                  aria-label={t.sectionUpAria}
                   className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
                 >
                   ↑
@@ -535,7 +619,7 @@ export function LebenslaufEditor({
                 <button
                   onClick={() => i < sectionOrder.length - 1 && dispatch({ type: 'REORDER_SECTION', from: i, to: i + 1 })}
                   disabled={i === sectionOrder.length - 1}
-                  aria-label="Abschnitt nach unten"
+                  aria-label={t.sectionDownAria}
                   className="text-xs text-muted hover:text-ink px-2 py-1 min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-20"
                 >
                   ↓
