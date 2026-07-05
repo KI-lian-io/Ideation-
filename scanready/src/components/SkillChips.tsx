@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { EditableField } from '@/components/EditableField'
-import type { SkillCategory } from '@/lib/schema'
+import type { UidSkillCategory } from '@/lib/lebenslauf-utils'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { EYEBROW, SKILL_CHIP } from '@/components/ui'
 import { useLang } from '@/lib/i18n'
@@ -26,7 +26,7 @@ export type GermanLanguageLevel = (typeof GERMAN_LANGUAGE_LEVELS)[number]
 // ---------------------------------------------------------------------------
 
 interface SkillChipsProps {
-  skills: SkillCategory[]
+  skills: UidSkillCategory[]
   dispatch: React.Dispatch<LebenslaufAction>
 }
 
@@ -39,7 +39,7 @@ function CategoryChips({
   catIndex,
   dispatch,
 }: {
-  cat: SkillCategory
+  cat: UidSkillCategory
   catIndex: number
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
@@ -110,11 +110,11 @@ function CategoryChips({
       <div className="flex flex-wrap gap-2">
         {cat.skills.map((skill, skillIndex) => (
           <div
-            key={skillIndex}
+            key={skill._uid}
             className={`flex items-center gap-1 ${SKILL_CHIP}`}
           >
             <EditableField
-              value={skill}
+              value={skill.text}
               placeholder={t.placeholderSkill}
               onSave={(v) =>
                 dispatch({ type: 'UPDATE_SKILL', catIndex, skillIndex, value: v })
@@ -153,7 +153,7 @@ export function SkillChips({ skills, dispatch }: SkillChipsProps) {
     <div className="flex flex-col gap-2">
       {skills.map((cat, catIndex) => (
         <CategoryChips
-          key={catIndex}
+          key={cat._uid}
           cat={cat}
           catIndex={catIndex}
           dispatch={dispatch}

@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react'
 import { EditableField } from '@/components/EditableField'
 import { SkillChips, LanguageLevelSelect } from '@/components/SkillChips'
 import { softFormatDate } from '@/lib/lebenslauf-utils'
+import type { WithUid, UidBullet, UidSkillCategory } from '@/lib/lebenslauf-utils'
 import type { Lebenslauf } from '@/lib/schema'
 import { EYEBROW } from '@/components/ui'
 import { useLang } from '@/lib/i18n'
@@ -13,9 +14,12 @@ import { useLang } from '@/lib/i18n'
  * instead of the array index – index keys break when a reorder or remove
  * shifts positions, because EditableField's internal edit-draft state stays
  * attached to the DOM node at that position rather than following the entry.
+ *
+ * Bullets and skills/skill-categories carry the same `_uid` (see
+ * lebenslauf-utils.ts's WithUid/UidBullet/UidSkillCategory) since they suffer
+ * the identical failure mode on REMOVE_BULLET / REMOVE_SKILL(_CATEGORY).
  */
-type WithUid<T> = T & { _uid: string }
-type ExperienceEntry = WithUid<Lebenslauf['experience'][number]>
+type ExperienceEntry = WithUid<Omit<Lebenslauf['experience'][number], 'bullets'>> & { bullets: UidBullet[] }
 type EducationEntry = WithUid<Lebenslauf['education'][number]>
 type LanguageEntry = WithUid<Lebenslauf['languages'][number]>
 
@@ -75,10 +79,11 @@ export function reorder<T>(arr: T[], from: number, to: number): T[] {
 // ---------------------------------------------------------------------------
 
 interface LebenslaufEditorProps {
-  lebenslauf: Omit<Lebenslauf, 'experience' | 'education' | 'languages'> & {
+  lebenslauf: Omit<Lebenslauf, 'experience' | 'education' | 'languages' | 'skills'> & {
     experience: ExperienceEntry[]
     education: EducationEntry[]
     languages: LanguageEntry[]
+    skills: UidSkillCategory[]
   }
   sectionOrder: string[]
   dispatch: React.Dispatch<LebenslaufAction>
@@ -348,11 +353,11 @@ function ExperienceSection({
             {/* Bullets */}
             <div className="flex flex-col gap-1 mt-1">
               {exp.bullets.map((bullet, bi) => (
-                <div key={bi} className="group/bullet flex items-start gap-1">
+                <div key={bullet._uid} className="group/bullet flex items-start gap-1">
                   <span className="text-muted mt-0.5 text-sm select-none">–</span>
                   <div className="flex-1">
                     <EditableField
-                      value={bullet}
+                      value={bullet.text}
                       placeholder={t.addBullet}
                       multiline
                       onSave={(v) => dispatch({ type: 'UPDATE_BULLET', expIndex: i, bulletIndex: bi, value: v })}
@@ -484,7 +489,7 @@ function SkillsSection({
   skills,
   dispatch,
 }: {
-  skills: Lebenslauf['skills']
+  skills: UidSkillCategory[]
   dispatch: React.Dispatch<LebenslaufAction>
 }) {
   return (

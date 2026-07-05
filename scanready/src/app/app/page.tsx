@@ -2,7 +2,14 @@
 import React, { useReducer, useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import type { Lebenslauf } from '@/lib/schema'
-import { isLebenslaufBasicallyEmpty, toPlainText } from '@/lib/lebenslauf-utils'
+import {
+  isLebenslaufBasicallyEmpty,
+  toPlainText,
+  stripUids,
+  withBulletUids,
+  withSkillCategoryUids,
+} from '@/lib/lebenslauf-utils'
+import type { LebenslaufEditorState } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
@@ -27,24 +34,27 @@ const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ss
  * against the same DOM node, silently attaching an in-flight edit to a
  * DIFFERENT entry (bug: index-keyed lists cross-write on reorder/remove).
  *
+ * The same failure mode applies to experience bullets and skills/skill-categories
+ * (raw string[] in the schema): withBulletUids/withSkillCategoryUids in
+ * lebenslauf-utils.ts wrap those the same way.
+ *
  * `_uid` is never sent to the API and never appears in copy/download output:
- * see handleGenerateLetter (uses toPlainText, field-by-field) and toPlainText
- * itself in lebenslauf-utils.ts (also field-by-field, never spreads the entry).
+ * see handleGenerateLetter and ResultView's handleCopy, both of which call
+ * stripUids() before toPlainText (also field-by-field, never spreads the entry).
  */
-type WithUid<T> = T & { _uid: string }
-
-type LebenslaufWithUids = Omit<Lebenslauf, 'experience' | 'education' | 'languages'> & {
-  experience: WithUid<Lebenslauf['experience'][number]>[]
-  education: WithUid<Lebenslauf['education'][number]>[]
-  languages: WithUid<Lebenslauf['languages'][number]>[]
-}
+type LebenslaufWithUids = LebenslaufEditorState
 
 function withUids(l: Lebenslauf): LebenslaufWithUids {
   return {
     ...l,
-    experience: l.experience.map((e) => ({ ...e, _uid: crypto.randomUUID() })),
+    experience: l.experience.map((e) => ({
+      ...e,
+      _uid: crypto.randomUUID(),
+      bullets: withBulletUids(e.bullets),
+    })),
     education: l.education.map((e) => ({ ...e, _uid: crypto.randomUUID() })),
     languages: l.languages.map((lang) => ({ ...lang, _uid: crypto.randomUUID() })),
+    skills: withSkillCategoryUids(l.skills),
   }
 }
 
@@ -167,7 +177,7 @@ function reducer(state: AppState, action: AppAction): AppState {
     }
     case 'ADD_EXPERIENCE': {
       if (!state.lebenslauf) return state
-      const blank = { role: '', company: '', location: null, start: null, end: null, bullets: [], _uid: crypto.randomUUID() }
+      const blank = { role: '', company: '', location: null, start: null, end: null, bullets: [] as ReturnType<typeof withBulletUids>, _uid: crypto.randomUUID() }
       return {
         ...state,
         lebenslauf: {
@@ -204,7 +214,10 @@ function reducer(state: AppState, action: AppAction): AppState {
       if (!state.lebenslauf) return state
       const exp = state.lebenslauf.experience.map((e, i) => {
         if (i !== action.expIndex) return e
-        const bullets = e.bullets.map((b, bi) => (bi === action.bulletIndex ? action.value : b))
+        // Update by array position (dispatch still carries the render-time index),
+        // but only the `text` field changes – `_uid` stays put, so the React key
+        // never moves and an in-flight edit on a sibling bullet can't cross-write.
+        const bullets = e.bullets.map((b, bi) => (bi === action.bulletIndex ? { ...b, text: action.value } : b))
         return { ...e, bullets }
       })
       return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
@@ -213,7 +226,7 @@ function reducer(state: AppState, action: AppAction): AppState {
       if (!state.lebenslauf) return state
       const exp = state.lebenslauf.experience.map((e, i) => {
         if (i !== action.expIndex) return e
-        return { ...e, bullets: [...e.bullets, ''] }
+        return { ...e, bullets: [...e.bullets, { _uid: crypto.randomUUID(), text: '' }] }
       })
       return { ...state, lebenslauf: { ...state.lebenslauf, experience: exp } }
     }
@@ -277,7 +290,9 @@ function reducer(state: AppState, action: AppAction): AppState {
         if (ci !== action.catIndex) return cat
         return {
           ...cat,
-          skills: cat.skills.map((s, si) => (si === action.skillIndex ? action.value : s)),
+          // Same identity rule as UPDATE_BULLET: update `text` in place by position,
+          // `_uid` never moves.
+          skills: cat.skills.map((s, si) => (si === action.skillIndex ? { ...s, text: action.value } : s)),
         }
       })
       return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
@@ -286,7 +301,7 @@ function reducer(state: AppState, action: AppAction): AppState {
       if (!state.lebenslauf) return state
       const skills = state.lebenslauf.skills.map((cat, ci) => {
         if (ci !== action.catIndex) return cat
-        return { ...cat, skills: [...cat.skills, ''] }
+        return { ...cat, skills: [...cat.skills, { _uid: crypto.randomUUID(), text: '' }] }
       })
       return { ...state, lebenslauf: { ...state.lebenslauf, skills } }
     }
@@ -304,7 +319,7 @@ function reducer(state: AppState, action: AppAction): AppState {
         ...state,
         lebenslauf: {
           ...state.lebenslauf,
-          skills: [...state.lebenslauf.skills, { category: '', skills: [] }],
+          skills: [...state.lebenslauf.skills, { category: '', skills: [], _uid: crypto.randomUUID() }],
         },
       }
     }
@@ -671,7 +686,7 @@ function ResultView({
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
 
   async function handleCopy() {
-    const text = toPlainText(lebenslauf, sectionOrder)
+    const text = toPlainText(stripUids(lebenslauf), sectionOrder)
     try {
       await navigator.clipboard.writeText(text)
       setCopyState('copied')
@@ -1327,7 +1342,7 @@ function AppShell() {
     // after PARSE_SUCCESS today, but the invariant is implicit and a future phase-graph
     // refactor could make lebenslauf null here and crash toPlainText(null) (IN-02).
     if (!state.lebenslauf) return
-    const cvText = toPlainText(state.lebenslauf, state.sectionOrder)
+    const cvText = toPlainText(stripUids(state.lebenslauf), state.sectionOrder)
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller

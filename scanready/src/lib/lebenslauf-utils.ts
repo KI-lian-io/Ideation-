@@ -1,4 +1,101 @@
-import type { Lebenslauf } from '@/lib/schema'
+import type { Lebenslauf, SkillCategory } from '@/lib/schema'
+
+// ---------------------------------------------------------------------------
+// Stable identity keys for editable list entries (bullets + skills/categories)
+// ---------------------------------------------------------------------------
+
+/**
+ * Client-side-only stable id wrapper. Mirrors the `_uid` pattern used for
+ * experience/education/language entries in page.tsx: React list keys must
+ * track logical identity, not array position, or a remove/reorder dispatch
+ * shifts indices while an in-flight edit stays attached to the wrong entry
+ * (see page.tsx's WithUid doc comment for the full bug writeup).
+ *
+ * `_uid` never reaches an API payload or copy/download output: the
+ * stripBulletUids/stripSkillUids helpers below are the only place that read
+ * these wrapped shapes and they always emit plain strings.
+ */
+export type WithUid<T> = T & { _uid: string }
+
+/** A bullet, wrapped with a stable id. `text` holds the actual bullet string. */
+export type UidBullet = WithUid<{ text: string }>
+
+/** A skill entry within a category, wrapped with a stable id. */
+export type UidSkill = WithUid<{ text: string }>
+
+/** A skill category, wrapped with a stable id, whose skills are themselves uid-wrapped. */
+export type UidSkillCategory = WithUid<Omit<SkillCategory, 'skills'>> & { skills: UidSkill[] }
+
+/** Wraps a plain bullets array with stable ids (parse / ADD_EXPERIENCE / ADD_BULLET). */
+export function withBulletUids(bullets: string[]): UidBullet[] {
+  return bullets.map((text) => ({ _uid: crypto.randomUUID(), text }))
+}
+
+/** Wraps a plain skills array with stable ids (parse / ADD_SKILL). */
+export function withSkillUids(skills: string[]): UidSkill[] {
+  return skills.map((text) => ({ _uid: crypto.randomUUID(), text }))
+}
+
+/** Wraps a plain skill-categories array (and each category's skills) with stable ids. */
+export function withSkillCategoryUids(categories: SkillCategory[]): UidSkillCategory[] {
+  return categories.map((cat) => ({
+    ...cat,
+    _uid: crypto.randomUUID(),
+    skills: withSkillUids(cat.skills),
+  }))
+}
+
+/** Unwraps a uid-wrapped bullets array back to plain strings – never emits `_uid`. */
+export function stripBulletUids(bullets: UidBullet[]): string[] {
+  return bullets.map((b) => b.text)
+}
+
+/** Unwraps a uid-wrapped skills array back to plain strings – never emits `_uid`. */
+export function stripSkillUids(skills: UidSkill[]): string[] {
+  return skills.map((s) => s.text)
+}
+
+/** Unwraps uid-wrapped skill categories back to the plain schema shape – never emits `_uid`. */
+export function stripSkillCategoryUids(categories: UidSkillCategory[]): SkillCategory[] {
+  return categories.map((cat) => ({
+    category: cat.category,
+    skills: stripSkillUids(cat.skills),
+  }))
+}
+
+/**
+ * Shape of the editor's in-memory Lebenslauf: experience/education/languages
+ * carry `_uid` (assigned in page.tsx's withUids), experience bullets and
+ * skills/skill-categories carry `_uid` via the helpers above. This is the
+ * type toPlainText's callers hold; stripUids below is the single boundary
+ * that converts it back to the plain, API/serialization-safe `Lebenslauf`.
+ */
+export type LebenslaufEditorState = Omit<Lebenslauf, 'experience' | 'education' | 'languages' | 'skills'> & {
+  experience: (WithUid<Omit<Lebenslauf['experience'][number], 'bullets'>> & { bullets: UidBullet[] })[]
+  education: WithUid<Lebenslauf['education'][number]>[]
+  languages: WithUid<Lebenslauf['languages'][number]>[]
+  skills: UidSkillCategory[]
+}
+
+/**
+ * Strips every `_uid` from the editor state, returning the plain `Lebenslauf`
+ * shape the schema/API/serialization expect. This is the single boundary
+ * function: call it before toPlainText or any API payload, never spread a
+ * uid-wrapped entry directly (that would leak `_uid` into copy/download output
+ * or a request body).
+ */
+export function stripUids(l: LebenslaufEditorState): Lebenslauf {
+  return {
+    ...l,
+    experience: l.experience.map(({ _uid, bullets, ...rest }) => ({
+      ...rest,
+      bullets: stripBulletUids(bullets),
+    })),
+    education: l.education.map(({ _uid, ...rest }) => rest),
+    languages: l.languages.map(({ _uid, ...rest }) => rest),
+    skills: stripSkillCategoryUids(l.skills),
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Section heading map: German DIN section names for toPlainText serialization

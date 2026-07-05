@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts src/lib/__tests__/extract-cv.test.ts src/lib/__tests__/lebenslauf-editor-reorder.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts src/lib/__tests__/extract-cv.test.ts src/lib/__tests__/lebenslauf-editor-reorder.test.ts src/lib/__tests__/lebenslauf-uid-boundary.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
