@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LEGAL } from "@/lib/legal-data";
 
-export const metadata: Metadata = { title: "Impressum — ScanReady" };
+export const metadata: Metadata = { title: "Impressum: ScanReady" };
 
 export default function ImpressumPage() {
   return (

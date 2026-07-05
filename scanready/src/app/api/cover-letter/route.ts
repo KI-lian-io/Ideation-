@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
             gate = sentinelVerdict(buffer, false);
             if (gate === "sentinel") {
               // Injection/garbage input: stop paying for tokens and pass the sentinel
-              // through as the (whole) response body — the client recognizes it and
+              // through as the (whole) response body: the client recognizes it and
               // shows a specific German error. No controller.error: that produced an
               // opaque "failed to pipe response" 500.
               stream.controller.abort();

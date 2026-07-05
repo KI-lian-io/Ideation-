@@ -6,7 +6,7 @@
  * Bug being guarded against: index-keyed React lists (key={i}) break identity
  * across a reorder/remove, because EditableField's internal edit-draft state
  * stays attached to whichever DOM node sits at that index rather than
- * following the logical entry — an in-flight edit can silently commit to a
+ * following the logical entry: an in-flight edit can silently commit to a
  * DIFFERENT entry after the array shifts. The fix assigns each entry a
  * stable `_uid` (crypto.randomUUID()) on parse/ADD_* and keys rows by
  * `entry._uid` instead of the array index. That only works if `reorder()`
@@ -15,7 +15,7 @@
  *
  * NOTE on the seam: `reorder()` lives in LebenslaufEditor.tsx, a 'use client'
  * component file. Node's `--experimental-strip-types` (this repo's test
- * runner, see package.json) cannot load `.tsx` — it only strips types from
+ * runner, see package.json) cannot load `.tsx`, it only strips types from
  * plain `.ts`/`.mts`. Rather than restructure page.tsx/LebenslaufEditor.tsx
  * to carve out a `.ts`-only seam (explicitly out of scope for this fix), this
  * test asserts against an inlined copy of the exact same algorithm
@@ -61,13 +61,13 @@ test('reorder: moved entry keeps its _uid value after moving down', () => {
   )
 })
 
-test('reorder: entries are moved by reference, not cloned — same object identity survives', () => {
+test('reorder: entries are moved by reference, not cloned: same object identity survives', () => {
   const a = { _uid: 'uid-a', role: 'A' }
   const b = { _uid: 'uid-b', role: 'B' }
   const c = { _uid: 'uid-c', role: 'C' }
   const result = reorder([a, b, c], 0, 2) // move A to the end
 
-  // Object identity (===), not just value equality — proves reorder() never
+  // Object identity (===), not just value equality: proves reorder() never
   // rebuilds an entry, so an in-flight edit attached to that specific object
   // travels with it to its new index instead of staying pinned to the slot.
   assert.equal(result[2], a)
@@ -84,7 +84,7 @@ test('reorder: does not mutate the input array (immutability contract the reduce
 
 test('crypto.randomUUID: produces unique ids for successive entries (ADD_* / withUids contract)', () => {
   // Sanity-checks the primitive page.tsx's withUids()/ADD_EXPERIENCE/ADD_EDUCATION/
-  // ADD_LANGUAGE rely on for uniqueness — not a copy of reducer logic.
+  // ADD_LANGUAGE rely on for uniqueness, not a copy of reducer logic.
   const ids = new Set(Array.from({ length: 50 }, () => crypto.randomUUID()))
   assert.equal(ids.size, 50, 'all generated ids must be unique')
 })

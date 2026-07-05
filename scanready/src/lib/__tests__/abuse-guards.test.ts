@@ -32,7 +32,7 @@ test('sentinelVerdict: exact sentinel → sentinel', () => {
 })
 
 test('sentinelVerdict: sentinel with leading whitespace and trailing text → sentinel', () => {
-  assert.equal(sentinelVerdict('\n ' + INVALID_INPUT_SENTINEL + ' — details', true), 'sentinel')
+  assert.equal(sentinelVerdict('\n ' + INVALID_INPUT_SENTINEL + ' - details', true), 'sentinel')
 })
 
 test('sentinelVerdict: partial prefix while streaming → pending', () => {

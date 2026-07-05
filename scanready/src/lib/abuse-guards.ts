@@ -7,14 +7,14 @@ import { NextRequest, NextResponse } from "next/server.js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// Re-exported for compat — the sentinel constant/function moved to sentinel.ts
+// Re-exported for compat: the sentinel constant/function moved to sentinel.ts
 // (client-safe: zero imports) so browser code can import it without pulling in
 // this file's server-only baggage (node:crypto, next/server, Upstash).
 export { INVALID_INPUT_SENTINEL, sentinelVerdict } from "./sentinel.ts";
 
 /**
  * Abuse guards for the Claude-backed routes: per-IP rate limiting (Upstash,
- * sliding window, hashed IPs with short TTL — GDPR: Art. 6(1)(f) transient
+ * sliding window, hashed IPs with short TTL, GDPR: Art. 6(1)(f) transient
  * abuse prevention) and a same-origin check for browser-only endpoints.
  *
  * Fail-open by design: if Upstash env vars are unset (local dev, or not yet
@@ -41,7 +41,7 @@ const limiters = new Map<RateBucket, Ratelimit>();
 function getLimiter(bucket: RateBucket): Ratelimit | null {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     if (!warned) {
-      console.warn("abuse-guards: Upstash env unset — rate limiting disabled (fail-open)");
+      console.warn("abuse-guards: Upstash env unset, rate limiting disabled (fail-open)");
       warned = true;
     }
     return null;
@@ -66,7 +66,7 @@ function getLimiter(bucket: RateBucket): Ratelimit | null {
 /**
  * Parse the JSON body of a request; null when malformed or not a plain object.
  * Centralizes the try/catch so a bare `req.json()` (which throws on malformed
- * bodies or non-JSON) can never surface as an uncaught 500 — routes map null
+ * bodies or non-JSON) can never surface as an uncaught 500: routes map null
  * to their existing German 400 shape instead.
  */
 export async function readJsonObject(req: NextRequest): Promise<Record<string, unknown> | null> {
@@ -83,7 +83,7 @@ export type AnswerEntry = { question: string; answer: string };
 
 /**
  * True when `value` is a well-formed answers[] array for /api/cover-letter:
- * a plain array, capped at `maxCount` (default 10 — aggregate-size bypass of
+ * a plain array, capped at `maxCount` (default 10, aggregate-size bypass of
  * the per-field ANSWER_LIMIT otherwise), where every element is a
  * {question, answer} pair of strings. A non-object element (e.g. `null`)
  * would otherwise crash the route with a TypeError on `ans.answer`.
@@ -123,7 +123,7 @@ export async function enforceRateLimit(
     if (success) return null;
     const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
     return NextResponse.json(
-      { error: "Zu viele Anfragen — bitte versuchen Sie es später erneut." },
+      { error: "Zu viele Anfragen, bitte versuchen Sie es später erneut." },
       { status: 429, headers: { "Retry-After": String(retryAfter) } }
     );
   } catch (err) {

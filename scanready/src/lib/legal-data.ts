@@ -2,7 +2,7 @@
  * Founder/operator identity for the legally required pages (§5 DDG, GDPR Art. 13).
  * FOUNDER ACTION REQUIRED: replace every value below with real data before deploy.
  * The build intentionally works with these placeholders so development isn't blocked,
- * but go-live with placeholder values is a legal violation — see docs/humanizer-golive.md.
+ * but go-live with placeholder values is a legal violation: see docs/humanizer-golive.md.
  */
 export const LEGAL = {
   operatorName: "FOUNDER_TODO Vorname Nachname",

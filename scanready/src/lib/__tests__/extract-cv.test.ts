@@ -1,7 +1,7 @@
 /**
- * Behavior tests for extract-cv.ts — the pure guard only.
+ * Behavior tests for extract-cv.ts: the pure guard only.
  * Extraction itself needs a browser File / real PDF; covered by manual browser verification.
- * Uses Node.js built-in test runner (node:test) — no extra dependencies.
+ * Uses Node.js built-in test runner (node:test), no extra dependencies.
  * Run: node --experimental-strip-types --test src/lib/__tests__/extract-cv.test.ts
  */
 import { test } from 'node:test'

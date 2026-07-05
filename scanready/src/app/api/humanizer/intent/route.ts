@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ clientSecret: pi.client_secret });
   } catch (err) {
-    console.error("humanizer intent error", err); // Stripe error only — never user content
+    console.error("humanizer intent error", err); // Stripe error only, never user content
     return NextResponse.json(
       { error: "Zahlung konnte nicht initialisiert werden. Bitte später erneut versuchen." },
       { status: 502 }

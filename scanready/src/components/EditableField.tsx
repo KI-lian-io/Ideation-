@@ -8,7 +8,7 @@ import { useState, useRef, useEffect } from 'react'
  * Active state: a controlled <input> or <textarea> (when multiline=true).
  *
  * Commit triggers: blur and Enter (single-line); blur only (multiline).
- * Cancel trigger: Escape — reverts to original value.
+ * Cancel trigger: Escape, reverts to original value.
  * onBlurFormat: optional post-blur formatter (date fields pass softFormatDate).
  *
  * XSS guard: values are always rendered as text nodes or controlled-input values.
@@ -91,7 +91,7 @@ export function EditableField({
 
   return (
     <span
-      // hover:bg-blue-50 is the only other blue usage — reserved per UI-SPEC
+      // hover:bg-blue-50 is the only other blue usage: reserved per UI-SPEC
       className={`cursor-pointer hover:bg-faint rounded px-1 ${monoClass} ${className ?? ''}`.trim()}
       onClick={() => {
         setDraft(value ?? '')
@@ -101,7 +101,7 @@ export function EditableField({
       {value ? (
         value
       ) : (
-        // Fillable blank — muted italic prompt (D-08)
+        // Fillable blank: muted italic prompt (D-08)
         <span className="text-muted italic">{placeholder}</span>
       )}
     </span>

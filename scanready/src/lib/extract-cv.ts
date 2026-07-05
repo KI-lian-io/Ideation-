@@ -1,6 +1,6 @@
 // src/lib/extract-cv.ts
 /**
- * Client-side CV text extraction. Runs entirely in the browser — the file is
+ * Client-side CV text extraction. Runs entirely in the browser: the file is
  * never uploaded anywhere (zero-retention). unpdf is imported dynamically so
  * the PDF.js payload only loads when a user actually picks a PDF.
  */
@@ -17,7 +17,7 @@ export class CvExtractError extends Error {
   }
 }
 
-/** Pure guard — separated from extraction so it's unit-testable without a File. */
+/** Pure guard, separated from extraction so it's unit-testable without a File. */
 export function validateCvFile(file: { name: string; size: number; type: string }): ExtractError | null {
   if (file.size > MAX_FILE_BYTES) return "too_large";
   const name = file.name.toLowerCase();
@@ -50,10 +50,10 @@ export async function extractCvText(file: File): Promise<string> {
   return cleaned;
 }
 
-/** User-facing message per failure reason (English — matches the app's UI chrome language). */
+/** User-facing message per failure reason (English: matches the app's UI chrome language). */
 export const EXTRACT_ERROR_MESSAGES: Record<ExtractError, string> = {
   too_large: "The file is too large (max. 10 MB).",
   unsupported_type: "Please choose a PDF or .txt file.",
   empty_extraction:
-    "No text could be read from this file — it's probably a scanned PDF. Please copy the text into the field manually instead.",
+    "No text could be read from this file. It's probably a scanned PDF: please copy the text into the field manually instead.",
 };

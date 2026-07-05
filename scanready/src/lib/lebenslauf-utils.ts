@@ -1,7 +1,7 @@
 import type { Lebenslauf } from '@/lib/schema'
 
 // ---------------------------------------------------------------------------
-// Section heading map — German DIN section names for toPlainText serialization
+// Section heading map: German DIN section names for toPlainText serialization
 // ---------------------------------------------------------------------------
 const SECTION_HEADINGS: Record<string, string> = {
   personal: 'Persönliche Daten',
@@ -12,14 +12,14 @@ const SECTION_HEADINGS: Record<string, string> = {
 }
 
 /**
- * Returns true if the parsed Lebenslauf is effectively empty — a sign that
+ * Returns true if the parsed Lebenslauf is effectively empty: a sign that
  * the pasted text was not a real CV (junk paste / D-17 guard).
  *
  * A result is "basically empty" if:
  *   - There is no non-empty name, OR
  *   - There is a name but zero experience AND zero education entries.
  *
- * Intentionally minimal — this is a near-empty guard, not a quality score.
+ * Intentionally minimal: this is a near-empty guard, not a quality score.
  */
 export function isLebenslaufBasicallyEmpty(l: Lebenslauf): boolean {
   const hasName = Boolean(l.personal.fullName?.trim())
@@ -51,7 +51,7 @@ export function softFormatDate(raw: string): string {
 /**
  * Serializes the CURRENT edited Lebenslauf to a clean plain-text block for
  * clipboard copy (D-04). Emits sections in `sectionOrder`; skips null/empty
- * fields cleanly. No HTML, no fabrication — copies only what the user has edited.
+ * fields cleanly. No HTML, no fabrication: copies only what the user has edited.
  */
 export function toPlainText(l: Lebenslauf, sectionOrder: string[]): string {
   const parts: string[] = []
@@ -135,7 +135,7 @@ export function toPlainText(l: Lebenslauf, sectionOrder: string[]): string {
         for (const lang of l.languages) {
           if (lang.language?.trim()) {
             const entry = lang.level?.trim()
-              ? `${lang.language.trim()} — ${lang.level.trim()}`
+              ? `${lang.language.trim()} – ${lang.level.trim()}`
               : lang.language.trim()
             lines.push(entry)
           }

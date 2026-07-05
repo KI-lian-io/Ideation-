@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LEGAL } from "@/lib/legal-data";
 
-export const metadata: Metadata = { title: "Datenschutzerklärung — ScanReady" };
+export const metadata: Metadata = { title: "Datenschutzerklärung: ScanReady" };
 
 /**
  * GDPR Art. 13 notice. Structure mirrors what the product actually does:
@@ -16,7 +16,7 @@ export default function DatenschutzPage() {
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">1. Verantwortlicher</h2>
         <p>
-          {LEGAL.operatorName}, {LEGAL.street}, {LEGAL.city}, {LEGAL.country} —{" "}
+          {LEGAL.operatorName}, {LEGAL.street}, {LEGAL.city}, {LEGAL.country},{" "}
           <a className="underline" href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
         </p>
       </section>

@@ -5,13 +5,13 @@ import { useEffect } from 'react'
  * Scroll-reveal driver. Renders nothing.
  *
  * Hydration-safe by construction: the hidden state lives behind `.reveal-ready`
- * on <html>, which only this effect adds — after hydration. So SSR markup (no
+ * on <html>, which only this effect adds, after hydration. So SSR markup (no
  * reveal-ready → everything visible) matches the client's first render, and
  * without JS the page degrades to fully visible. The reveal CSS is in globals.css.
  */
 export function ScrollReveal() {
   useEffect(() => {
-    // Respect reduced motion: never hide, never animate — leave everything visible.
+    // Respect reduced motion: never hide, never animate. Leave everything visible.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     document.documentElement.classList.add('reveal-ready')

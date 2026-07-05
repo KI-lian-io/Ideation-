@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LEGAL } from "@/lib/legal-data";
 
-export const metadata: Metadata = { title: "AGB & Widerrufsbelehrung — ScanReady" };
+export const metadata: Metadata = { title: "AGB & Widerrufsbelehrung: ScanReady" };
 
 /**
  * Minimal AGB for the single paid feature (Humanizer+ one-shot refinement).
@@ -47,7 +47,7 @@ export default function AgbPage() {
           Die Überarbeitung basiert ausschließlich auf Ihrem eigenen Text; für den Erfolg einer
           Bewerbung wird keine Gewähr übernommen. Bitte lassen Sie das Ergebnis vor dem Versand
           von einem Muttersprachler prüfen. Schlägt die Erstellung nach erfolgreicher Zahlung
-          dauerhaft fehl, erstatten wir den Kaufpreis — Kontakt:{" "}
+          dauerhaft fehl, erstatten wir den Kaufpreis. Kontakt:{" "}
           <a className="underline" href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>.
         </p>
       </section>

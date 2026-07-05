@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ScanReady design system — Warm Editorial Broadsheet. Warm paper, navy ink, taupe label.
+/* ScanReady design system: Warm Editorial Broadsheet. Warm paper, navy ink, taupe label.
    Seven colors, three system-font voices, one curve. No second accent, no shadows. */
 @theme {
   --color-paper: #f0eee9; /* page background, warm off-white */
@@ -11,23 +11,23 @@
   --color-hair: rgba(27, 36, 48, 0.1); /* hairlines, card borders */
   --color-eyebrow: #9a8b72; /* warm taupe, mono labels only */
 
-  /* Deep green — the single CTA / active / focus accent, four tiers (Starbucks-green-on-cream). */
+  /* Deep green: the single CTA / active / focus accent, four tiers (Starbucks-green-on-cream). */
   --color-accent: #0a7d63;
   --color-accent-deep: #0b6e58;
   --color-accent-soft: #d2e9e1;
   --color-accent-tint: #eef6f2;
 
-  /* Functional colors (error/warn/tag) — from the exported ScanReady Design System, additive. */
+  /* Functional colors (error/warn/tag): from the exported ScanReady Design System, additive. */
   --color-brand-error: #c0503c;
   --color-brand-warn: #b9791a;
   --color-brand-tag: #3772cf;
 
-  /* Text ramp additions — annotation body + secondary/caption greys, additive. */
+  /* Text ramp additions: annotation body + secondary/caption greys, additive. */
   --color-ink-soft: #2a3340;
   --color-slate: #4a5160;
   --color-stone: #8a857c;
 
-  /* Signature dark band — navy-to-teal color-block, additive. */
+  /* Signature dark band: navy-to-teal color-block, additive. */
   --color-band-from: #1b2430;
   --color-band-to: #234038;
 
@@ -47,8 +47,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Paper grain — 2–3% opacity SVG turbulence, inline data-URI, single small tile,
-     repeated. Landing page background only (never on .doc-sheet or cards — those
+  /* Paper grain: 2–3% opacity SVG turbulence, inline data-URI, single small tile,
+     repeated. Landing page background only (never on .doc-sheet or cards, those
      stay pristine print surfaces). Imperceptible as texture, perceptible as warmth. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
   background-repeat: repeat;
@@ -58,7 +58,7 @@ body {
   background: rgba(10, 125, 99, 0.18);
 }
 
-/* Scroll reveal — hidden state applies only once JS adds .reveal-ready (see ScrollReveal.tsx).
+/* Scroll reveal: hidden state applies only once JS adds .reveal-ready (see ScrollReveal.tsx).
    Without JS, or before hydration, sections render fully visible. Content rises on enter. */
 .reveal-ready .section-animate {
   opacity: 0;
@@ -72,7 +72,7 @@ body {
   transform: none;
 }
 
-/* Print-sheet document surface — the ONLY elevated surface in the tool. Used for the
+/* Print-sheet document surface: the ONLY elevated surface in the tool. Used for the
    Lebenslauf editor and the Anschreiben (streaming + result), never for chrome/cards. */
 .doc-sheet {
   background: var(--color-card);
@@ -86,12 +86,12 @@ body {
   transition: border-color 0.2s var(--ease-out);
 }
 /* Accessible focus style on the sheet itself (focus-within), so the borderless
-   textarea inside still communicates a clear focus state — hairline → accent. */
+   textarea inside still communicates a clear focus state: hairline → accent. */
 .doc-sheet:focus-within {
   border-color: var(--color-accent);
 }
 
-/* Blinking caret after streamed text — CSS steps, ~1s cycle. */
+/* Blinking caret after streamed text: CSS steps, ~1s cycle. */
 .stream-caret {
   display: inline-block;
   animation: stream-caret-blink 1s steps(1) infinite;
@@ -107,7 +107,7 @@ body {
   }
 }
 
-/* Generic mount reveal — opacity + translateY, one-time (animation, not transition).
+/* Generic mount reveal: opacity + translateY, one-time (animation, not transition).
    Used for phase-transition roots, parse-reveal sections (with --i stagger), and
    one-off completion moments (letter header + sheet). */
 @keyframes rise-in {
@@ -128,7 +128,7 @@ body {
   animation-delay: calc(var(--i, 0) * 60ms);
 }
 
-/* Humanizer+ modal — overlay fade + dialog scale/fade, transform+opacity only. */
+/* Humanizer+ modal: overlay fade + dialog scale/fade, transform+opacity only. */
 @keyframes modal-overlay-fade {
   from {
     opacity: 0;
@@ -154,7 +154,7 @@ body {
   animation: modal-dialog-rise 0.15s var(--ease-out) both;
 }
 
-/* Scan-line sweep — the brand's ONE ownable motion signature. A soft accent-green
+/* Scan-line sweep: the brand's ONE ownable motion signature. A soft accent-green
    band with a crisp 2px leading edge, sweeping top-to-bottom. Used by the hero
    typesetting theater (stage 2) today; reserved for future reuse in LoadingView's
    parse/generate states and a subtle doc-sheet hover-intent moment. Transform only. */
@@ -221,7 +221,7 @@ body {
   }
 }
 
-/* The US date badge — warm red, fades with the source card lines but held
+/* The US date badge: warm red, fades with the source card lines but held
    slightly longer so the eye tracks it into stage 3's snap. */
 .theater-source-date {
   opacity: 1;
@@ -252,7 +252,7 @@ body {
   }
 }
 
-/* The re-typeset date — snaps in mono accent-green with a small settle bounce. */
+/* The re-typeset date: snaps in mono accent-green with a small settle bounce. */
 .theater-date {
   display: inline-block;
   opacity: 0;
@@ -297,7 +297,7 @@ body {
   }
 }
 
-/* Replay affordance — decorative but keyboard-operable (role="button"). */
+/* Replay affordance: decorative but keyboard-operable (role="button"). */
 .theater-stage {
   cursor: pointer;
 }
@@ -306,7 +306,7 @@ body {
   outline-offset: 4px;
 }
 
-/* Masthead double-rule — broadsheet nav treatment (landing only). A 2px ink
+/* Masthead double-rule: broadsheet nav treatment (landing only). A 2px ink
    rule with a 0.5px hairline sitting 3px beneath it, via box-shadow so no
    extra DOM node is needed. */
 .masthead-rule {
@@ -314,7 +314,7 @@ body {
   box-shadow: 0 5px 0 -2.5px var(--color-hair);
 }
 
-/* Registration-mark corner ornament — decorative print detail in the footer.
+/* Registration-mark corner ornament: decorative print detail in the footer.
    A hairline crosshair-in-circle, aria-hidden. Pure CSS, no image request. */
 .reg-mark {
   position: relative;
@@ -360,7 +360,7 @@ body {
     opacity: 1 !important;
   }
 
-  /* Hero typesetting theater — no animation at all. Render the completed
+  /* Hero typesetting theater: no animation at all. Render the completed
      end state statically: source card faded back, sheet fully typeset,
      date already snapped, pins already visible. Must look intentional
      and complete, not like a paused animation. */

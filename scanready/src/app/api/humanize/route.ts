@@ -18,7 +18,7 @@ export const maxDuration = 300;
  *   { letterText: string, direction: 'formeller'|'moderner'|'praegnanter', paymentIntentId: string }
  * Verifies the paid, unconsumed PaymentIntent, streams the refined letter, then marks
  * the PI consumed. Consumed is set only AFTER a complete stream so failures are
- * retryable; the metadata update is not atomic — a deliberate double-submit can get
+ * retryable; the metadata update is not atomic: a deliberate double-submit can get
  * two refinements for one payment (accepted: costs ~cents, spec D8). If the client
  * disconnects mid-stream, `cancel()` aborts the Anthropic stream so the for-await
  * throws and the PI is left unconsumed (retryable) instead of being marked spent.
@@ -100,10 +100,10 @@ export async function POST(req: NextRequest) {
             gate = sentinelVerdict(buffer, false);
             if (gate === "sentinel") {
               // Injection/garbage input: stop paying for tokens and pass the sentinel
-              // through as the (whole) response body — the client recognizes it and
+              // through as the (whole) response body: the client recognizes it and
               // shows a specific German error. No controller.error: that produced an
               // opaque "failed to pipe response" 500. This return is BEFORE the
-              // consume-mark below — the PI stays redeemable, same as any other
+              // consume-mark below: the PI stays redeemable, same as any other
               // failed-refinement path.
               stream.controller.abort();
               controller.enqueue(encoder.encode(INVALID_INPUT_SENTINEL));
@@ -124,12 +124,12 @@ export async function POST(req: NextRequest) {
         try {
           controller.error(err);
         } catch {
-          // stream already cancelled by the client — nothing to signal
+          // stream already cancelled by the client: nothing to signal
         }
         return; // PI stays unconsumed → client may retry
       }
       if (req.signal.aborted) {
-        // Disconnect raced with natural stream completion — the client never
+        // Disconnect raced with natural stream completion: the client never
         // received the full letter, so leave the PI redeemable.
         return;
       }

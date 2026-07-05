@@ -1,5 +1,5 @@
 /**
- * Behavior tests for checkHumanizerPi — pure PaymentIntent gate logic.
+ * Behavior tests for checkHumanizerPi: pure PaymentIntent gate logic.
  * Run: node --experimental-strip-types --test src/lib/__tests__/humanizer.test.ts
  */
 import { test } from 'node:test'
