@@ -467,3 +467,154 @@ body {
     transform: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Print / PDF export (browser print-to-PDF, no PDF library, no server round-trip)
+   ---------------------------------------------------------------------------
+   #print-root hosts exactly one PrintLebenslauf or PrintAnschreiben at a time
+   (mounted by the export handlers in src/app/app/page.tsx). On screen it is
+   display:none + aria-hidden (never part of the visible tool UI or a11y tree).
+   On print, `body.printing-lebenslauf` / `body.printing-letter` (toggled by
+   the handlers around window.print()) flips the visibility: everything else
+   on the page is hidden, #print-root becomes the entire printed document.
+   DIN 5008 A4 margins: left 25mm (binding/hole-punch allowance), 20mm elsewhere. */
+#print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 20mm 20mm 25mm;
+  }
+
+  body.printing-lebenslauf #print-root,
+  body.printing-letter #print-root {
+    display: block;
+  }
+
+  /* Hide everything else on the page while printing. */
+  body.printing-lebenslauf > :not(#print-root),
+  body.printing-letter > :not(#print-root) {
+    display: none !important;
+  }
+
+  /* Print surface: pure black-on-white, no paper tint, no grain, no UI chrome. */
+  body.printing-lebenslauf,
+  body.printing-letter {
+    background: #fff !important;
+    background-image: none !important;
+  }
+
+  .print-sheet {
+    color: #000;
+    background: #fff;
+    font-family: var(--font-serif-text);
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .print-sheet * {
+    color: #000 !important;
+  }
+
+  .print-section {
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+  }
+
+  .print-section-heading {
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 6pt;
+    border-bottom: 0.75pt solid #000;
+    padding-bottom: 2pt;
+  }
+
+  .print-personal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16pt;
+  }
+
+  .print-personal-fields {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .print-name {
+    font-size: 16pt;
+    font-weight: 600;
+    margin-bottom: 4pt;
+  }
+
+  .print-photo {
+    flex-shrink: 0;
+    width: 30mm;
+    height: 40mm;
+    object-fit: cover;
+  }
+
+  .print-line {
+    margin: 0 0 3pt 0;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .print-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8pt;
+  }
+
+  .print-entry {
+    page-break-inside: avoid;
+  }
+
+  .print-entry-title {
+    font-weight: 600;
+  }
+
+  .print-entry-meta {
+    font-size: 10pt;
+  }
+
+  .print-bullets {
+    margin: 4pt 0 0 0;
+    padding-left: 14pt;
+  }
+
+  .print-bullets li {
+    margin-bottom: 2pt;
+    orphans: 2;
+    widows: 2;
+  }
+
+  .print-signature-block {
+    margin-top: 28pt;
+    page-break-inside: avoid;
+  }
+
+  .print-signature-gap {
+    height: 24pt;
+  }
+
+  .print-signature-rule {
+    width: 55mm;
+    border-top: 0.75pt solid #000;
+  }
+
+  .print-signature-caption {
+    font-size: 9pt;
+    margin-top: 2pt;
+  }
+
+  .print-letter-body {
+    white-space: pre-wrap;
+    orphans: 3;
+    widows: 3;
+  }
+}

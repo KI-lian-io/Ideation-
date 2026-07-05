@@ -147,6 +147,30 @@ export function softFormatDate(raw: string): string {
 }
 
 /**
+ * Derives a sensible default "Ort, Datum" line for the DIN closing signature
+ * block on the printed Lebenslauf (see src/components/PrintSheet.tsx). Purely
+ * a display default the user can edit inline before printing: never sent to
+ * any API, never added to the Zod schema, never part of copy/download output.
+ *
+ * City guess: the text after the LAST comma in the free-text address field
+ * (trimmed); empty string when the address has no comma or is empty. Date is
+ * always `now` formatted as German DD.MM.YYYY, via injected Date so this stays
+ * pure/testable (no direct `new Date()` call in this helper).
+ */
+export function defaultOrtDatum(address: string | null | undefined, now: Date): string {
+  const raw = address?.trim() ?? ''
+  const lastComma = raw.lastIndexOf(',')
+  const city = lastComma === -1 ? '' : raw.slice(lastComma + 1).trim()
+
+  const dd = String(now.getDate()).padStart(2, '0')
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const yyyy = String(now.getFullYear())
+  const date = `${dd}.${mm}.${yyyy}`
+
+  return city ? `${city}, ${date}` : date
+}
+
+/**
  * Serializes the CURRENT edited Lebenslauf to a clean plain-text block for
  * clipboard copy (D-04). Emits sections in `sectionOrder`; skips null/empty
  * fields cleanly. No HTML, no fabrication: copies only what the user has edited.

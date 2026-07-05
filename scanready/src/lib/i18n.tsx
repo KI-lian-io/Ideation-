@@ -66,6 +66,12 @@ type Dict = {
   startOverLink: string
   startOverConfirm: string
 
+  // Print / PDF export (browser print-to-PDF, no server round-trip, no PDF library)
+  exportPdfAria: string
+  exportPdfCta: string
+  exportPdfHint: string
+  ortDatumLabel: string
+
   // ErrorView / JunkView
   errorTitle: string
   errorGeneric: string
@@ -266,6 +272,11 @@ const en = {
   copyFailedAria: 'Copy failed.',
   startOverLink: 'Start over / paste a new CV',
   startOverConfirm: 'This discards your converted Lebenslauf. Start over?',
+
+  exportPdfAria: 'Export as PDF',
+  exportPdfCta: 'Export as PDF',
+  exportPdfHint: "Choose 'Save as PDF' in the print dialog.",
+  ortDatumLabel: 'Ort/Datum line for the signature',
 
   errorTitle: 'Something went wrong',
   errorGeneric: 'An unexpected error occurred.',
@@ -469,6 +480,11 @@ const de = {
   copyFailedAria: 'Kopieren fehlgeschlagen.',
   startOverLink: 'Neu beginnen / neuen Lebenslauf einfügen',
   startOverConfirm: 'Damit wird Ihr umgewandelter Lebenslauf verworfen. Neu beginnen?',
+
+  exportPdfAria: 'Als PDF exportieren',
+  exportPdfCta: 'Als PDF exportieren',
+  exportPdfHint: "Wählen Sie im Druckdialog 'Als PDF sichern'.",
+  ortDatumLabel: 'Ort/Datum-Zeile für die Unterschrift',
 
   errorTitle: 'Etwas ist schiefgelaufen',
   errorGeneric: 'Ein unerwarteter Fehler ist aufgetreten.',

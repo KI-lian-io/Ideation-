@@ -29,7 +29,9 @@ export type AnalyticsEvent =
   | "humanizer_done";
 
 type AnalyticsProps = {
-  copy_download: { kind: "lebenslauf_copy" | "letter_copy" | "letter_download" };
+  copy_download: {
+    kind: "lebenslauf_copy" | "letter_copy" | "letter_download" | "lebenslauf_pdf" | "letter_pdf";
+  };
 };
 
 type PropsFor<E extends AnalyticsEvent> = E extends keyof AnalyticsProps ? AnalyticsProps[E] : never;

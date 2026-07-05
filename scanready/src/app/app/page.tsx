@@ -8,11 +8,13 @@ import {
   stripUids,
   withBulletUids,
   withSkillCategoryUids,
+  defaultOrtDatum,
 } from '@/lib/lebenslauf-utils'
 import type { LebenslaufEditorState } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder, DEFAULT_PHOTO_TRANSFORM } from '@/components/LebenslaufEditor'
 import type { LebenslaufAction, PhotoTransform } from '@/components/LebenslaufEditor'
 import { NormGapPanel } from '@/components/NormGapPanel'
+import { PrintLebenslauf, PrintAnschreiben } from '@/components/PrintSheet'
 import { PERSONALIZATION_QUESTIONS, questionsForPosting, recommendDirection } from '@/lib/prompts'
 import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
@@ -697,6 +699,7 @@ function ResultView({
   dispatch,
   onReset,
   onStartCoverLetter,
+  onExportPdf,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -705,10 +708,16 @@ function ResultView({
   dispatch: React.Dispatch<AppAction>
   onReset: () => void
   onStartCoverLetter: () => void
+  onExportPdf: (ortDatum: string) => void
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+  // Ort/Datum line for the DIN signature block on the printed Lebenslauf – a plain,
+  // user-editable string (never part of LebenslaufSchema, never sent to any API; see
+  // PrintSheet.tsx's doc comment). Derived ONCE on first render via lazy initializer
+  // so a later edit to personal.address doesn't silently overwrite what the user typed.
+  const [ortDatum, setOrtDatum] = useState(() => defaultOrtDatum(lebenslauf.personal.address, new Date()))
 
   async function handleCopy() {
     const text = toPlainText(stripUids(lebenslauf), sectionOrder)
@@ -812,6 +821,33 @@ function ResultView({
           >
             {copyState === 'copied' ? t.copied : t.copyLebenslauf}
           </button>
+          {/* Export as PDF – browser print-to-PDF (window.print()), no server round-trip,
+              no PDF library. Ungated today; a follow-up task gates this behind a paid
+              bundle via the single onExportPdf seam (see AppShell's handleExportLebenslaufPdf). */}
+          <button
+            onClick={() => onExportPdf(ortDatum)}
+            aria-label={t.exportPdfAria}
+            className={btnClass('secondary')}
+          >
+            {t.exportPdfCta}
+          </button>
+        </div>
+
+        {/* Ort/Datum for the printed signature block – editable so the user controls
+            exactly what prints (see defaultOrtDatum in lebenslauf-utils.ts). Purely a
+            print-time UI string: never added to the schema, never sent to any API. */}
+        <div className="flex flex-col gap-1 mt-4">
+          <label htmlFor="ort-datum-input" className="text-sm text-muted">
+            {t.ortDatumLabel}
+          </label>
+          <input
+            id="ort-datum-input"
+            type="text"
+            value={ortDatum}
+            onChange={(e) => setOrtDatum(e.target.value)}
+            className="w-full max-w-xs rounded-md border border-hair bg-card px-3 py-1.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          />
+          <p className="text-xs text-muted">{t.exportPdfHint}</p>
         </div>
       </div>
 
@@ -1067,6 +1103,7 @@ function CoverLetterResultView({
   jobPosting,
   onRegenerate,
   onReset,
+  onExportPdf,
   onNewLetter,
 }: {
   letterText: string
@@ -1074,6 +1111,7 @@ function CoverLetterResultView({
   jobPosting: string
   onRegenerate: () => void
   onReset: () => void
+  onExportPdf: () => void
   onNewLetter: () => void
 }) {
   const { t } = useLang()
@@ -1218,6 +1256,17 @@ function CoverLetterResultView({
           {t.downloadCta}
         </button>
 
+        {/* Export as PDF – browser print-to-PDF (window.print()), no server round-trip,
+            no PDF library. Ungated today; a follow-up task gates this behind a paid
+            bundle via the single onExportPdf seam (see AppShell's handleExportLetterPdf). */}
+        <button
+          onClick={onExportPdf}
+          aria-label={t.exportPdfAria}
+          className={`${btnClass('secondary')} shrink-0`}
+        >
+          {t.exportPdfCta}
+        </button>
+
         {/* Regenerate – re-runs same jobPosting + answers from reducer state */}
         <button
           onClick={onRegenerate}
@@ -1252,6 +1301,11 @@ function CoverLetterResultView({
       {/* .txt-only forewarning – sets expectations until PDF export ships */}
       <p className="text-sm text-muted">
         {t.txtForewarning}
+      </p>
+
+      {/* Print-dialog hint – shown once, near the Export as PDF button above */}
+      <p className="text-sm text-muted">
+        {t.exportPdfHint}
       </p>
 
       {originalLetter !== null && (
@@ -1340,11 +1394,49 @@ function AppShell() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [letterText, setLetterText] = useState('')
   const abortRef = useRef<AbortController | null>(null)
+  // Which document (if any) is currently mounted into #print-root for a
+  // window.print() call – single source of truth so only one print-only
+  // region is ever live at a time, regardless of which result view triggered
+  // it. See handlePrintLebenslauf / handlePrintLetter below and the
+  // body.printing-lebenslauf / body.printing-letter CSS toggle in globals.css.
+  const [printJob, setPrintJob] = useState<
+    | { kind: 'lebenslauf'; lebenslauf: Lebenslauf; sectionOrder: string[]; photoUrl: string | null; ortDatum: string }
+    | { kind: 'letter'; letterText: string }
+    | null
+  >(null)
 
   // Abort any in-flight cover-letter request on unmount
   useEffect(() => {
     return () => abortRef.current?.abort()
   }, [])
+
+  // Drives the print-to-PDF flow: once a printJob mounts #print-root's content
+  // and the matching body.printing-* class, wait one paint (rAF) so the browser
+  // has laid out the print-only DOM before calling window.print() – then clear
+  // the job on the browser's own afterprint event, whether the user printed,
+  // saved as PDF, or cancelled the dialog (all three fire afterprint).
+  useEffect(() => {
+    if (!printJob) return
+    const bodyClass = printJob.kind === 'lebenslauf' ? 'printing-lebenslauf' : 'printing-letter'
+    document.body.classList.add(bodyClass)
+
+    function cleanup() {
+      document.body.classList.remove(bodyClass)
+      setPrintJob(null)
+    }
+    window.addEventListener('afterprint', cleanup)
+
+    const raf = requestAnimationFrame(() => {
+      window.print()
+    })
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('afterprint', cleanup)
+      document.body.classList.remove(bodyClass)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- printJob identity change is the only trigger; bodyClass is derived from it
+  }, [printJob])
 
   // Warn before leaving the tab once there's real work in progress – anything past
   // 'input' has either an in-flight request or unsaved generated content the user
@@ -1506,6 +1598,30 @@ function AppShell() {
     await runParse()
   }
 
+  // ---------------------------------------------------------------------------
+  // Print / PDF export – single seam per document (ungated today; a follow-up
+  // task gates these behind a paid bundle). Both route through printJob state
+  // above, which mounts the matching PrintSheet component into #print-root and
+  // triggers window.print() via the printJob effect. No PDF library, no server
+  // round-trip: this is entirely the browser's native print-to-PDF pipeline.
+  // ---------------------------------------------------------------------------
+  function handleExportLebenslaufPdf(ortDatum: string) {
+    if (!state.lebenslauf) return
+    track('copy_download', { kind: 'lebenslauf_pdf' })
+    setPrintJob({
+      kind: 'lebenslauf',
+      lebenslauf: stripUids(state.lebenslauf),
+      sectionOrder: state.sectionOrder,
+      photoUrl: state.photoUrl,
+      ortDatum,
+    })
+  }
+
+  function handleExportLetterPdf() {
+    track('copy_download', { kind: 'letter_pdf' })
+    setPrintJob({ kind: 'letter', letterText })
+  }
+
   return (
     <>
       {/* Top-bar wordmark – links back to the landing (UI-SPEC §F item 2). Same centered
@@ -1552,6 +1668,7 @@ function AppShell() {
               dispatch={dispatch}
               onReset={() => dispatch({ type: 'RESET' })}
               onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
+              onExportPdf={handleExportLebenslaufPdf}
             />
           </div>
         )}
@@ -1603,6 +1720,7 @@ function AppShell() {
               jobPosting={state.jobPosting}
               onRegenerate={handleGenerateLetter}
               onReset={() => dispatch({ type: 'RESET' })}
+              onExportPdf={handleExportLetterPdf}
               onNewLetter={() => {
                 // Clear only the posting – SET_JOB_POSTING('') resyncs the answer list
                 // by question identity, so typed base answers (style/motivation) survive
@@ -1627,6 +1745,23 @@ function AppShell() {
           </div>
         )}
       </main>
+      </div>
+
+      {/* Print-only region for the browser's native print-to-PDF flow (window.print(),
+          driven by the printJob effect above). Invisible on screen (display:none via
+          #print-root in globals.css) and out of the a11y tree – aria-hidden so it never
+          surfaces to assistive tech while sitting in the DOM unprinted. Mounts exactly
+          one document at a time, matching whichever body.printing-* class is active. */}
+      <div id="print-root" aria-hidden="true">
+        {printJob?.kind === 'lebenslauf' && (
+          <PrintLebenslauf
+            lebenslauf={printJob.lebenslauf}
+            sectionOrder={printJob.sectionOrder}
+            photoUrl={printJob.photoUrl}
+            ortDatum={printJob.ortDatum}
+          />
+        )}
+        {printJob?.kind === 'letter' && <PrintAnschreiben letterText={printJob.letterText} />}
       </div>
     </>
   )
