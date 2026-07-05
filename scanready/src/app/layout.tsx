@@ -4,7 +4,7 @@ import "./globals.css";
 
 // Four type voices: Inter (UI prose), Geist Mono (labels/code), Source Serif 4 (the
 // reading serif for the generated Lebenslauf/Anschreiben). Display serif stays a system
-// stack (Iowan/Palatino/Georgia) — defined in globals.css, no web-font load.
+// stack (Iowan/Palatino/Georgia); defined in globals.css, no web-font load.
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 const sourceSerif = Source_Serif_4({ variable: "--font-source-serif", subsets: ["latin"], display: "swap" });
@@ -17,11 +17,11 @@ export const metadata: Metadata = {
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000",
   ),
-  title: "ScanReady — Win the German Recruiter's First Scan",
+  title: "ScanReady: Win the German Recruiter's First Scan",
   description:
     "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
   openGraph: {
-    title: "ScanReady — Win the German Recruiter's First Scan",
+    title: "ScanReady: Win the German Recruiter's First Scan",
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",

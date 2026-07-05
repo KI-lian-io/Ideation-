@@ -3,11 +3,11 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Btn, CARD, EYEBROW } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "ScanReady — Win the German Recruiter's First Scan",
+  title: "ScanReady: Win the German Recruiter's First Scan",
   description:
     "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
   openGraph: {
-    title: "ScanReady — Win the German Recruiter's First Scan",
+    title: "ScanReady: Win the German Recruiter's First Scan",
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Inline lock SVG — reused in hero and trust band
+// Inline lock SVG: reused in hero and trust band
 function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg
@@ -54,10 +54,10 @@ function CheckIcon() {
   );
 }
 
-// Hero typesetting theater — tiny orchestration script (toggles .theater-playing on
+// Hero typesetting theater: tiny orchestration script (toggles .theater-playing on
 // the stage element; all actual motion is CSS keyframes in globals.css). Deferred,
 // inert until the stage scrolls into view. IntersectionObserver starts/pauses the
-// loop; click/tap/keyboard replays from the start. No React state needed — this is
+// loop; click/tap/keyboard replays from the start. No React state needed, this is
 // decorative theater, not app logic, so a plain inline script keeps page.tsx a
 // Server Component (metadata export requires it) without adding a new client file.
 const TYPESETTING_THEATER_SCRIPT = `(function () {
@@ -141,7 +141,7 @@ const SECTION_IDS = {
 export default function HomePage() {
   return (
     <>
-      {/* Navigation — broadsheet masthead: larger display-serif wordmark, double
+      {/* Navigation: broadsheet masthead, larger display-serif wordmark, double
           rule beneath (2px ink + 0.5px hairline, see .masthead-rule), mono dateline. */}
       <nav className="sticky top-0 z-50 bg-paper masthead-rule flex items-center">
         <div className="max-w-4xl mx-auto px-6 w-full h-16 flex items-center justify-between gap-4">
@@ -185,12 +185,12 @@ export default function HomePage() {
 
             <p className="text-base text-muted leading-relaxed max-w-2xl mx-auto mb-10">
               Turn your CV into a norm-correct German Lebenslauf and an
-              Anschreiben that sounds like you — grounded only in your real
+              Anschreiben that sounds like you, grounded only in your real
               facts, never invented. Bilingual output explains every Lebenslauf
               change so you trust what you send.
             </p>
 
-            <CtaLink href="/app" variant="accent">Convert your CV — it&rsquo;s free</CtaLink>
+            <CtaLink href="/app" variant="accent">Convert your CV – it&rsquo;s free</CtaLink>
 
             <p className="mt-4 flex items-center justify-center gap-2 text-sm text-muted">
               <LockIcon />
@@ -198,7 +198,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Hero typesetting theater — decorative spectacle, never a substitute for
+          {/* Hero typesetting theater: decorative spectacle, never a substitute for
               the semantic content above. IntersectionObserver-driven loop (see
               TYPESETTING_THEATER_SCRIPT): scan sweep → lines re-typeset into the
               German sheet → date snaps to DIN mono → DIN annotation pins fade in.
@@ -307,12 +307,12 @@ export default function HomePage() {
                   Authentic voice
                 </p>
                 <h3 className="text-3xl font-semibold text-ink mb-3 leading-snug">
-                  Sounds like you — not a template.
+                  Sounds like you, not a template.
                 </h3>
                 <p className="text-sm text-muted leading-relaxed mb-6">
                   We ask 3–5 questions about your actual motivations, specific
                   achievements, and what draws you to this role. Your answers
-                  become the letter — we never invent an employer, title, date,
+                  become the letter; we never invent an employer, title, date,
                   or skill.
                 </p>
 
@@ -353,15 +353,15 @@ export default function HomePage() {
                 </h3>
                 <p className="text-sm text-muted leading-relaxed mb-4">
                   Whether you&rsquo;re on a Chancenkarte or just never learned the
-                  German format — the rules are the gap, not your experience.
+                  German format, the rules are the gap, not your experience.
                   Reverse-chronological DIN layout, correct date format,
                   personal-data block, photo guidance.
                 </p>
                 <p className="text-sm text-muted leading-relaxed mb-4">
                   The rules aren&rsquo;t what most blogs claim, either: 61% of
                   German recruiters prefer a <em>two-page</em> CV, and 64% call
-                  spelling errors a dealbreaker — DACH recruiter studies, not
-                  imported one-page lore.
+                  spelling errors a dealbreaker (DACH recruiter studies, not
+                  imported one-page lore).
                 </p>
                 <p className="text-sm text-muted italic mb-6">
                   A native German speaker should review the final letter before
@@ -401,7 +401,7 @@ export default function HomePage() {
             </div>
 
             <div className="text-center mt-12">
-              <CtaLink href="/app">Convert your CV — it&rsquo;s free</CtaLink>
+              <CtaLink href="/app">Convert your CV – it&rsquo;s free</CtaLink>
             </div>
           </div>
         </section>
@@ -428,7 +428,7 @@ export default function HomePage() {
                   Paste your CV
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">
-                  Paste your résumé text — US, UK, or any English format. No
+                  Paste your résumé text: US, UK, or any English format. No
                   account, no upload, no storage.
                 </p>
               </div>
@@ -456,14 +456,14 @@ export default function HomePage() {
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">
                   Paste the job posting and answer a few questions about your
-                  real motivations and experience. The letter streams live —
+                  real motivations and experience. The letter streams live,
                   grounded only in your own facts.
                 </p>
               </div>
             </div>
 
             <div className="text-center mt-14">
-              <CtaLink href="/app">Start — it takes 5 minutes</CtaLink>
+              <CtaLink href="/app">Start now – it takes 5 minutes</CtaLink>
             </div>
           </div>
         </section>
@@ -504,7 +504,7 @@ export default function HomePage() {
               </span>
               <span className="flex items-center gap-2">
                 <CheckIcon />
-                Grounded — never fabricated
+                Grounded, never fabricated
               </span>
             </div>
           </div>
@@ -522,26 +522,33 @@ export default function HomePage() {
               id={SECTION_IDS.founder}
               className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-6"
             >
-              Built by someone who needed it.
+              Built by a German, for everyone applying here.
             </h2>
 
             <div className="text-base text-muted leading-relaxed space-y-4">
               <p>
-                I&rsquo;m an expat applying for jobs in Germany. When I tried to
-                convert my CV to a Lebenslauf, every tool either invented
-                experience I don&rsquo;t have or produced generic filler that sounded
-                nothing like me. So I built this.
+                I&rsquo;m German, born and raised, living in Hamburg. I know the
+                Lebenslauf and Anschreiben conventions from the inside: what a
+                recruiter here expects to see, and what quietly signals
+                &ldquo;this person doesn&rsquo;t know the norms.&rdquo;
               </p>
               <p>
-                ScanReady is my dogfooded tool — I&rsquo;m using it on my own live
-                applications. The output is grounded strictly in real facts. The
-                voice comes from your answers to a few honest questions, not a
-                template.
+                I&rsquo;m also applying for jobs myself right now, so I test every
+                change against my own real CV and my own live applications
+                before it ships. When I tried existing tools to speed that up,
+                they either invented experience I don&rsquo;t have or produced
+                generic filler that sounded nothing like me. So I built this
+                instead.
+              </p>
+              <p>
+                ScanReady never invents facts. The German is native-quality
+                because I&rsquo;m native. The voice is yours, built from your own
+                answers to a few honest questions, not a template.
               </p>
             </div>
 
             <p className="mt-8 text-sm font-semibold text-ink">
-              — Kilian Hartmann
+              Kilian Hartmann
             </p>
           </div>
         </section>
@@ -556,15 +563,65 @@ export default function HomePage() {
               id={SECTION_IDS.proof}
               className={`${EYEBROW} mb-4`}
             >
-              Real output — the founder&rsquo;s own application
+              What actually changes
             </p>
+            <h2 className="font-serif text-3xl font-semibold text-ink leading-[1.2] mb-12">
+              Three mechanical fixes, every time.
+            </h2>
 
-            {/* Full before/after founder mockup */}
-            {/* REPLACE WITH REAL CONTENT when founder's real CV excerpt is available */}
+            {/* Norm-transform grid: real, mechanical product behavior, not a testimonial */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+              <div className={`${CARD} px-5 py-6`}>
+                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className="text-sm text-muted italic line-through mb-3">
+                  Mar 2021 – Present
+                </p>
+                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className="text-sm text-ink font-mono mb-4">
+                  03/2021 – heute
+                </p>
+                <p className="text-sm text-muted leading-relaxed">
+                  German date format, and &ldquo;heute&rdquo; instead of
+                  &ldquo;Present.&rdquo;
+                </p>
+              </div>
+
+              <div className={`${CARD} px-5 py-6`}>
+                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className="text-sm text-muted italic line-through mb-3">
+                  German: fluent, English: native
+                </p>
+                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className="text-sm text-ink mb-4">
+                  Deutsch: Verhandlungssicher · Englisch: Muttersprache
+                </p>
+                <p className="text-sm text-muted leading-relaxed">
+                  German recruiters expect German CV vocabulary, not &ldquo;fluent.&rdquo;
+                </p>
+              </div>
+
+              <div className={`${CARD} px-5 py-6`}>
+                <p className={`${EYEBROW} mb-2`}>Before</p>
+                <p className="text-sm text-muted italic line-through mb-3">
+                  Excel, SQL, Forecasting, Driver&rsquo;s license
+                </p>
+                <p className={`${EYEBROW} mb-2`}>After</p>
+                <p className="text-sm text-ink mb-4">
+                  IT-Kenntnisse: Excel, SQL · Fachkenntnisse: Forecasting ·
+                  Sonstige Kenntnisse: Führerschein Klasse B
+                </p>
+                <p className="text-sm text-muted leading-relaxed">
+                  Skills grouped into the categories German recruiters scan for.
+                </p>
+              </div>
+            </div>
+
+            {/* Illustrative example: labeled honestly, not attributed to the founder's real CV */}
+            <p className={`${EYEBROW} mt-10 mb-4`}>Illustrative example</p>
             <div
               className={`${CARD} overflow-hidden mx-auto max-w-2xl text-left`}
               role="img"
-              aria-label="Before and after comparison: original English-format résumé section on the left, converted to a norm-correct German Lebenslauf on the right, with English norm-gap annotation notes visible below the German output"
+              aria-label="Illustrative before and after example: a generic English-format résumé section on top, converted to a norm-correct German Lebenslauf below, with an English norm-gap annotation note under the German output"
             >
               {/* Before panel */}
               <div className="border-b border-hair px-6 py-5">
@@ -572,7 +629,6 @@ export default function HomePage() {
                   Original CV (English)
                 </p>
                 <p className="text-sm text-muted italic leading-relaxed">
-                  {/* REPLACE WITH REAL CONTENT: founder's real résumé excerpt */}
                   &ldquo;Senior Product Manager | Jan 2021–Present | Drove
                   cross-functional alignment across engineering and design to
                   ship three core product features, increasing activation rate
@@ -586,28 +642,32 @@ export default function HomePage() {
                   Lebenslauf Output (German)
                 </p>
                 <p className="text-sm text-ink leading-relaxed mb-3">
-                  {/* REPLACE WITH REAL CONTENT: real Lebenslauf excerpt generated by the tool */}
-                  Senior Product Manager | Jan. 2021 – heute
+                  Senior Product Manager | 01/2021 – heute
                   <br />
                   Führte die bereichsübergreifende Zusammenarbeit zwischen
                   Engineering und Design, um drei Kernproduktfunktionen
-                  einzuführen — Aktivierungsrate um 18&nbsp;% gesteigert.
+                  einzuführen. Aktivierungsrate um 18&nbsp;% gesteigert.
                 </p>
                 <div className="rounded-md bg-paper border border-hair px-3 py-2">
                   <p className="text-sm text-muted">
                     <span className="font-semibold text-ink">
                       Norm note:
                     </span>{" "}
-                    Date reformatted to DIN standard (Jan. 2021); &ldquo;Present&rdquo;
-                    replaced with &ldquo;heute&rdquo; (German norm); percentage formatted
-                    with non-breaking space before symbol.
+                    Date reformatted to the German MM/YYYY convention;
+                    &ldquo;Present&rdquo; replaced with &ldquo;heute&rdquo;; percentage
+                    formatted with a non-breaking space before the symbol.
                   </p>
                 </div>
               </div>
             </div>
 
+            <p className="mt-8 text-sm text-muted max-w-xl mx-auto">
+              No testimonials yet: the tool is new. Judge the output yourself.
+              The first conversion is free.
+            </p>
+
             <div className="mt-12">
-              <CtaLink href="/app">Convert your CV — it&rsquo;s free</CtaLink>
+              <CtaLink href="/app">Convert your CV, it&rsquo;s free</CtaLink>
               <p className="mt-3 text-sm text-muted">
                 No account. No storage. Takes 5 minutes.
               </p>
@@ -619,22 +679,22 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-ink py-10">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Print folio line — mono, broadsheet page-foot convention */}
+          {/* Print folio line: mono, broadsheet page-foot convention */}
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40 mb-4">
-            ScanReady — Seite 1
+            ScanReady · Seite 1
           </p>
           <div className="flex items-center justify-between text-sm text-white/70">
             <p>ScanReady</p>
             <div className="flex items-center gap-4">
               <p>© 2026</p>
-              {/* Registration-mark corner ornament — decorative print detail */}
+              {/* Registration-mark corner ornament: decorative print detail */}
               <span className="reg-mark" aria-hidden="true" />
             </div>
           </div>
         </div>
       </footer>
 
-      {/* Scroll micro-motion — hydration-safe driver (no inline script, no SSR mismatch) */}
+      {/* Scroll micro-motion: hydration-safe driver (no inline script, no SSR mismatch) */}
       <ScrollReveal />
     </>
   );
