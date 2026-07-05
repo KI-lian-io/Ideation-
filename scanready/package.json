@@ -10,12 +10,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts src/lib/__tests__/extract-cv.test.ts src/lib/__tests__/lebenslauf-editor-reorder.test.ts src/lib/__tests__/lebenslauf-uid-boundary.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts src/lib/__tests__/extract-cv.test.ts src/lib/__tests__/lebenslauf-editor-reorder.test.ts src/lib/__tests__/lebenslauf-uid-boundary.test.ts src/lib/__tests__/print-sheet.test.ts src/lib/__tests__/account.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
     "@stripe/react-stripe-js": "^6.7.0",
     "@stripe/stripe-js": "^9.9.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "next": "16.2.9",

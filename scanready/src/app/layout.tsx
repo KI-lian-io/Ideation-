@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { AccountProvider } from "@/components/AccountProvider";
 import "./globals.css";
 
 // Four type voices: Inter (UI prose), Geist Mono (labels/code), Source Serif 4 (the
@@ -36,14 +37,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {children}
-        <footer className="mt-auto border-t border-hair px-6 py-6">
-          <nav className="mx-auto flex w-full max-w-5xl flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
-            <a className="hover:text-ink transition-colors" href="/impressum">Impressum</a>
-            <a className="hover:text-ink transition-colors" href="/datenschutz">Datenschutz</a>
-            <a className="hover:text-ink transition-colors" href="/agb">AGB &amp; Widerruf</a>
-          </nav>
-        </footer>
+        <AccountProvider>
+          {children}
+          <footer className="mt-auto border-t border-hair px-6 py-6">
+            <nav className="mx-auto flex w-full max-w-5xl flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+              <a className="hover:text-ink transition-colors" href="/impressum">Impressum</a>
+              <a className="hover:text-ink transition-colors" href="/datenschutz">Datenschutz</a>
+              <a className="hover:text-ink transition-colors" href="/agb">AGB &amp; Widerruf</a>
+            </nav>
+          </footer>
+        </AccountProvider>
       </body>
     </html>
   );
