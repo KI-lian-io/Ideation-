@@ -54,6 +54,61 @@ function CheckIcon() {
   );
 }
 
+// Hero typesetting theater — tiny orchestration script (toggles .theater-playing on
+// the stage element; all actual motion is CSS keyframes in globals.css). Deferred,
+// inert until the stage scrolls into view. IntersectionObserver starts/pauses the
+// loop; click/tap/keyboard replays from the start. No React state needed — this is
+// decorative theater, not app logic, so a plain inline script keeps page.tsx a
+// Server Component (metadata export requires it) without adding a new client file.
+const TYPESETTING_THEATER_SCRIPT = `(function () {
+  var stage = document.getElementById('typesetting-theater');
+  if (!stage) return;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+
+  var HOLD_MS = 8500; // full sequence (~4.5s) + 4s hold before looping
+  var timer = null;
+
+  function play() {
+    stage.classList.remove('theater-playing');
+    // force reflow so re-adding the class restarts the CSS animations
+    void stage.offsetWidth;
+    stage.classList.add('theater-playing');
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(play, HOLD_MS);
+  }
+
+  function stop() {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  }
+
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          play();
+        } else {
+          stop();
+        }
+      });
+    },
+    { threshold: 0.35 }
+  );
+  observer.observe(stage);
+
+  function replay() {
+    play();
+  }
+  stage.addEventListener('click', replay);
+  stage.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      replay();
+    }
+  });
+})();`;
+
 // CTA link with consistent styling and focus/hover states
 function CtaLink({
   href,
@@ -86,18 +141,22 @@ const SECTION_IDS = {
 export default function HomePage() {
   return (
     <>
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-paper border-b border-hair h-14 flex items-center">
-        <div className="max-w-4xl mx-auto px-6 w-full flex items-center justify-between">
+      {/* Navigation — broadsheet masthead: larger display-serif wordmark, double
+          rule beneath (2px ink + 0.5px hairline, see .masthead-rule), mono dateline. */}
+      <nav className="sticky top-0 z-50 bg-paper masthead-rule flex items-center">
+        <div className="max-w-4xl mx-auto px-6 w-full h-16 flex items-center justify-between gap-4">
           <a
             href="/"
-            className="text-sm font-semibold text-ink tracking-tight focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
+            className="font-serif text-xl sm:text-2xl font-semibold text-ink tracking-tight focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
           >
             ScanReady
-            <span className="text-eyebrow font-mono text-sm ml-1 tracking-normal">
-              DE
-            </span>
           </a>
+          <p
+            className={`${EYEBROW} hidden sm:block flex-1 text-center`}
+            aria-hidden="true"
+          >
+            Bewerbung · Deutschland
+          </p>
           <Btn as="a" href="/app" variant="accent">
             Try it free
           </Btn>
@@ -138,7 +197,95 @@ export default function HomePage() {
               Nothing is stored. Processing is stateless and zero-retention.
             </p>
           </div>
+
+          {/* Hero typesetting theater — decorative spectacle, never a substitute for
+              the semantic content above. IntersectionObserver-driven loop (see
+              TYPESETTING_THEATER_SCRIPT): scan sweep → lines re-typeset into the
+              German sheet → date snaps to DIN mono → DIN annotation pins fade in.
+              Click/tap/Enter/Space replays. Static, complete end-state under
+              prefers-reduced-motion (CSS-only, see globals.css). */}
+          <div className="max-w-3xl mx-auto px-6 mt-16 sm:mt-20">
+            <div
+              id="typesetting-theater"
+              role="button"
+              tabIndex={0}
+              aria-label="Replay the conversion animation"
+              className="theater-stage relative grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-4 rounded-xl"
+            >
+              {/* Left: source résumé card */}
+              <div
+                className="theater-source relative bg-card border border-hair rounded-lg px-5 py-6 shadow-sm"
+                style={{ transform: "rotate(-1.2deg)" }}
+                aria-hidden="true"
+              >
+                <div className="scan-sweep" />
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted mb-4">
+                  RESUME.docx
+                </p>
+                <div className="space-y-2 font-sans">
+                  <div className="h-2 w-3/4 rounded bg-faint" />
+                  <div className="h-2 w-1/2 rounded bg-faint" />
+                  <p className="theater-source-date font-mono text-xs text-brand-error mt-3">
+                    Mar 2024 – Present
+                  </p>
+                  <div className="h-2 w-full rounded bg-faint mt-3" />
+                  <div className="h-2 w-2/3 rounded bg-faint" />
+                </div>
+              </div>
+
+              {/* Center arrow, hidden on mobile stack */}
+              <div className="hidden sm:flex items-center justify-center text-muted" aria-hidden="true">
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 8H26M26 8L19 1M26 8L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+
+              {/* Right: destination Lebenslauf sheet */}
+              <div className="doc-sheet relative px-5 py-6 text-left" aria-hidden="true">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-eyebrow mb-4">
+                  Lebenslauf
+                </p>
+                <div className="space-y-2 font-serif-text">
+                  <div className="theater-line h-2 w-3/4 rounded bg-faint" style={{ "--i": 0 } as React.CSSProperties} />
+                  <div className="theater-line h-2 w-1/2 rounded bg-faint" style={{ "--i": 1 } as React.CSSProperties} />
+                  <p className="theater-line font-mono text-xs text-accent mt-3" style={{ "--i": 2 } as React.CSSProperties}>
+                    <span className="theater-date">03/2024 – heute</span>
+                  </p>
+                  <div className="theater-line h-2 w-full rounded bg-faint mt-3" style={{ "--i": 3 } as React.CSSProperties} />
+                  <div className="theater-line h-2 w-2/3 rounded bg-faint" style={{ "--i": 4 } as React.CSSProperties} />
+                </div>
+
+                {/* DIN annotation pins with hairline leader lines */}
+                <div className="theater-pin flex items-center gap-2 mt-5 pt-3 border-t border-hair" style={{ "--i": 0 } as React.CSSProperties}>
+                  <span className="inline-block h-px w-4 bg-hair" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
+                    DIN 5008
+                  </span>
+                </div>
+                <div className="theater-pin flex items-center gap-2 mt-2" style={{ "--i": 1 } as React.CSSProperties}>
+                  <span className="inline-block h-px w-4 bg-hair" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
+                    Rückwärts chronologisch
+                  </span>
+                </div>
+                <div className="theater-pin flex items-center gap-2 mt-2" style={{ "--i": 2 } as React.CSSProperties}>
+                  <span className="inline-block h-px w-4 bg-hair" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow">
+                    Foto optional (AGG)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
+
+        {/* Orchestration for the hero theater: toggles .theater-playing on the stage
+            node (IntersectionObserver start/pause; click/Enter/Space replay). Tiny,
+            deferred, no-op under prefers-reduced-motion. All motion itself is CSS. */}
+        <script
+          defer
+          dangerouslySetInnerHTML={{ __html: TYPESETTING_THEATER_SCRIPT }}
+        />
 
         {/* ── Section 2: Two-column pathways ── */}
         <section
@@ -471,9 +618,19 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="bg-ink py-10">
-        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between text-sm text-white/70">
-          <p>ScanReady</p>
-          <p>© 2026</p>
+        <div className="max-w-4xl mx-auto px-6">
+          {/* Print folio line — mono, broadsheet page-foot convention */}
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/40 mb-4">
+            ScanReady — Seite 1
+          </p>
+          <div className="flex items-center justify-between text-sm text-white/70">
+            <p>ScanReady</p>
+            <div className="flex items-center gap-4">
+              <p>© 2026</p>
+              {/* Registration-mark corner ornament — decorative print detail */}
+              <span className="reg-mark" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </footer>
 

@@ -47,10 +47,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Paper grain — 2–3% opacity SVG turbulence, inline data-URI, single small tile,
+     repeated. Landing page background only (never on .doc-sheet or cards — those
+     stay pristine print surfaces). Imperceptible as texture, perceptible as warmth. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
 
 ::selection {
-  background: var(--color-faint);
+  background: rgba(10, 125, 99, 0.18);
 }
 
 /* Scroll reveal — hidden state applies only once JS adds .reveal-ready (see ScrollReveal.tsx).
@@ -149,6 +154,197 @@ body {
   animation: modal-dialog-rise 0.15s var(--ease-out) both;
 }
 
+/* Scan-line sweep — the brand's ONE ownable motion signature. A soft accent-green
+   band with a crisp 2px leading edge, sweeping top-to-bottom. Used by the hero
+   typesetting theater (stage 2) today; reserved for future reuse in LoadingView's
+   parse/generate states and a subtle doc-sheet hover-intent moment. Transform only. */
+.scan-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.scan-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 125, 99, 0.1) 45%,
+    rgba(10, 125, 99, 0.1) 55%,
+    transparent 100%
+  );
+  border-top: 2px solid rgba(10, 125, 99, 0.55);
+  transform: translateY(-100%);
+}
+.theater-playing .scan-sweep::after {
+  animation: scan-sweep-pass 1.2s var(--ease-out) both;
+  animation-delay: 0.4s;
+}
+@keyframes scan-sweep-pass {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(350%);
+  }
+}
+
+/* ── Hero typesetting theater ──────────────────────────────────────────────
+   A US résumé card re-typesets into the German Lebenslauf sheet in a
+   choreographed, looping sequence. Orchestrated by toggling `.theater-playing`
+   on the root node (see TypesettingTheater.tsx); IntersectionObserver starts it,
+   click/tap replays it. Transform + opacity only. Full static end-state under
+   prefers-reduced-motion (below). */
+
+/* Stage 1 → held: the source card is visible from the start; it fades down as
+   the sweep finishes and the sheet takes over (stage 3). */
+.theater-source {
+  opacity: 1;
+  transition: none;
+}
+.theater-playing .theater-source {
+  animation: theater-source-fade 0.6s var(--ease-out) both;
+  animation-delay: 1.5s;
+}
+@keyframes theater-source-fade {
+  from {
+    opacity: 1;
+    transform: rotate(-1.2deg) translateY(0);
+  }
+  to {
+    opacity: 0.22;
+    transform: rotate(-1.2deg) translateY(-4px);
+  }
+}
+
+/* The US date badge — warm red, fades with the source card lines but held
+   slightly longer so the eye tracks it into stage 3's snap. */
+.theater-source-date {
+  opacity: 1;
+}
+.theater-playing .theater-source-date {
+  animation: theater-source-fade 0.5s var(--ease-out) both;
+  animation-delay: 1.6s;
+}
+
+/* Stage 3: destination sheet lines re-set into serif, staggered via --i. Each
+   line starts slightly offset + faded, as if freshly typeset. */
+.theater-line {
+  opacity: 0;
+  transform: translateX(10px);
+}
+.theater-playing .theater-line {
+  animation: theater-line-set 0.5s var(--ease-out) both;
+  animation-delay: calc(1.9s + var(--i, 0) * 140ms);
+}
+@keyframes theater-line-set {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* The re-typeset date — snaps in mono accent-green with a small settle bounce. */
+.theater-date {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(1);
+}
+.theater-playing .theater-date {
+  animation: theater-date-settle 0.4s var(--ease-out) both;
+  animation-delay: 2.6s;
+}
+@keyframes theater-date-settle {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stage 4: DIN annotation pins fade in with hairline leader lines, staggered. */
+.theater-pin {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.theater-playing .theater-pin {
+  animation: theater-pin-in 0.45s var(--ease-out) both;
+  animation-delay: calc(3.2s + var(--i, 0) * 220ms);
+}
+@keyframes theater-pin-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Replay affordance — decorative but keyboard-operable (role="button"). */
+.theater-stage {
+  cursor: pointer;
+}
+.theater-stage:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* Masthead double-rule — broadsheet nav treatment (landing only). A 2px ink
+   rule with a 0.5px hairline sitting 3px beneath it, via box-shadow so no
+   extra DOM node is needed. */
+.masthead-rule {
+  border-bottom: 2px solid var(--color-ink);
+  box-shadow: 0 5px 0 -2.5px var(--color-hair);
+}
+
+/* Registration-mark corner ornament — decorative print detail in the footer.
+   A hairline crosshair-in-circle, aria-hidden. Pure CSS, no image request. */
+.reg-mark {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.reg-mark::before,
+.reg-mark::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+}
+.reg-mark::before {
+  left: 50%;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  transform: translateX(-50%);
+}
+.reg-mark::after {
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -162,5 +358,32 @@ body {
   .stream-caret {
     animation: none !important;
     opacity: 1 !important;
+  }
+
+  /* Hero typesetting theater — no animation at all. Render the completed
+     end state statically: source card faded back, sheet fully typeset,
+     date already snapped, pins already visible. Must look intentional
+     and complete, not like a paused animation. */
+  .scan-sweep {
+    display: none !important;
+  }
+  .theater-source {
+    opacity: 0.22 !important;
+    transform: rotate(-1.2deg) !important;
+  }
+  .theater-source-date {
+    opacity: 0.22 !important;
+  }
+  .theater-line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .theater-date {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .theater-pin {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
