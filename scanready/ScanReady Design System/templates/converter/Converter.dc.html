@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="CV converter" description="ScanReady's core two-pane screen — paste source CV + job posting on the left, generated DIN Lebenslauf / Anschreiben on the right" -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: var(--surface); }
+  a { text-decoration: none; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--surface); font-family: var(--font-sans); color: var(--ink);">
+
+  <!-- App bar -->
+  <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter); height: 60px; display: flex; align-items: center; justify-content: space-between;">
+      <img src="../../assets/logo/scanready-lockup.svg" height="22" alt="ScanReady" />
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: var(--fs-body-sm); color: var(--steel);">Zero-retention session</span>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="sm" hint-size="100px,36px">Start over</x-import>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width: 1280px; margin: 0 auto; padding: var(--space-xxxl) var(--gutter); display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); align-items: start;">
+
+    <!-- Left: source -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-xl);">
+      <div>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="80px,16px">Step 1 · Source</x-import>
+        <h1 style="font-family: var(--font-serif); font-size: var(--fs-h2); font-weight: 600; line-height: var(--lh-h2); color: var(--ink); margin: 8px 0 0;">Paste what you have.</h1>
+        <p style="font-size: var(--fs-body-md); line-height: var(--lh-body-md); color: var(--steel); margin: 8px 0 0; max-width: 44ch;">Any language, any format. We read it and reformat to the German norm — nothing is stored.</p>
+      </div>
+
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Input" label="Job posting" placeholder="Paste the full Stellenanzeige here…" hint-size="100%,72px"></x-import>
+
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Input" label="Your current CV" multiline="{{ true }}" rows="{{ 7 }}" max-length="{{ 8000 }}" show-counter="{{ true }}" placeholder="Paste your résumé text…" hint-size="100%,200px"></x-import>
+
+      <div style="display: flex; gap: 12px;">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="180px,48px">Convert to Lebenslauf</x-import>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="ghost" size="lg" hint-size="120px,48px">Clear</x-import>
+      </div>
+    </div>
+
+    <!-- Right: generated document -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="120px,16px">Step 2 · Generated</x-import>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Badge" tone="success" hint-size="100px,22px">Normalized</x-import>
+      </div>
+
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Tabs" items="{{ tabItems }}" value="{{ tab }}" on-change="{{ setTab }}" hint-size="100%,40px"></x-import>
+
+      <!-- Lebenslauf -->
+      <sc-if value="{{ isLebenslauf }}" hint-placeholder-val="{{ true }}">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.DocumentMockup" kicker="Lebenslauf · DIN 5008" title="Max Mustermann" hint-size="100%,420px">
+          <div style="color: var(--steel); font-family: var(--font-sans); font-size: var(--fs-body-sm); margin-bottom: 16px;">Senior Product Manager · Berlin · max@example.de · +49 30 1234567</div>
+          <div style="font-family: var(--font-mono); font-size: var(--fs-eyebrow); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Berufserfahrung</div>
+          <div style="margin-bottom: 14px;"><strong>Jan. 2021 – heute · Acme GmbH</strong><br />Produktstrategie und Roadmap für ein zwölfköpfiges Team; Umsatz um 40&nbsp;% gesteigert.</div>
+          <div style="margin-bottom: 16px;"><strong>2018 – 2020 · Beispiel AG</strong><br />Neuer Onboarding-Flow eingeführt; Nutzeraktivierung um 22&nbsp;% verbessert.</div>
+          <div style="font-family: var(--font-mono); font-size: var(--fs-eyebrow); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Ausbildung</div>
+          <div>2014 – 2017 · M.Sc. Informatik · TU Berlin</div>
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.NormNote" hint-size="100%,44px">Dates reformatted to DIN standard; "Present" → "heute"; sections reordered to the Lebenslauf norm.</x-import>
+        </x-import>
+      </sc-if>
+
+      <!-- Anschreiben -->
+      <sc-if value="{{ isAnschreiben }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.DocumentMockup" kicker="Anschreiben · tuned to the posting" title="Bewerbung als Senior Product Manager" hint-size="100%,420px">
+          <div style="color: var(--steel); font-family: var(--font-sans); font-size: var(--fs-body-sm); margin-bottom: 16px;">Berlin, 28. Juni 2026</div>
+          Sehr geehrte Damen und Herren,<br /><br />
+          mit großem Interesse habe ich Ihre Ausschreibung gelesen. In den letzten fünf Jahren habe ich Produktteams geführt und messbare Ergebnisse erzielt — genau die Verbindung aus Strategie und Umsetzung, die Sie suchen.<br /><br />
+          Über ein persönliches Gespräch freue ich mich sehr.<br /><br />
+          Mit freundlichen Grüßen<br />Max Mustermann
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.NormNote" hint-size="100%,44px">Tone matched to the posting's keywords; closing set to the formal "Mit freundlichen Grüßen".</x-import>
+        </x-import>
+      </sc-if>
+
+      <div style="display: flex; gap: 12px;">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" hint-size="120px,40px">Download PDF</x-import>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="120px,40px">Regenerieren</x-import>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: 'lebenslauf' };
+  renderVals() {
+    const tab = this.state.tab;
+    return {
+      tab,
+      isLebenslauf: tab === 'lebenslauf',
+      isAnschreiben: tab === 'anschreiben',
+      tabItems: [
+        { id: 'lebenslauf', label: 'Lebenslauf' },
+        { id: 'anschreiben', label: 'Anschreiben' },
+      ],
+      setTab: (id) => this.setState({ tab: id }),
+    };
+  }
+}
+</script>
+</body>
+</html>

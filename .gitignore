@@ -1,3 +1,6 @@
 
 # GSD researcher web-fetch cache (not source)
 .planning/research/.cache/
+
+# macOS noise
+.DS_Store

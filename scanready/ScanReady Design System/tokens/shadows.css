@@ -1,0 +1,13 @@
+:root {
+  /* ── Elevation — flat by default; shadow is rare ── */
+  --shadow-none: none;
+  --shadow-card: rgba(27, 36, 48, 0.06) 0px 4px 12px;            /* optional feature-tile lift */
+  /* The one shadowed element: the hero document mockup. */
+  --shadow-mockup: rgba(27, 36, 48, 0.10) 0px 1px 1px, rgba(27, 36, 48, 0.08) 0px 12px 32px -8px;
+  --shadow-brand-glow: rgba(10, 125, 99, 0.10) 0px 8px 24px;     /* featured pricing tier only — green */
+
+  /* ── Motion ───────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --dur-fast: 150ms; /* @kind other */
+  --dur-base: 200ms; /* @kind other */
+}
