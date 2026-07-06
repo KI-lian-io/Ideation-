@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { checkHumanizerPi } from "@/lib/humanizer";
+import { checkHumanizerEntitlement } from "@/lib/humanizer";
 import {
   HUMANIZER_SYSTEM,
   HUMANIZER_DIRECTIONS,
@@ -64,14 +64,18 @@ export async function POST(req: NextRequest) {
       { status: 502 }
     );
   }
-  const check = checkHumanizerPi(pi);
+  // Accepts both PI kinds: a standalone Humanizer+ purchase, or a
+  // Bewerbungspaket whose included refinement is still unused (spec D3).
+  const check = checkHumanizerEntitlement(pi);
   if (!check.ok) {
     const messages: Record<string, string> = {
       not_paid: "Die Zahlung ist noch nicht abgeschlossen.",
       consumed: "Diese Zahlung wurde bereits eingelöst.",
       wrong_feature: "Ungültige Zahlungsreferenz.",
     };
-    return NextResponse.json({ error: messages[check.reason] }, { status: 402 });
+    // reason is machine-readable: the client uses 'consumed' to fall back from
+    // a spent paket refinement to the normal payment step.
+    return NextResponse.json({ error: messages[check.reason], reason: check.reason }, { status: 402 });
   }
 
   const stream = anthropic.messages.stream({
@@ -133,11 +137,17 @@ export async function POST(req: NextRequest) {
         // received the full letter, so leave the PI redeemable.
         return;
       }
-      // Mark consumed only after a full successful stream.
+      // Mark the entitlement spent only after a full successful stream. Which
+      // flag depends on the PI kind: a standalone humanizer PI is fully
+      // consumed; a paket PI only spends its included refinement, the PDF
+      // export unlock (checkPaketPi) must survive this update.
       try {
-        await getStripe().paymentIntents.update(paymentIntentId, {
-          metadata: { feature: "humanizer", consumed: "true" },
-        });
+        await getStripe().paymentIntents.update(
+          paymentIntentId,
+          check.kind === "paket"
+            ? { metadata: { feature: "paket", humanizer_used: "true" } }
+            : { metadata: { feature: "humanizer", consumed: "true" } }
+        );
       } catch (err) {
         console.error("humanize consume-mark error", err); // user got their letter; worst case a free retry window
       }

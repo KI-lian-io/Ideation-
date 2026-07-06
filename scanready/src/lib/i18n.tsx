@@ -168,6 +168,22 @@ type Dict = {
   humanizerPaymentNotCompleted: string
   humanizerPaymentFailedGeneric: string
 
+  // PaketModal (Bewerbungspaket) chrome. Same legal-text rule as the Humanizer:
+  // the Widerruf declaration and the "Zahlungspflichtig bestellen" button
+  // wording are German legal strings in both UI languages.
+  paketEyebrow: string
+  paketTitle: string
+  paketIntro: string
+  paketContentPdf: string
+  paketContentHumanizer: string
+  paketPerApplicationNote: string
+  paketContinueCta: string
+  paketPayCta: string
+  paketLockedExportCta: string
+  paketUnlockedBadge: string
+  paketIncludedRefinementNotice: string
+  paketRefinementSpentNotice: string
+
   // LebenslaufEditor chrome
   addOptionalFields: string
   photoDetailsSummary: string
@@ -324,7 +340,7 @@ const en = {
   humanizerCtaAria: 'Buy Feinschliff mit Humanizer+',
   humanizerCta: 'Feinschliff mit Humanizer+ – 2,99 €',
   overHumanizerLimit: (current) => `Humanizer+ is available for letters up to 10,000 characters – yours is currently ${current}.`,
-  txtForewarning: '.txt for now – paste into your own template. PDF export is coming.',
+  txtForewarning: '.txt download is free. Print-ready PDF export (DIN 5008) is part of the Bewerbungspaket, 4,99 € one-time.',
   restoreOriginal: 'Restore original',
   continuationIntro: 'Applying to more roles? Write another Anschreiben from the same Lebenslauf.',
   newLetterCta: 'New Anschreiben',
@@ -379,6 +395,22 @@ const en = {
   humanizerEmptyResponseError: 'Empty response. Your payment stays valid, please try again.',
   humanizerPaymentNotCompleted: 'Payment not completed. Please try again.',
   humanizerPaymentFailedGeneric: 'Payment failed. You were not charged, please try again.',
+
+  paketEyebrow: 'Bewerbungspaket',
+  paketTitle: 'Print-ready export, 4,99 €',
+  paketIntro:
+    'One-time purchase for this application. Your documents, typeset for print and ready to send:',
+  paketContentPdf: 'Print-ready PDF export of Lebenslauf and Anschreiben (DIN 5008, A4)',
+  paketContentHumanizer: 'One Humanizer+ refinement included (worth 2,99 €)',
+  paketPerApplicationNote: 'Applies to this application. A new application is a new Paket.',
+  paketContinueCta: 'Continue to payment',
+  paketPayCta: 'Zahlungspflichtig bestellen (4,99 €)',
+  paketLockedExportCta: 'Unlock PDF export (4,99 €)',
+  paketUnlockedBadge: 'Bewerbungspaket active',
+  paketIncludedRefinementNotice:
+    'Included in your Bewerbungspaket, no additional payment needed.',
+  paketRefinementSpentNotice:
+    'The refinement included in your Bewerbungspaket has already been used. A further refinement costs 2,99 €.',
 
   addOptionalFields: '+ Add optional fields (Nationalität, Geburtsdatum)',
   photoDetailsSummary: 'Photo (optional) – details',
@@ -532,7 +564,7 @@ const de = {
   humanizerCtaAria: 'Feinschliff mit Humanizer+ kaufen',
   humanizerCta: 'Feinschliff mit Humanizer+ – 2,99 €',
   overHumanizerLimit: (current) => `Humanizer+ ist für Briefe bis 10.000 Zeichen verfügbar – Ihrer hat derzeit ${current}.`,
-  txtForewarning: 'Vorerst nur .txt – in Ihre eigene Vorlage einfügen. PDF-Export folgt.',
+  txtForewarning: 'Der .txt-Download ist kostenlos. Der druckfertige PDF-Export (DIN 5008) ist Teil des Bewerbungspakets, einmalig 4,99 €.',
   restoreOriginal: 'Original wiederherstellen',
   continuationIntro: 'Bewerben Sie sich auf weitere Stellen? Verfassen Sie ein weiteres Anschreiben zum selben Lebenslauf.',
   newLetterCta: 'Neues Anschreiben',
@@ -587,6 +619,22 @@ const de = {
   humanizerEmptyResponseError: 'Leere Antwort. Ihre Zahlung bleibt gültig, bitte versuchen Sie es erneut.',
   humanizerPaymentNotCompleted: 'Zahlung nicht abgeschlossen. Bitte erneut versuchen.',
   humanizerPaymentFailedGeneric: 'Zahlung fehlgeschlagen. Es wurde nichts abgebucht, bitte versuchen Sie es erneut.',
+
+  paketEyebrow: 'Bewerbungspaket',
+  paketTitle: 'Druckfertiger Export, 4,99 €',
+  paketIntro:
+    'Einmalkauf für diese Bewerbung. Ihre Dokumente, druckfertig gesetzt und bereit zum Versand:',
+  paketContentPdf: 'Druckfertiger PDF-Export von Lebenslauf und Anschreiben (DIN 5008, A4)',
+  paketContentHumanizer: 'Ein Humanizer+ Feinschliff inklusive (Wert: 2,99 €)',
+  paketPerApplicationNote: 'Gilt für diese Bewerbung. Eine neue Bewerbung ist ein neues Paket.',
+  paketContinueCta: 'Weiter zur Zahlung',
+  paketPayCta: 'Zahlungspflichtig bestellen (4,99 €)',
+  paketLockedExportCta: 'PDF-Export freischalten (4,99 €)',
+  paketUnlockedBadge: 'Bewerbungspaket aktiv',
+  paketIncludedRefinementNotice:
+    'In Ihrem Bewerbungspaket enthalten, keine weitere Zahlung nötig.',
+  paketRefinementSpentNotice:
+    'Der im Bewerbungspaket enthaltene Feinschliff wurde bereits genutzt. Ein weiterer Feinschliff kostet 2,99 €.',
 
   addOptionalFields: '+ Optionale Felder hinzufügen (Nationalität, Geburtsdatum)',
   photoDetailsSummary: 'Foto (optional) – Details',

@@ -53,11 +53,18 @@ export default function HumanizerModal({
   recommended,
   onClose,
   onDone,
+  prepaidPaymentIntentId = null,
 }: {
   letterText: string
   recommended: HumanizerDirection
   onClose: () => void
   onDone: (refined: string) => void
+  /** A succeeded Bewerbungspaket PaymentIntent id whose included Humanizer+
+   * refinement may still be unused. When set, picking a direction skips the
+   * payment step and refines against this PI directly; if the server answers
+   * 402/consumed (refinement already spent), the modal falls back to the
+   * normal 2,99 € payment step with a notice. */
+  prepaidPaymentIntentId?: string | null
 }) {
   const { t } = useLang()
   const pendingAttempt = useRef(readPaidAttempt()).current
@@ -134,9 +141,10 @@ export default function HumanizerModal({
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [paying, onClose])
 
-  async function pickDirection(d: HumanizerDirection) {
-    setDirection(d)
-    setError(null)
+  // Creates a fresh 2,99 € PaymentIntent and shows the payment step. Used by the
+  // normal purchase path and as the fallback when a paket's included refinement
+  // turns out to be spent.
+  async function startPaidFlow() {
     try {
       const res = await fetch('/api/humanizer/intent', { method: 'POST' })
       const data = await res.json()
@@ -145,16 +153,30 @@ export default function HumanizerModal({
       setStep('payment')
     } catch {
       setError(t.humanizerIntentInitError)
+      setStep('direction')
     }
   }
 
-  async function runRefinement(piId: string) {
+  async function pickDirection(d: HumanizerDirection) {
+    setDirection(d)
+    setError(null)
+    // Bewerbungspaket path: the included refinement is prepaid, skip payment
+    // entirely. Direction is passed explicitly because the `direction` state
+    // set one line above hasn't settled yet in this same tick.
+    if (prepaidPaymentIntentId) {
+      await runRefinement(prepaidPaymentIntentId, d)
+      return
+    }
+    await startPaidFlow()
+  }
+
+  async function runRefinement(piId: string, dir: HumanizerDirection | null = direction) {
     paymentIntentIdRef.current = piId
     // Persist the paid-but-unconsumed attempt (PI id + direction only, never letter
     // content) so a modal remount after a stream failure resumes instead of
     // re-charging via the direction picker.
-    if (direction) {
-      sessionStorage.setItem(PAID_ATTEMPT_KEY, JSON.stringify({ paymentIntentId: piId, direction }))
+    if (dir) {
+      sessionStorage.setItem(PAID_ATTEMPT_KEY, JSON.stringify({ paymentIntentId: piId, direction: dir }))
     }
     setStep('refining')
     setError(null)
@@ -162,10 +184,19 @@ export default function HumanizerModal({
       const res = await fetch('/api/humanize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ letterText, direction, paymentIntentId: piId }),
+        body: JSON.stringify({ letterText, direction: dir, paymentIntentId: piId }),
       })
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}))
+        // Paket fallback: the included refinement was already used (e.g. spent in
+        // an earlier session). Drop the stored attempt (retrying it can never
+        // succeed) and offer the normal 2,99 € purchase with an honest notice.
+        if (res.status === 402 && (data as { reason?: string }).reason === 'consumed' && piId === prepaidPaymentIntentId) {
+          sessionStorage.removeItem(PAID_ATTEMPT_KEY)
+          setError(t.paketRefinementSpentNotice)
+          await startPaidFlow()
+          return
+        }
         throw new Error(data.error ?? t.humanizerRefinementFailedGeneric)
       }
       const reader = res.body.getReader()
@@ -201,7 +232,12 @@ export default function HumanizerModal({
         <div className="flex items-start justify-between">
           <div>
             <p className={EYEBROW}>{t.humanizerEyebrow}</p>
-            <h2 id={headingId} className="font-serif text-2xl font-semibold text-ink">{t.humanizerTitle}</h2>
+            {/* With a paket-included refinement the 2,99 € in the standard title would
+                read like an upcoming charge, so the price is dropped ("Feinschliff" is
+                the product word in both UI languages). */}
+            <h2 id={headingId} className="font-serif text-2xl font-semibold text-ink">
+              {prepaidPaymentIntentId ? 'Feinschliff' : t.humanizerTitle}
+            </h2>
           </div>
           <button onClick={onClose} aria-label={t.humanizerCloseAria} className="text-muted hover:text-ink text-xl leading-none">×</button>
         </div>
@@ -211,6 +247,11 @@ export default function HumanizerModal({
             <p className="text-sm text-muted">
               {t.humanizerDirectionIntro}
             </p>
+            {prepaidPaymentIntentId && (
+              <p className="text-sm font-semibold text-accent">
+                {t.paketIncludedRefinementNotice}
+              </p>
+            )}
             {/* Recommended direction first (personalized from the job posting), then the
                 remaining two in their original relative order: defuses choice paralysis
                 without hiding the alternatives. */}

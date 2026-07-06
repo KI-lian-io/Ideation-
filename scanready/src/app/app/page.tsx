@@ -23,6 +23,12 @@ import { track } from '@/lib/analytics'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
+const PaketModal = dynamic(() => import('@/components/PaketModal'), { ssr: false })
+
+/** sessionStorage key for a paid Bewerbungspaket: stores ONLY the PaymentIntent
+ * id (never document content), so a reload restores the unlock after a server
+ * re-verification instead of charging again. */
+const PAKET_PURCHASE_KEY = 'paket_purchase'
 
 // ---------------------------------------------------------------------------
 // Stable identity keys for editable list entries
@@ -700,6 +706,8 @@ function ResultView({
   onReset,
   onStartCoverLetter,
   onExportPdf,
+  paketUnlocked,
+  onRequestPaket,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -709,6 +717,10 @@ function ResultView({
   onReset: () => void
   onStartCoverLetter: () => void
   onExportPdf: (ortDatum: string) => void
+  /** Bewerbungspaket unlock state, owned by AppShell (Stripe PI in sessionStorage,
+   * server-verified). Locked: the export button opens the purchase modal instead. */
+  paketUnlocked: boolean
+  onRequestPaket: () => void
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
@@ -822,33 +834,41 @@ function ResultView({
             {copyState === 'copied' ? t.copied : t.copyLebenslauf}
           </button>
           {/* Export as PDF – browser print-to-PDF (window.print()), no server round-trip,
-              no PDF library. Ungated today; a follow-up task gates this behind a paid
-              bundle via the single onExportPdf seam (see AppShell's handleExportLebenslaufPdf). */}
+              no PDF library. Gated behind the Bewerbungspaket (4,99 € one-shot per
+              application): locked, the button opens the purchase modal; unlocked, it
+              routes through the single onExportPdf seam (AppShell's
+              handleExportLebenslaufPdf). Copy and .txt download stay free. */}
           <button
-            onClick={() => onExportPdf(ortDatum)}
+            onClick={() => (paketUnlocked ? onExportPdf(ortDatum) : onRequestPaket())}
             aria-label={t.exportPdfAria}
             className={btnClass('secondary')}
           >
-            {t.exportPdfCta}
+            {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
           </button>
         </div>
+        {paketUnlocked && (
+          <p className="mt-2 text-xs font-semibold text-accent">{t.paketUnlockedBadge}</p>
+        )}
 
         {/* Ort/Datum for the printed signature block – editable so the user controls
             exactly what prints (see defaultOrtDatum in lebenslauf-utils.ts). Purely a
-            print-time UI string: never added to the schema, never sent to any API. */}
-        <div className="flex flex-col gap-1 mt-4">
-          <label htmlFor="ort-datum-input" className="text-sm text-muted">
-            {t.ortDatumLabel}
-          </label>
-          <input
-            id="ort-datum-input"
-            type="text"
-            value={ortDatum}
-            onChange={(e) => setOrtDatum(e.target.value)}
-            className="w-full max-w-xs rounded-md border border-hair bg-card px-3 py-1.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-          />
-          <p className="text-xs text-muted">{t.exportPdfHint}</p>
-        </div>
+            print-time UI string: never added to the schema, never sent to any API.
+            Only relevant once printing is unlocked. */}
+        {paketUnlocked && (
+          <div className="flex flex-col gap-1 mt-4">
+            <label htmlFor="ort-datum-input" className="text-sm text-muted">
+              {t.ortDatumLabel}
+            </label>
+            <input
+              id="ort-datum-input"
+              type="text"
+              value={ortDatum}
+              onChange={(e) => setOrtDatum(e.target.value)}
+              className="w-full max-w-xs rounded-md border border-hair bg-card px-3 py-1.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            />
+            <p className="text-xs text-muted">{t.exportPdfHint}</p>
+          </div>
+        )}
       </div>
 
       {/* Exit ramp – demoted to a small muted text link at the very bottom of the view,
@@ -1105,6 +1125,9 @@ function CoverLetterResultView({
   onReset,
   onExportPdf,
   onNewLetter,
+  paketUnlocked,
+  paketPi,
+  onRequestPaket,
 }: {
   letterText: string
   setLetterText: (text: string) => void
@@ -1113,6 +1136,12 @@ function CoverLetterResultView({
   onReset: () => void
   onExportPdf: () => void
   onNewLetter: () => void
+  /** Bewerbungspaket unlock state, owned by AppShell. paketPi is the succeeded
+   * PaymentIntent id; it doubles as the prepaid token for the included
+   * Humanizer+ refinement (HumanizerModal skips payment while it is unspent). */
+  paketUnlocked: boolean
+  paketPi: string | null
+  onRequestPaket: () => void
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1257,14 +1286,16 @@ function CoverLetterResultView({
         </button>
 
         {/* Export as PDF – browser print-to-PDF (window.print()), no server round-trip,
-            no PDF library. Ungated today; a follow-up task gates this behind a paid
-            bundle via the single onExportPdf seam (see AppShell's handleExportLetterPdf). */}
+            no PDF library. Gated behind the Bewerbungspaket (4,99 € one-shot per
+            application): locked, the button opens the purchase modal; unlocked, it
+            routes through the single onExportPdf seam (AppShell's
+            handleExportLetterPdf). Copy and the .txt download stay free. */}
         <button
-          onClick={onExportPdf}
+          onClick={() => (paketUnlocked ? onExportPdf() : onRequestPaket())}
           aria-label={t.exportPdfAria}
           className={`${btnClass('secondary')} shrink-0`}
         >
-          {t.exportPdfCta}
+          {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
         </button>
 
         {/* Regenerate – re-runs same jobPosting + answers from reducer state */}
@@ -1303,10 +1334,12 @@ function CoverLetterResultView({
         {t.txtForewarning}
       </p>
 
-      {/* Print-dialog hint – shown once, near the Export as PDF button above */}
-      <p className="text-sm text-muted">
-        {t.exportPdfHint}
-      </p>
+      {/* Print-dialog hint – only meaningful once the export is unlocked */}
+      {paketUnlocked && (
+        <p className="text-sm text-muted">
+          {t.exportPdfHint}
+        </p>
+      )}
 
       {originalLetter !== null && (
         <button
@@ -1340,6 +1373,7 @@ function CoverLetterResultView({
         <HumanizerModal
           letterText={letterText}
           recommended={recommendDirection(jobPosting, letterText)}
+          prepaidPaymentIntentId={paketPi}
           onClose={() => setHumanizerOpen(false)}
           onDone={(refined) => {
             setOriginalLetter((prev) => prev ?? letterText)
@@ -1404,6 +1438,72 @@ function AppShell() {
     | { kind: 'letter'; letterText: string }
     | null
   >(null)
+
+  // Bewerbungspaket unlock: the succeeded PaymentIntent id (null = locked).
+  // Server-verified before it ever unlocks anything; persisted in
+  // sessionStorage so a reload within the session doesn't re-charge. Per
+  // application by design ("pro Bewerbung", spec D3): RESET clears it.
+  const [paketPi, setPaketPi] = useState<string | null>(null)
+  const [paketOpen, setPaketOpen] = useState(false)
+
+  // Restore a paid Paket after a reload: never trust the stored id alone,
+  // ask the server (Stripe) whether it is a succeeded paket PI. On a definitive
+  // rejection (402: wrong_feature / not_paid) drop the stored id; on transient
+  // failures (network / 502 / 503) keep it stored but stay locked, the next
+  // mount retries.
+  useEffect(() => {
+    const stored = (() => {
+      try {
+        const raw = sessionStorage.getItem(PAKET_PURCHASE_KEY)
+        if (!raw) return null
+        const parsed = JSON.parse(raw)
+        return typeof parsed?.paymentIntentId === 'string' ? (parsed.paymentIntentId as string) : null
+      } catch {
+        return null
+      }
+    })()
+    if (!stored) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch('/api/paket/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId: stored }),
+        })
+        if (cancelled) return
+        if (res.ok) {
+          setPaketPi(stored)
+        } else if (res.status === 402) {
+          sessionStorage.removeItem(PAKET_PURCHASE_KEY)
+        }
+      } catch {
+        // transient: stay locked, keep the stored id for the next attempt
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  function handlePaketUnlocked(paymentIntentId: string) {
+    try {
+      sessionStorage.setItem(PAKET_PURCHASE_KEY, JSON.stringify({ paymentIntentId }))
+    } catch {
+      // storage unavailable (private mode edge case): the in-memory unlock still works
+    }
+    setPaketPi(paymentIntentId)
+    setPaketOpen(false)
+  }
+
+  function clearPaket() {
+    try {
+      sessionStorage.removeItem(PAKET_PURCHASE_KEY)
+    } catch {
+      // ignore: nothing stored
+    }
+    setPaketPi(null)
+  }
 
   // Abort any in-flight cover-letter request on unmount
   useEffect(() => {
@@ -1598,12 +1698,23 @@ function AppShell() {
     await runParse()
   }
 
+  // Full start-over: clears the reducer AND the Bewerbungspaket unlock. The
+  // Paket is "pro Bewerbung" (spec D3): a new application is a new purchase.
+  // Deliberately NOT cleared by onNewLetter (new posting, same Lebenslauf):
+  // re-locking a just-paid export mid-session would read as exactly the trap
+  // pattern the /preise page positions against.
+  function handleReset() {
+    clearPaket()
+    dispatch({ type: 'RESET' })
+  }
+
   // ---------------------------------------------------------------------------
-  // Print / PDF export – single seam per document (ungated today; a follow-up
-  // task gates these behind a paid bundle). Both route through printJob state
-  // above, which mounts the matching PrintSheet component into #print-root and
-  // triggers window.print() via the printJob effect. No PDF library, no server
-  // round-trip: this is entirely the browser's native print-to-PDF pipeline.
+  // Print / PDF export – single seam per document, gated in the result views
+  // behind the Bewerbungspaket unlock (paketPi). Both route through printJob
+  // state above, which mounts the matching PrintSheet component into
+  // #print-root and triggers window.print() via the printJob effect. No PDF
+  // library, no server round-trip: entirely the browser's native
+  // print-to-PDF pipeline.
   // ---------------------------------------------------------------------------
   function handleExportLebenslaufPdf(ortDatum: string) {
     if (!state.lebenslauf) return
@@ -1666,9 +1777,11 @@ function AppShell() {
               photoUrl={state.photoUrl}
               photoTransform={state.photoTransform}
               dispatch={dispatch}
-              onReset={() => dispatch({ type: 'RESET' })}
+              onReset={handleReset}
               onStartCoverLetter={() => dispatch({ type: 'START_COVER_LETTER' })}
               onExportPdf={handleExportLebenslaufPdf}
+              paketUnlocked={paketPi !== null}
+              onRequestPaket={() => setPaketOpen(true)}
             />
           </div>
         )}
@@ -1719,8 +1832,11 @@ function AppShell() {
               setLetterText={setLetterText}
               jobPosting={state.jobPosting}
               onRegenerate={handleGenerateLetter}
-              onReset={() => dispatch({ type: 'RESET' })}
+              onReset={handleReset}
               onExportPdf={handleExportLetterPdf}
+              paketUnlocked={paketPi !== null}
+              paketPi={paketPi}
+              onRequestPaket={() => setPaketOpen(true)}
               onNewLetter={() => {
                 // Clear only the posting – SET_JOB_POSTING('') resyncs the answer list
                 // by question identity, so typed base answers (style/motivation) survive
@@ -1763,6 +1879,16 @@ function AppShell() {
         )}
         {printJob?.kind === 'letter' && <PrintAnschreiben letterText={printJob.letterText} />}
       </div>
+
+      {/* Bewerbungspaket purchase – mounted at shell level because both result views
+          (Lebenslauf + Anschreiben) can open it. Conditionally mounted for the same
+          Stripe.js-cookie reason as HumanizerModal. */}
+      {paketOpen && (
+        <PaketModal
+          onClose={() => setPaketOpen(false)}
+          onUnlocked={handlePaketUnlocked}
+        />
+      )}
     </>
   )
 }
