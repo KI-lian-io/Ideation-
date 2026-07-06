@@ -6,7 +6,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
-import { isLebenslaufBasicallyEmpty, softFormatDate, toPlainText } from '../lebenslauf-utils.ts'
+import {
+  isLebenslaufBasicallyEmpty,
+  softFormatDate,
+  toPlainText,
+  derivePackageTitle,
+  answersToWire,
+  wireAnswersToIds,
+} from '../lebenslauf-utils.ts'
 
 // Minimal shape matching the Lebenslauf type for testing purposes
 function makeLebenslauf(overrides: {
@@ -153,4 +160,70 @@ test('toPlainText: emits Kurzprofil between personal and experience, skips it wh
 
   const withoutProfil = toPlainText(base, order)
   assert.ok(!withoutProfil.includes('Kurzprofil'), 'no empty Kurzprofil heading when profil is null')
+})
+
+// ---------------------------------------------------------------------------
+// Stage 3 accounts: derivePackageTitle / answersToWire / wireAnswersToIds
+// ---------------------------------------------------------------------------
+
+test('derivePackageTitle: falls back to Bewerbung when there is no posting', () => {
+  assert.equal(derivePackageTitle(null), 'Bewerbung')
+  assert.equal(derivePackageTitle(undefined), 'Bewerbung')
+  assert.equal(derivePackageTitle(''), 'Bewerbung')
+  assert.equal(derivePackageTitle('   \n  '), 'Bewerbung')
+})
+
+test('derivePackageTitle: uses the first non-empty line', () => {
+  assert.equal(derivePackageTitle('\n\nSoftware Engineer (m/w/d)\nAcme GmbH'), 'Software Engineer (m/w/d)')
+})
+
+test('derivePackageTitle: truncates long first lines to ~60 chars with an ellipsis', () => {
+  const long = 'A'.repeat(80)
+  const title = derivePackageTitle(long)
+  assert.ok(title.length <= 61, 'truncated title stays near 60 chars')
+  assert.ok(title.endsWith('…'), 'truncated title ends with an ellipsis')
+})
+
+const QUESTIONS = [
+  { id: 'achievement', en: 'Describe an achievement.' },
+  { id: 'why-company', en: 'Why this company?' },
+]
+
+test('answersToWire: maps id-answers to {question, answer} and drops empty answers', () => {
+  const wire = answersToWire(
+    [
+      { id: 'achievement', answer: 'Shipped X' },
+      { id: 'why-company', answer: '   ' },
+    ],
+    QUESTIONS
+  )
+  assert.deepEqual(wire, [{ question: 'Describe an achievement.', answer: 'Shipped X' }])
+})
+
+test('wireAnswersToIds: maps stored wire answers back to ids by English question text', () => {
+  const ids = wireAnswersToIds([{ question: 'Why this company?', answer: 'Great culture' }], QUESTIONS)
+  assert.deepEqual(ids, [
+    { id: 'achievement', answer: '' },
+    { id: 'why-company', answer: 'Great culture' },
+  ])
+})
+
+test('wireAnswersToIds: drops unmatched stored answers (question no longer applies)', () => {
+  const ids = wireAnswersToIds(
+    [{ question: 'A question that no longer exists', answer: 'orphaned' }],
+    QUESTIONS
+  )
+  assert.deepEqual(ids, [
+    { id: 'achievement', answer: '' },
+    { id: 'why-company', answer: '' },
+  ])
+})
+
+test('answersToWire then wireAnswersToIds round-trips non-empty answers', () => {
+  const original = [
+    { id: 'achievement', answer: 'Shipped X' },
+    { id: 'why-company', answer: 'Great culture' },
+  ]
+  const roundTripped = wireAnswersToIds(answersToWire(original, QUESTIONS), QUESTIONS)
+  assert.deepEqual(roundTripped, original)
 })

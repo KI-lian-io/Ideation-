@@ -9,6 +9,9 @@ import {
   withBulletUids,
   withSkillCategoryUids,
   defaultOrtDatum,
+  answersToWire,
+  wireAnswersToIds,
+  derivePackageTitle,
 } from '@/lib/lebenslauf-utils'
 import type { LebenslaufEditorState } from '@/lib/lebenslauf-utils'
 import { LebenslaufEditor, reorder, DEFAULT_PHOTO_TRANSFORM } from '@/components/LebenslaufEditor'
@@ -20,6 +23,16 @@ import { INVALID_INPUT_SENTINEL } from '@/lib/sentinel'
 import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 import { LangProvider, useLang } from '@/lib/i18n'
 import { track } from '@/lib/analytics'
+import { AccountMenu } from '@/components/AccountMenu'
+import { useAccount } from '@/components/AccountProvider'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { accountsEnabled } from '@/lib/supabase/config'
+import {
+  saveApplicationPackage,
+  listPackages,
+  type ApplicationPackageRow,
+  type SaveResult,
+} from '@/lib/account'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
@@ -108,6 +121,15 @@ type AppAction =
   | { type: 'PARSE_ERROR'; payload: string }
   | { type: 'PARSE_JUNK' }
   | { type: 'RESET' }
+  | {
+      type: 'LOAD_PACKAGE'
+      payload: {
+        resumeText: string
+        lebenslauf: Lebenslauf
+        jobPosting: string
+        answers: { id: string; answer: string }[]
+      }
+    }
   | { type: 'START_COVER_LETTER' }
   | { type: 'SET_JOB_POSTING'; payload: string }
   | { type: 'SET_ANSWER'; payload: { id: string; answer: string } }
@@ -154,6 +176,23 @@ function reducer(state: AppState, action: AppAction): AppState {
     case 'RESET':
       revokePhoto(state.photoUrl)
       return initialState
+    case 'LOAD_PACKAGE':
+      // Loads a saved application package into the result phase. lebenslauf arrives
+      // as the plain (uid-free) schema shape from Postgres; wrap it the same way
+      // PARSE_SUCCESS does. Photo is never persisted (zero-retention guardrail for
+      // the display-only crop), so it resets to null/default here.
+      revokePhoto(state.photoUrl)
+      return {
+        ...state,
+        phase: 'result',
+        resumeText: action.payload.resumeText,
+        lebenslauf: withUids(action.payload.lebenslauf),
+        jobPosting: action.payload.jobPosting,
+        answers: action.payload.answers,
+        photoUrl: null,
+        photoTransform: DEFAULT_PHOTO_TRANSFORM,
+        errorMessage: null,
+      }
 
     // -------------------------------------------------------------------------
     // Photo (client-side-only, display-only – see AppState.photoUrl doc comment)
@@ -523,10 +562,14 @@ function InputView({
   resumeText,
   onTextChange,
   onSubmit,
+  onLoadPackage,
 }: {
   resumeText: string
   onTextChange: (text: string) => void
   onSubmit: () => void
+  /** Stage 3 accounts: dispatches LOAD_PACKAGE for the chosen saved application.
+   * SavedApplications renders nothing when accounts are disabled or signed out. */
+  onLoadPackage: (pkg: ApplicationPackageRow) => void
 }) {
   const { t } = useLang()
   const RESUME_LIMIT = 30_000
@@ -652,6 +695,70 @@ function InputView({
       >
         {t.submitCta}
       </button>
+
+      {/* Stage 3 accounts: saved applications for the signed-in user. Renders
+          nothing when accounts are disabled or the user is signed out. */}
+      <SavedApplications onOpen={onLoadPackage} />
+    </div>
+  )
+}
+
+/**
+ * Lists the signed-in user's saved application packages on the input view.
+ * Fetches once when a user is present (accountsEnabled() && user); renders
+ * nothing while signed out or disabled, matching every other Stage 3 UI.
+ */
+function SavedApplications({ onOpen }: { onOpen: (pkg: ApplicationPackageRow) => void }) {
+  const { t } = useLang()
+  const { user } = useAccount()
+  const [packages, setPackages] = useState<ApplicationPackageRow[] | null>(null)
+
+  useEffect(() => {
+    if (!accountsEnabled() || !user) {
+      setPackages(null)
+      return
+    }
+    let cancelled = false
+    listPackages(getSupabaseBrowserClient(), user.id).then((rows) => {
+      if (!cancelled) setPackages(rows)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [user])
+
+  if (!accountsEnabled() || !user || packages === null) return null
+
+  return (
+    <div className="mt-2 flex flex-col gap-3 border-t border-hair pt-6">
+      <p className={EYEBROW}>{t.savedApplicationsHeading}</p>
+      {packages.length === 0 ? (
+        <p className="text-sm text-muted">{t.savedApplicationsEmpty}</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {packages.map((pkg) => (
+            <li
+              key={pkg.id}
+              className="flex items-center justify-between gap-3 rounded-md border border-hair bg-paper px-4 py-3"
+            >
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="text-sm font-semibold text-ink truncate">{pkg.title}</span>
+                <span className="text-xs text-muted">
+                  {t.savedApplicationsUpdated(new Date(pkg.updated_at).toLocaleDateString('de-DE'))}
+                  {pkg.read_only && (
+                    <span className="ml-2 font-mono uppercase tracking-[0.1em] text-eyebrow">
+                      {t.savedApplicationsReadOnlyBadge}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <button onClick={() => onOpen(pkg)} className={`${btnClass('secondary')} shrink-0`}>
+                {t.savedApplicationsOpen}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
@@ -708,6 +815,7 @@ function ResultView({
   onExportPdf,
   paketUnlocked,
   onRequestPaket,
+  onSavePackage,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -721,6 +829,9 @@ function ResultView({
    * server-verified). Locked: the export button opens the purchase modal instead. */
   paketUnlocked: boolean
   onRequestPaket: () => void
+  /** Stage 3 accounts: saves the current Lebenslauf (anschreiben: null at this
+   * step). Renders nothing via SaveApplicationButton when accounts are disabled. */
+  onSavePackage: () => Promise<SaveResult | 'signed_out'>
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
@@ -850,6 +961,12 @@ function ResultView({
           <p className="mt-2 text-xs font-semibold text-accent">{t.paketUnlockedBadge}</p>
         )}
 
+        {/* Stage 3 accounts: save this Lebenslauf (anschreiben: null at this step).
+            Renders nothing when accounts are disabled. */}
+        <div className="mt-4">
+          <SaveApplicationButton onSave={onSavePackage} />
+        </div>
+
         {/* Ort/Datum for the printed signature block – editable so the user controls
             exactly what prints (see defaultOrtDatum in lebenslauf-utils.ts). Purely a
             print-time UI string: never added to the schema, never sent to any API.
@@ -879,6 +996,72 @@ function ResultView({
       >
         {t.startOverLink}
       </button>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Save application (Stage 3 accounts) – shared between ResultView and
+// CoverLetterResultView. Renders nothing when accounts are disabled. Never
+// auto-saves: only fires on the explicit button click (zero-retention
+// guardrail for the anonymous flow, and honest about what accounts do).
+// ---------------------------------------------------------------------------
+function SaveApplicationButton({
+  onSave,
+}: {
+  onSave: () => Promise<SaveResult | 'signed_out'>
+}) {
+  const { t } = useLang()
+  const [state, setState] = useState<
+    'idle' | 'saving' | 'saved' | 'signed_out' | 'limit' | 'error'
+  >('idle')
+
+  if (!accountsEnabled()) return null
+
+  async function handleClick() {
+    setState('saving')
+    const result = await onSave()
+    if (result === 'signed_out') {
+      setState('signed_out')
+      return
+    }
+    if (result.ok) {
+      setState('saved')
+      return
+    }
+    setState(result.reason)
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={handleClick}
+        disabled={state === 'saving'}
+        className={btnClass('secondary')}
+      >
+        {state === 'saving' ? t.saveApplicationSaving : t.saveApplicationCta}
+      </button>
+      <span className="sr-only" aria-live="polite">
+        {state === 'saved' ? t.saveApplicationSaved : ''}
+      </span>
+      {state === 'saved' && <p className="text-sm text-accent">{t.saveApplicationSaved}</p>}
+      {state === 'signed_out' && (
+        <p className="text-sm text-muted">
+          {t.saveApplicationSignedOutHint}{' '}
+          <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
+            {t.kontoLink}
+          </a>
+        </p>
+      )}
+      {state === 'limit' && (
+        <p className="text-sm text-muted">
+          {t.saveApplicationLimitHint}{' '}
+          <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
+            {t.kontoLink}
+          </a>
+        </p>
+      )}
+      {state === 'error' && <p className="text-sm text-red-600">{t.saveApplicationErrorHint}</p>}
     </div>
   )
 }
@@ -1128,6 +1311,7 @@ function CoverLetterResultView({
   paketUnlocked,
   paketPi,
   onRequestPaket,
+  onSavePackage,
 }: {
   letterText: string
   setLetterText: (text: string) => void
@@ -1142,6 +1326,9 @@ function CoverLetterResultView({
   paketUnlocked: boolean
   paketPi: string | null
   onRequestPaket: () => void
+  /** Stage 3 accounts: saves the current Lebenslauf + letter. Renders nothing
+   * via SaveApplicationButton when accounts are disabled. */
+  onSavePackage: () => Promise<SaveResult | 'signed_out'>
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1317,6 +1504,10 @@ function CoverLetterResultView({
         </button>
       </div>
 
+      {/* Stage 3 accounts: save this Lebenslauf + letter. Renders nothing when
+          accounts are disabled. */}
+      <SaveApplicationButton onSave={onSavePackage} />
+
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
         {t.priceAnchor}
@@ -1425,6 +1616,7 @@ async function describeFetchFailure(
 
 function AppShell() {
   const { t } = useLang()
+  const { user } = useAccount()
   const [state, dispatch] = useReducer(reducer, initialState)
   const [letterText, setLetterText] = useState('')
   const abortRef = useRef<AbortController | null>(null)
@@ -1557,6 +1749,30 @@ function AppShell() {
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [state.phase])
+
+  // Explicit user action only (no auto-save – zero-retention guardrail). Re-checks
+  // auth via the browser client at click time (not just AccountProvider's context
+  // state), since the user may have signed in from another tab after this page
+  // mounted. Returns a typed outcome the two result views render feedback for.
+  async function handleSavePackage(anschreiben: string | null): Promise<SaveResult | 'signed_out'> {
+    if (!accountsEnabled()) return { ok: false, reason: 'error', message: 'accounts_disabled' }
+    const client = getSupabaseBrowserClient()
+    const {
+      data: { user: freshUser },
+    } = await client.auth.getUser()
+    if (!freshUser) return 'signed_out'
+    if (!state.lebenslauf) return { ok: false, reason: 'error', message: 'no_lebenslauf' }
+
+    const questions = questionsForPosting(state.jobPosting)
+    return saveApplicationPackage(client, freshUser.id, {
+      cvText: state.resumeText,
+      jobPosting: state.jobPosting || null,
+      answers: answersToWire(state.answers, questions),
+      lebenslauf: stripUids(state.lebenslauf),
+      anschreiben,
+      packageTitle: derivePackageTitle(state.jobPosting),
+    })
+  }
 
   async function handleGenerateLetter() {
     // Explicit guard instead of a non-null assertion: this path is only reachable
@@ -1733,6 +1949,35 @@ function AppShell() {
     setPrintJob({ kind: 'letter', letterText })
   }
 
+  // Opens a saved application package into the tool. cv_text lives on the
+  // separate `cvs` row (account.ts's ApplicationPackageRow only carries
+  // cv_id), so this reads it directly via the browser client rather than
+  // extending account.ts's query shape. Wire answers ({question: en-text,
+  // answer}) are mapped back to reducer-state {id, answer} by matching against
+  // the current question list for the stored posting; unmatched stored answers
+  // are dropped. Opening a read_only package is allowed (view/copy): re-saving
+  // always inserts a NEW row, which the DB limit trigger blocks for free
+  // accounts, so the read-only row itself can never be overwritten.
+  async function handleLoadPackage(pkg: ApplicationPackageRow) {
+    const client = getSupabaseBrowserClient()
+    const { data: cv } = await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()
+    const jobPosting = pkg.job_posting ?? ''
+    const questions = questionsForPosting(jobPosting)
+    dispatch({
+      type: 'LOAD_PACKAGE',
+      payload: {
+        resumeText: (cv as { cv_text?: string } | null)?.cv_text ?? '',
+        lebenslauf: pkg.lebenslauf,
+        jobPosting,
+        answers: wireAnswersToIds(pkg.answers, questions),
+      },
+    })
+    if (pkg.anschreiben) {
+      setLetterText(pkg.anschreiben)
+      dispatch({ type: 'COVER_LETTER_DONE' })
+    }
+  }
+
   return (
     <>
       {/* Top-bar wordmark – links back to the landing (UI-SPEC §F item 2). Same centered
@@ -1744,7 +1989,10 @@ function AppShell() {
             ScanReady
             <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
           </a>
-          <LangToggle />
+          <div className="flex items-center gap-4">
+            <AccountMenu />
+            <LangToggle />
+          </div>
         </div>
       </div>
 
@@ -1759,6 +2007,7 @@ function AppShell() {
               resumeText={state.resumeText}
               onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
               onSubmit={handleSubmit}
+              onLoadPackage={handleLoadPackage}
             />
           </div>
         )}
@@ -1782,6 +2031,7 @@ function AppShell() {
               onExportPdf={handleExportLebenslaufPdf}
               paketUnlocked={paketPi !== null}
               onRequestPaket={() => setPaketOpen(true)}
+              onSavePackage={() => handleSavePackage(null)}
             />
           </div>
         )}
@@ -1845,6 +2095,7 @@ function AppShell() {
                 dispatch({ type: 'SET_JOB_POSTING', payload: '' })
                 dispatch({ type: 'START_COVER_LETTER' })
               }}
+              onSavePackage={() => handleSavePackage(letterText)}
             />
           </div>
         )}

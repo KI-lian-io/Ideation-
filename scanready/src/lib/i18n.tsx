@@ -245,6 +245,41 @@ type Dict = {
     empty_extraction: string
   }
   extractGenericError: string
+
+  // Stage 3 accounts – AccountMenu, save action, load list, /konto
+  accountSignIn: string
+  accountLink: string
+  accountSignOut: string
+  saveApplicationCta: string
+  saveApplicationSaving: string
+  saveApplicationSaved: string
+  saveApplicationSignedOutHint: string
+  saveApplicationLimitHint: string
+  saveApplicationErrorHint: string
+  kontoLink: string
+  savedApplicationsHeading: string
+  savedApplicationsUpdated: (date: string) => string
+  savedApplicationsReadOnlyBadge: string
+  savedApplicationsOpen: string
+  savedApplicationsEmpty: string
+  kontoDisabledNotice: string
+  kontoSignInIntro: string
+  kontoSavedHeading: string
+  kontoSavedHint: string
+  kontoDeleteConfirm: string
+  kontoDeleteCta: string
+  kontoSubscriptionHeading: string
+  kontoSubscriptionActive: (date: string) => string
+  kontoSubscriptionNone: string
+  kontoSubscribeCta: string
+  kontoSubscribeError: string
+  kontoCancelLink: string
+  kontoDangerHeading: string
+  kontoDeleteAccountCta: string
+  kontoDeleteAccountConfirm: string
+  kontoDeleteAccountWorking: string
+  kontoDeleteAccountError: string
+  kontoLoading: string
 }
 
 const en = {
@@ -469,6 +504,41 @@ const en = {
       "No text could be read from this file – it's probably a scanned PDF. Please copy the text into the field manually instead.",
   },
   extractGenericError: 'The file could not be read. Please copy the text into the field manually.',
+
+  accountSignIn: 'Sign in',
+  accountLink: 'Account',
+  accountSignOut: 'Sign out',
+  saveApplicationCta: 'Save application',
+  saveApplicationSaving: 'Saving …',
+  saveApplicationSaved: 'Saved to your account ✓',
+  saveApplicationSignedOutHint: 'Sign in first – open your account in a new tab, then try again.',
+  saveApplicationLimitHint: 'Free accounts store one application. Manage or subscribe in your account.',
+  saveApplicationErrorHint: 'Could not save. Please try again.',
+  kontoLink: 'Account',
+  savedApplicationsHeading: 'Saved applications',
+  savedApplicationsUpdated: (date) => `Updated ${date}`,
+  savedApplicationsReadOnlyBadge: 'Read-only',
+  savedApplicationsOpen: 'Open',
+  savedApplicationsEmpty: 'No saved applications yet.',
+  kontoDisabledNotice: 'Accounts are not available yet.',
+  kontoSignInIntro: 'Sign in to save applications and manage your subscription.',
+  kontoSavedHeading: 'Saved applications',
+  kontoSavedHint: 'Opening a saved application happens in the tool at /app.',
+  kontoDeleteConfirm: 'Delete this saved application?',
+  kontoDeleteCta: 'Delete',
+  kontoSubscriptionHeading: 'Subscription',
+  kontoSubscriptionActive: (date) => `Active – renews/ends ${date}`,
+  kontoSubscriptionNone: 'No active subscription.',
+  kontoSubscribeCta: 'Subscribe',
+  kontoSubscribeError: 'Das Abonnement ist derzeit nicht verfügbar.',
+  kontoCancelLink: 'Cancel subscription',
+  kontoDangerHeading: 'Danger zone',
+  kontoDeleteAccountCta: 'Delete account',
+  kontoDeleteAccountConfirm:
+    'This permanently deletes your account and all saved applications (GDPR Art. 17). This cannot be undone. Continue?',
+  kontoDeleteAccountWorking: 'Deleting …',
+  kontoDeleteAccountError: 'Could not delete account. Please try again.',
+  kontoLoading: 'Loading …',
 } satisfies Dict
 
 const de = {
@@ -693,6 +763,41 @@ const de = {
       'Aus dieser Datei konnte kein Text gelesen werden – vermutlich ein gescanntes PDF. Bitte fügen Sie den Text stattdessen manuell ein.',
   },
   extractGenericError: 'Die Datei konnte nicht gelesen werden. Bitte fügen Sie den Text manuell in das Feld ein.',
+
+  accountSignIn: 'Anmelden',
+  accountLink: 'Konto',
+  accountSignOut: 'Abmelden',
+  saveApplicationCta: 'Bewerbung speichern',
+  saveApplicationSaving: 'Wird gespeichert …',
+  saveApplicationSaved: 'Im Konto gespeichert ✓',
+  saveApplicationSignedOutHint: 'Bitte zuerst anmelden – Konto in einem neuen Tab öffnen, dann erneut versuchen.',
+  saveApplicationLimitHint: 'Kostenlose Konten speichern eine Bewerbung. Verwalten oder abonnieren Sie im Konto.',
+  saveApplicationErrorHint: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+  kontoLink: 'Konto',
+  savedApplicationsHeading: 'Gespeicherte Bewerbungen',
+  savedApplicationsUpdated: (date) => `Aktualisiert ${date}`,
+  savedApplicationsReadOnlyBadge: 'Nur lesbar',
+  savedApplicationsOpen: 'Öffnen',
+  savedApplicationsEmpty: 'Noch keine gespeicherten Bewerbungen.',
+  kontoDisabledNotice: 'Konten sind derzeit noch nicht verfügbar.',
+  kontoSignInIntro: 'Melden Sie sich an, um Bewerbungen zu speichern und Ihr Abonnement zu verwalten.',
+  kontoSavedHeading: 'Gespeicherte Bewerbungen',
+  kontoSavedHint: 'Eine gespeicherte Bewerbung öffnen Sie im Tool unter /app.',
+  kontoDeleteConfirm: 'Diese gespeicherte Bewerbung löschen?',
+  kontoDeleteCta: 'Löschen',
+  kontoSubscriptionHeading: 'Abonnement',
+  kontoSubscriptionActive: (date) => `Aktiv – verlängert sich/endet am ${date}`,
+  kontoSubscriptionNone: 'Kein aktives Abonnement.',
+  kontoSubscribeCta: 'Abonnieren',
+  kontoSubscribeError: 'Das Abonnement ist derzeit nicht verfügbar.',
+  kontoCancelLink: 'Abonnement kündigen',
+  kontoDangerHeading: 'Gefahrenzone',
+  kontoDeleteAccountCta: 'Konto löschen',
+  kontoDeleteAccountConfirm:
+    'Damit werden Ihr Konto und alle gespeicherten Bewerbungen unwiderruflich gelöscht (DSGVO Art. 17). Dies kann nicht rückgängig gemacht werden. Fortfahren?',
+  kontoDeleteAccountWorking: 'Wird gelöscht …',
+  kontoDeleteAccountError: 'Konto konnte nicht gelöscht werden. Bitte erneut versuchen.',
+  kontoLoading: 'Wird geladen …',
 } satisfies Dict
 
 const DICTIONARIES: Record<UILang, Dict> = { en, de }

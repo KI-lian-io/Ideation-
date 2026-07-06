@@ -278,3 +278,62 @@ export function toPlainText(l: Lebenslauf, sectionOrder: string[]): string {
 
   return parts.join('\n\n')
 }
+
+// ---------------------------------------------------------------------------
+// Stage 3 accounts: pure helpers for saving/loading an application package
+// ---------------------------------------------------------------------------
+
+/**
+ * Derives a short, human-readable title for a saved application package from
+ * the job posting text: the first non-empty line, truncated to ~60 chars.
+ * Falls back to 'Bewerbung' when there is no posting yet (saving straight
+ * from the Lebenslauf result view, before writing an Anschreiben).
+ */
+export function derivePackageTitle(jobPosting: string | null | undefined): string {
+  const firstLine = jobPosting
+    ?.split('\n')
+    .map((line) => line.trim())
+    .find((line) => line.length > 0)
+  if (!firstLine) return 'Bewerbung'
+  return firstLine.length > 60 ? `${firstLine.slice(0, 60).trimEnd()}…` : firstLine
+}
+
+/** One personalization answer as stored in reducer state (keyed by question id). */
+export type IdAnswer = { id: string; answer: string }
+/** One personalization answer as stored/sent on the wire (keyed by English question text). */
+export type WireAnswer = { question: string; answer: string }
+
+/**
+ * Maps reducer-state answers ({id, answer}) to the wire/save shape
+ * ({question: en-text, answer}), dropping empty answers. `questions` is the
+ * id -> {en, de} list for the current posting (questionsForPosting()).
+ */
+export function answersToWire(
+  answers: IdAnswer[],
+  questions: { id: string; en: string }[]
+): WireAnswer[] {
+  return answers
+    .filter((a) => a.answer.trim().length > 0)
+    .map((a) => ({
+      question: questions.find((q) => q.id === a.id)?.en ?? '',
+      answer: a.answer,
+    }))
+    .filter((a) => a.question.length > 0)
+}
+
+/**
+ * Maps stored wire answers ({question: en-text, answer}) back to reducer-state
+ * shape ({id, answer}) by matching English question text against the current
+ * question list for the posting. Unmatched stored answers (e.g. a question
+ * that no longer applies) are dropped; unmatched current questions get an
+ * empty answer, same as a fresh SET_JOB_POSTING sync.
+ */
+export function wireAnswersToIds(
+  wireAnswers: WireAnswer[],
+  questions: { id: string; en: string }[]
+): IdAnswer[] {
+  return questions.map((q) => {
+    const match = wireAnswers.find((a) => a.question === q.en)
+    return { id: q.id, answer: match?.answer ?? '' }
+  })
+}
