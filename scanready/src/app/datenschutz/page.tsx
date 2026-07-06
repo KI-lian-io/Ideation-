@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { LEGAL } from "@/lib/legal-data";
+import { accountsEnabled } from "@/lib/supabase/config";
 
 export const metadata: Metadata = { title: "Datenschutzerklärung: ScanReady" };
 
 /**
  * GDPR Art. 13 notice. Structure mirrors what the product actually does:
- * transient processing only, no storage, no accounts, no analytics cookies.
+ * transient processing only for the anonymous flow; the optional accounts
+ * layer (Supabase, opt-in storage) is described ONLY while it is actually
+ * enabled (accountsEnabled() branches below), so the live text never claims
+ * more or less than the deployed configuration.
  * FOUNDER ACTION: have this reviewed before go-live (see docs/humanizer-golive.md).
  */
 export default function DatenschutzPage() {
+  const accounts = accountsEnabled();
   return (
     <main lang="de" className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6 text-sm text-ink leading-relaxed">
       <h1 className="font-serif text-3xl font-semibold">Datenschutzerklärung</h1>
@@ -26,9 +31,12 @@ export default function DatenschutzPage() {
         <p>
           Texte, die Sie in das Tool eingeben (Lebenslauf, Stellenanzeige, Antworten), werden
           ausschließlich zur Erstellung Ihrer Dokumente verarbeitet und{" "}
-          <strong>nicht gespeichert</strong>. Es gibt keine Konten und keine Datenbank. Die
-          Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung:
-          Erbringung des von Ihnen angeforderten Dienstes).
+          <strong>nicht gespeichert</strong>.{" "}
+          {accounts
+            ? "Ohne Konto gibt es keine Speicherung und keine Datenbank; eine Speicherung findet nur statt, wenn Sie ein optionales Konto anlegen und Inhalte ausdrücklich selbst speichern (siehe Abschnitt 7)."
+            : "Es gibt keine Konten und keine Datenbank."}{" "}
+          Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO
+          (Vertragserfüllung: Erbringung des von Ihnen angeforderten Dienstes).
         </p>
         <p>
           Zur Texterstellung übermitteln wir Ihre Eingaben an die Anthropic API (Anthropic PBC).
@@ -51,6 +59,8 @@ export default function DatenschutzPage() {
           Stripe geladen, der technisch notwendige Cookies zur Betrugsprävention setzt
           (Art. 6 Abs. 1 lit. b und f DSGVO). Auch die in Abschnitt 4 beschriebene
           Reichweitenmessung setzt keine Cookies.
+          {accounts &&
+            " Wenn Sie sich mit einem optionalen Konto anmelden, werden technisch notwendige Authentifizierungs-Cookies gesetzt, die Ihre Anmeldung aufrechterhalten (Art. 6 Abs. 1 lit. b DSGVO); sie entfallen mit der Abmeldung."}
         </p>
       </section>
 
@@ -90,10 +100,40 @@ export default function DatenschutzPage() {
           Sie haben die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der
           Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht
           auf Beschwerde bei einer Aufsichtsbehörde (Art. 77 DSGVO). Da wir Ihre Dokumentdaten
+          {accounts ? " ohne Konto " : " "}
           nicht speichern, liegen nach Abschluss Ihrer Sitzung in der Regel keine
           personenbezogenen Dokumentdaten mehr vor.
         </p>
       </section>
+
+      {/* Rendered only while the accounts layer is actually provisioned: the live
+          notice must never describe processing that does not exist in the deployed
+          configuration (and vice versa the day it does). */}
+      {accounts && (
+        <section className="flex flex-col gap-2">
+          <h2 className="font-semibold">7. Konto und gespeicherte Bewerbungen (optional)</h2>
+          <p>
+            Optional können Sie ein Konto anlegen (Anmeldung über Google; Authentifizierung und
+            Datenhaltung über Supabase, Hosting in der EU). Eine Speicherung Ihrer Inhalte
+            (Lebenslauf, Stellenanzeige, Antworten, Anschreiben) erfolgt{" "}
+            <strong>nur auf Ihre ausdrückliche Aktion</strong> (&bdquo;Bewerbung
+            speichern&ldquo;), niemals automatisch. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+            DSGVO (Vertragserfüllung: Bereitstellung der Speicherfunktion).
+          </p>
+          <p>
+            Bei der Anmeldung über Google erhalten wir Ihre E-Mail-Adresse. Für ein
+            Abonnement wird die Zahlungsabwicklung über Stripe Checkout durchgeführt
+            (siehe Abschnitt 5); wir speichern dazu eine Kundenreferenz und den
+            Abonnementstatus, keine Zahlungsdaten.
+          </p>
+          <p>
+            Sie können Ihr Konto jederzeit selbst löschen (&bdquo;Konto löschen&ldquo; im
+            Konto-Bereich); damit werden alle gespeicherten Inhalte entfernt (Art. 17 DSGVO).
+            Ein bestehendes Abonnement kündigen Sie unter{" "}
+            <a className="underline" href="/kuendigen">Verträge hier kündigen</a>.
+          </p>
+        </section>
+      )}
     </main>
   );
 }

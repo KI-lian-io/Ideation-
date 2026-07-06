@@ -165,9 +165,6 @@ export default function PreisePage() {
 
               {/* Bewerbungspaket */}
               <div className={`${CARD} px-6 py-8 flex flex-col relative`}>
-                <span className="absolute top-4 right-4 font-mono text-[10px] uppercase tracking-[0.14em] text-eyebrow border border-hair rounded-full px-2 py-1">
-                  In Kürze
-                </span>
                 <p className={`${EYEBROW} mb-3`}>Komplettpaket</p>
                 <h2 className="text-2xl font-semibold text-ink mb-1 leading-snug">
                   Bewerbungspaket
@@ -196,13 +193,8 @@ export default function PreisePage() {
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-muted">Kein Abo.</p>
-                <Btn
-                  as="button"
-                  variant="secondary"
-                  className="mt-4 text-center"
-                  disabled
-                >
-                  Noch nicht verfügbar
+                <Btn as="a" href="/app" variant="secondary" className="mt-4 text-center">
+                  Im Tool freischalten
                 </Btn>
               </div>
             </div>

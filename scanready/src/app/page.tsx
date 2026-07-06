@@ -543,15 +543,16 @@ export default function HomePage() {
               Zero-retention, by design.
             </h2>
             <p className="text-base text-white/70 leading-relaxed max-w-2xl mx-auto mb-8">
-              Your CV text is sent to the AI, the output comes back, and nothing
-              is saved. No database. No account. No training on your data. What
-              you paste here stays between you and your application.
+              No account needed. Use ScanReady without one and nothing is
+              saved: your CV text is sent to the AI, the output comes back,
+              no database, no training on your data. What you paste here
+              stays between you and your application.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-white/70">
               <span className="flex items-center gap-2">
                 <CheckIcon />
-                No storage, no account
+                No account needed, no storage without one
               </span>
               <span className="flex items-center gap-2">
                 <CheckIcon />
@@ -773,6 +774,11 @@ export default function HomePage() {
             <div className="flex items-center gap-4">
               <a className="hover:text-white transition-colors" href="/preise">
                 Pricing
+              </a>
+              {/* §312k BGB: the cancellation path must be reachable from the site,
+                  German statutory link label. */}
+              <a className="hover:text-white transition-colors" href="/kuendigen" lang="de">
+                Verträge hier kündigen
               </a>
               <p>© 2026</p>
               {/* Registration-mark corner ornament: decorative print detail */}

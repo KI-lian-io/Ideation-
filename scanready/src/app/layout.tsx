@@ -44,6 +44,8 @@ export default function RootLayout({
               <a className="hover:text-ink transition-colors" href="/impressum">Impressum</a>
               <a className="hover:text-ink transition-colors" href="/datenschutz">Datenschutz</a>
               <a className="hover:text-ink transition-colors" href="/agb">AGB &amp; Widerruf</a>
+              {/* §312k BGB: statutory cancellation path, reachable from every page */}
+              <a className="hover:text-ink transition-colors" href="/kuendigen" lang="de">Verträge hier kündigen</a>
             </nav>
           </footer>
         </AccountProvider>

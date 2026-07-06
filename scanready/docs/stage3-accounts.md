@@ -104,3 +104,45 @@ by design -- this task only ships the foundation.
    `saveApplicationPackage()`), then attempt a second: it should be rejected
    with `{ ok: false, reason: 'limit' }` while the account has no active
    subscription (proves the DB-level guard, not just UI, blocks it).
+
+## 7. Subscription billing setup (Stripe)
+
+The billing rails are code-complete and env-gated. To activate:
+
+1. In the Stripe dashboard, create a recurring monthly Price for the
+   "Konto & Speichern" subscription (spec D2: pick a number in the
+   3,99-5,99 EUR range) and copy its price id (price_...).
+2. Add a webhook endpoint pointing at `<site-url>/api/stripe/webhook`,
+   subscribed to: `checkout.session.completed`,
+   `customer.subscription.created`, `customer.subscription.updated`,
+   `customer.subscription.deleted`. Copy the signing secret (whsec_...).
+3. Set in Vercel:
+   - `STRIPE_SUBSCRIPTION_PRICE_ID` (the price id from step 1)
+   - `STRIPE_WEBHOOK_SECRET` (the signing secret from step 2)
+   - `SUPABASE_SERVICE_ROLE_KEY` (Supabase project settings -> API; the
+     webhook writes `subscriptions` rows and flips package read-only state,
+     which RLS would block for any lesser key)
+4. Redeploy. Without any of these, `/api/subscription/*` answers a German
+   503 and the webhook responds 503 without touching anything.
+
+Flow once live: /konto (built by the accounts-UI task) -> POST
+/api/subscription/checkout -> Stripe Checkout (redirect is fine here: no
+client-memory content to lose, unlike the letter flows) -> webhook syncs
+the `subscriptions` row -> the DB package-limit trigger starts honoring the
+subscription automatically.
+
+## 8. Kuendigungsbutton (§312k BGB) - FOUNDER legal review required
+
+`/kuendigen` carries the statutory "Verträge hier kündigen" wording, is
+linked from every footer, explains that the one-shot purchases have nothing
+to cancel, and (while accounts are enabled) offers a one-click cancellation
+for the signed-in subscriber with an on-screen confirmation of receipt
+(timestamp + period end). Identification happens via the same Google
+account used at purchase.
+
+Whether this implementation satisfies §312k in full (e.g. the
+identification step, the form of the confirmation) is a legal judgment:
+have it reviewed together with the AGB before the subscription goes live.
+The AGB (`/agb`) and Datenschutz (`/datenschutz`) render their
+subscription/account sections only while `accountsEnabled()` is true, so
+the live legal texts always match the deployed configuration.

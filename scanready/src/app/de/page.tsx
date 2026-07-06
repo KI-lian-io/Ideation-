@@ -768,6 +768,10 @@ export default function GermanHomePage() {
               <a className="hover:text-white transition-colors" href="/preise">
                 Preise
               </a>
+              {/* §312k BGB: gesetzliche Beschriftung des Kündigungspfads */}
+              <a className="hover:text-white transition-colors" href="/kuendigen">
+                Verträge hier kündigen
+              </a>
               <p>© 2026</p>
               {/* Registrierungsmarke: dekoratives Druckdetail */}
               <span className="reg-mark" aria-hidden="true" />
