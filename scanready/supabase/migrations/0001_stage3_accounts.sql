@@ -305,5 +305,28 @@ $$;
 -- that represent an authenticated end user, so an anonymous/unauthenticated
 -- caller cannot invoke this at all (auth.uid() would be null and the delete
 -- would be a no-op anyway, but least-privilege is cheap here).
-revoke all on function public.delete_own_account() from public;
+revoke all on function public.delete_own_account() from public, anon;
 grant execute on function public.delete_own_account() to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 7. Function grant hardening
+-- ---------------------------------------------------------------------------
+-- Postgres grants EXECUTE on new functions to PUBLIC by default, which
+-- exposes every function in an API schema via /rest/v1/rpc/*. For SECURITY
+-- DEFINER functions that take an arbitrary user_uuid this is a real
+-- cross-user mutation vector (any caller could flip another user's
+-- read_only flags), flagged by Supabase's security advisor (lint 0028/0029).
+--
+-- mark/clear_packages_read_only: webhook-only (service role).
+revoke all on function public.mark_packages_read_only(uuid) from public, anon, authenticated;
+revoke all on function public.clear_packages_read_only(uuid) from public, anon, authenticated;
+grant execute on function public.mark_packages_read_only(uuid) to service_role;
+grant execute on function public.clear_packages_read_only(uuid) to service_role;
+
+-- Trigger functions fire via their triggers (as table owner) and need no
+-- direct execute grants at all; revoking removes the useless RPC exposure.
+revoke all on function public.enforce_package_limit() from public, anon, authenticated;
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+
+-- Remaining, intentional advisor exception: delete_own_account() stays
+-- executable by `authenticated` (it deletes strictly auth.uid(), see above).
