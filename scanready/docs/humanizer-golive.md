@@ -80,10 +80,13 @@ until the corresponding env vars exist.
       Firefox once with a real CV (DIN margins, page breaks, photo)
 
 ### Accounts + subscription (all steps in docs/stage3-accounts.md)
-- [ ] Supabase EU project + run supabase/migrations/0001_stage3_accounts.sql
-- [ ] Google OAuth client + Supabase provider config
+- [x] Supabase EU project + run supabase/migrations/0001_stage3_accounts.sql
+      (done 2026-07-06; security advisor clean)
+- [x] Google OAuth client + Supabase provider config (done 2026-07-06;
+      sign-in verified locally, profiles trigger confirmed)
 - [ ] Vercel env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      SUPABASE_SERVICE_ROLE_KEY
+      SUPABASE_SERVICE_ROLE_KEY (Preview first; Production only after the
+      legal review below)
 - [ ] Stripe: recurring Price (3,99-5,99 EUR decision) + webhook endpoint;
       Vercel env: STRIPE_SUBSCRIPTION_PRICE_ID, STRIPE_WEBHOOK_SECRET
 - [ ] Legal review: §312k /kuendigen flow, AGB subscription section,

@@ -1,13 +1,32 @@
 # Stage 3 accounts: setup runbook
 
-Status: code-complete on the branch, inert until the env vars below are set.
-This is a founder-actions checklist, not engineering work. Nothing here
-affects the anonymous tool flow at `/app`, which stays fully stateless
-regardless of whether accounts are turned on.
+Status as of 2026-07-06 (live founder session):
+- [x] Supabase EU project created (Frankfurt, ref `thgmhbzimnjcaoqyyiyp`)
+- [x] Migration 0001 applied; Supabase security advisor clean (function-grant
+      hardening applied live and mirrored into the migration file; the only
+      remaining advisor line is the intentional `delete_own_account()`
+      authenticated grant)
+- [x] Google OAuth configured (External/testing mode, founder as test user)
+      and verified end to end: sign-in works, `handle_new_user` trigger
+      created the profiles row
+- [x] Local `scanready/.env.local` carries the URL + publishable key
+      (note: new-style `sb_publishable_...` key goes under our var name
+      `NEXT_PUBLIC_SUPABASE_ANON_KEY`; it is the drop-in anon-key successor)
+- [x] Supabase MCP wired project-scoped via `.mcp.json` (interactive
+      sessions can run SQL/advisors directly)
+- [ ] Accounts E2E (save 1 package, 2nd blocked by DB limit, reload + load)
+- [ ] Vercel env vars (Preview first, Production only after legal review)
+- [ ] Subscription: Stripe Price + webhook (section 7) and §312k legal
+      review (section 8)
+
+The rest of this file is the original checklist; done items above stay
+documented below for rebuild-from-scratch scenarios. Nothing here affects
+the anonymous tool flow at `/app`, which stays fully stateless regardless
+of whether accounts are turned on.
 
 Background: `docs/superpowers/specs/2026-07-03-monetization-humanizer-design.md`
-(D4-D7). Only build/turn on Stage 3 once Humanizer+ (Stage 1) shows
-conversion, per that spec.
+(D4-D7). The build-only-on-conversion-evidence gate was consciously
+overridden by the founder on 2026-07-06 (goal-directed session).
 
 ## 1. Create the Supabase project
 
