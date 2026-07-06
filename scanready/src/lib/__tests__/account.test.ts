@@ -1,13 +1,14 @@
 /**
  * Behavior test for the pure Postgres-error -> typed-result mapper used by
- * saveApplicationPackage. The Supabase calls themselves are not unit-tested
- * (per the Stage 3 accounts build brief); this is the one non-trivial pure
- * mapper in src/lib/account.ts.
+ * saveApplicationPackage, plus a regression test for the orphaned-cvs-row
+ * cleanup in its pkgError branch (a blocked/limit save must not leak the
+ * already-inserted cvs row).
  * Run: node --experimental-strip-types --test src/lib/__tests__/account.test.ts
  */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mapSaveError } from '../account.ts'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { mapSaveError, saveApplicationPackage } from '../account.ts'
 
 test('mapSaveError: package_limit trigger message -> reason "limit"', () => {
   const result = mapSaveError({ message: 'package_limit' })
@@ -44,4 +45,70 @@ test('mapSaveError: undefined error -> reason "error" with unknown_error fallbac
 test('mapSaveError: error object with no message -> reason "error" with unknown_error fallback', () => {
   const result = mapSaveError({ message: null })
   assert.deepEqual(result, { ok: false, reason: 'error', message: 'unknown_error' })
+})
+
+test('saveApplicationPackage: blocked (limit) save cleans up the orphaned cvs row', async () => {
+  // accountsEnabled() reads these two env vars on every call (no module-level
+  // caching), so setting them right before the call is enough -- no import
+  // order or stale-cache concern.
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+  const deleteCalls: Array<{ column: string; value: unknown }> = []
+
+  const fakeClient = {
+    from(table: string) {
+      if (table === 'cvs') {
+        return {
+          insert() {
+            return this
+          },
+          select() {
+            return this
+          },
+          single() {
+            return Promise.resolve({ data: { id: 'cv-123' }, error: null })
+          },
+          delete() {
+            return this
+          },
+          eq(column: string, value: unknown) {
+            deleteCalls.push({ column, value })
+            return Promise.resolve({ data: null, error: null })
+          },
+        }
+      }
+      if (table === 'application_packages') {
+        return {
+          insert() {
+            return this
+          },
+          select() {
+            return this
+          },
+          single() {
+            return Promise.resolve({ data: null, error: { message: 'package_limit' } })
+          },
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    },
+  } as unknown as SupabaseClient
+
+  try {
+    const result = await saveApplicationPackage(fakeClient, 'user-1', {
+      cvText: 'some cv text',
+      jobPosting: null,
+      answers: [],
+      lebenslauf: {} as never,
+      anschreiben: null,
+    })
+
+    assert.deepEqual(result, { ok: false, reason: 'limit' })
+    assert.equal(deleteCalls.length, 1)
+    assert.deepEqual(deleteCalls[0], { column: 'id', value: 'cv-123' })
+  } finally {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
 })

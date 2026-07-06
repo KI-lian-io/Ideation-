@@ -122,6 +122,12 @@ export async function saveApplicationPackage(
     .single();
 
   if (pkgError || !pkg) {
+    // The cvs row above was already inserted, but the package insert was
+    // rejected (e.g. by the enforce_package_limit trigger) -- without this
+    // delete, that cvs row would be orphaned and leak the full CV text.
+    // Best-effort only: a failure here must never change the SaveResult
+    // returned to the caller, so its outcome is intentionally ignored.
+    await client.from("cvs").delete().eq("id", cv.id);
     return mapSaveError(pkgError);
   }
 
