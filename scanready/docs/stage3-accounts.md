@@ -14,10 +14,41 @@ Status as of 2026-07-06 (live founder session):
       `NEXT_PUBLIC_SUPABASE_ANON_KEY`; it is the drop-in anon-key successor)
 - [x] Supabase MCP wired project-scoped via `.mcp.json` (interactive
       sessions can run SQL/advisors directly)
-- [ ] Accounts E2E (save 1 package, 2nd blocked by DB limit, reload + load)
+- [x] Accounts E2E (save 1 package, 2nd blocked by DB limit, reload + load)
+      - Verified 2026-07-06: E2E PASSED against the live Frankfurt project
+        (ref `thgmhbzimnjcaoqyyiyp`) through the real UI on the localhost
+        dev server. Method: Google OAuth cannot run headless, so a
+        disposable email user was created via the public signup API
+        (the email provider is enabled alongside Google), confirmed via
+        SQL, signed in via password grant, and the session was injected
+        as the `@supabase/ssr` cookie; server-side session validation was
+        confirmed. The test user was deleted afterwards via the app's own
+        `delete_own_account()` RPC, returning the DB to baseline with only
+        the founder account remaining.
+      - Verified: saving one package created 1 `cvs` row + 1
+        `application_packages` row; a second save was blocked by the
+        `enforce_package_limit` trigger at the DB layer with the correct
+        UI limit hint; after reload, the saved package listed in
+        InputView and loaded back into the result phase intact via
+        `LOAD_PACKAGE`.
+      - Also verified via SQL probes: cross-user RLS (another user's JWT
+        sees 0 rows), the read_only downgrade contract (owner UPDATE
+        affects 0 rows, SELECT still works), `handle_new_user` firing for
+        email signups too, and `delete_own_account()` cascading removal
+        of `profiles`/`cvs`/`application_packages`.
 - [ ] Vercel env vars (Preview first, Production only after legal review)
 - [ ] Subscription: Stripe Price + webhook (section 7) and §312k legal
       review (section 8)
+
+Follow-ups found during the 2026-07-06 E2E (not fixed by this doc edit):
+- KNOWN ISSUE: `saveApplicationPackage` inserts the `cvs` row before the
+  guarded package insert, so every limit-blocked save leaks one orphaned
+  `cvs` row containing the full CV text. A fix is in progress in a
+  separate session; recorded here as a known issue only.
+- NOTE: the Supabase email/password provider is enabled on the project
+  while the UI only offers Google sign-in. The founder may want to
+  disable the email provider in the dashboard if Google-only sign-in is
+  intended.
 
 The rest of this file is the original checklist; done items above stay
 documented below for rebuild-from-scratch scenarios. Nothing here affects
