@@ -60,3 +60,35 @@ denominator live" checkbox above.
 ## Rollback
 - Unset NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY + STRIPE_SECRET_KEY in Vercel → intent route
   returns 503, modal shows the init error, core free flow unaffected.
+
+## Stage 3 gates (Bewerbungspaket, accounts, subscription) - added 2026-07-06
+
+All Stage 3 code is on the branch and env-gated OFF. Nothing below activates
+until the corresponding env vars exist.
+
+### Bewerbungspaket (4,99 EUR one-shot, PDF export + included Humanizer+)
+- [ ] Uses the SAME Stripe keys as Humanizer+ - no extra env needed; it is
+      live as soon as Stripe keys are set
+- [ ] Price check: 4,99 EUR is the code constant PAKET_PRICE_CENTS in
+      src/lib/humanizer.ts (spec range 4,99-7,99) - change there if desired,
+      and keep /preise and the AGB in sync
+- [ ] Native-speaker review of the new German copy: PaketModal, /preise,
+      /kuendigen, Datenschutz §7, AGB subscription/Paket sections
+- [ ] Test-mode E2E: buy a Paket, export both PDFs, run the included
+      Humanizer+ refinement, verify the second refinement asks for 2,99 EUR
+- [ ] Print QA: export both documents via "Save as PDF" in Chrome/Safari/
+      Firefox once with a real CV (DIN margins, page breaks, photo)
+
+### Accounts + subscription (all steps in docs/stage3-accounts.md)
+- [ ] Supabase EU project + run supabase/migrations/0001_stage3_accounts.sql
+- [ ] Google OAuth client + Supabase provider config
+- [ ] Vercel env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      SUPABASE_SERVICE_ROLE_KEY
+- [ ] Stripe: recurring Price (3,99-5,99 EUR decision) + webhook endpoint;
+      Vercel env: STRIPE_SUBSCRIPTION_PRICE_ID, STRIPE_WEBHOOK_SECRET
+- [ ] Legal review: §312k /kuendigen flow, AGB subscription section,
+      Datenschutz account sections (they render only once accounts are
+      enabled - review them with env set on a preview deployment)
+- [ ] E2E: sign in, save 1 package (free), verify the 2nd is blocked,
+      subscribe in test mode, verify the 2nd saves, cancel via /kuendigen,
+      verify packages flip to read-only at period end
