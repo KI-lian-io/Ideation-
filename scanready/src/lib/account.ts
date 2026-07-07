@@ -187,6 +187,94 @@ export async function deletePackage(
 }
 
 /**
+ * Live-Pass window check: does this humanizer_purchases row (kind pass_30d)
+ * currently grant an entitlement? Pure, no I/O, so it gets a direct unit
+ * test the same way mapSaveError does. Deliberately distinct from the
+ * Stripe-PI checks in humanizer.ts (checkHumanizerPi / checkPaketPi /
+ * checkHumanizerEntitlement): those model a single-use PaymentIntent token,
+ * while a Pass is a standing DB-row entitlement with an expiry window.
+ * Returns false for a null row, a null expires_at, or an expiry in the past;
+ * true only when expires_at is a future timestamp.
+ */
+export function checkPassEntitlement(
+  row: { expires_at: string | null } | null
+): boolean {
+  if (!row || !row.expires_at) return false;
+  return new Date(row.expires_at).getTime() > Date.now();
+}
+
+/**
+ * Renames a saved application package. accountsEnabled()-gated no-op, same
+ * convention as deletePackage. The RLS update-while-editable policy already
+ * blocks writes to read_only rows server-side; the caller must ALSO hide
+ * the rename control on read_only rows client-side (done in the gallery
+ * UI), so this helper does not itself branch on read_only.
+ */
+export async function updatePackageTitle(
+  client: SupabaseClient,
+  packageId: string,
+  title: string
+): Promise<{ ok: boolean; message?: string }> {
+  if (!accountsEnabled()) return { ok: false, message: "accounts_disabled" };
+
+  const { error } = await client
+    .from("application_packages")
+    .update({ title })
+    .eq("id", packageId);
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
+}
+
+/**
+ * Fetches the signed-in user's currently-live Pass (kind pass_30d, not yet
+ * expired), newest first, or null if they have none. RLS select-own already
+ * scopes the read to the caller; accountsEnabled()-gated no-op like the
+ * other read helpers.
+ */
+export async function getActivePass(
+  client: SupabaseClient,
+  userId: string
+): Promise<{ expires_at: string } | null> {
+  if (!accountsEnabled()) return null;
+
+  const { data, error } = await client
+    .from("humanizer_purchases")
+    .select("expires_at")
+    .eq("user_id", userId)
+    .eq("kind", "pass_30d")
+    .gt("expires_at", new Date().toISOString())
+    .order("expires_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as { expires_at: string };
+}
+
+/**
+ * Lists the signed-in user's paket purchase history (amount + timestamp,
+ * newest first) for the storage-gate "you already paid" anchor variant. RLS
+ * select-own already scopes it to the caller; accountsEnabled()-gated no-op
+ * like the other read helpers.
+ */
+export async function listPaketPurchases(
+  client: SupabaseClient,
+  userId: string
+): Promise<{ amount_cents: number; created_at: string }[]> {
+  if (!accountsEnabled()) return [];
+
+  const { data, error } = await client
+    .from("humanizer_purchases")
+    .select("amount_cents, created_at")
+    .eq("user_id", userId)
+    .eq("kind", "paket")
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return (data ?? []) as { amount_cents: number; created_at: string }[];
+}
+
+/**
  * Deletes the signed-in user's entire account (GDPR Art. 17) by calling the
  * delete_own_account() RPC defined in the migration. That function is
  * security definer and deletes strictly `auth.users where id = auth.uid()`

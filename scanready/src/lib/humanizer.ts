@@ -17,6 +17,29 @@ export const HUMANIZER_PRICE_CENTS = 299;
  */
 export const PAKET_PRICE_CENTS = 499;
 
+/**
+ * Bewerbungsphase-Pass: a 30-day non-renewing entitlement (per PRD 6.2) for
+ * 14,99 EUR. Unlike HUMANIZER_PRICE_CENTS / PAKET_PRICE_CENTS this is not a
+ * single-use PaymentIntent token: a live Pass grants PDF export and
+ * refinements for its whole window, checked against the humanizer_purchases
+ * row's expires_at column (see checkPassEntitlement in account.ts), not a PI
+ * status. The 14,99 EUR price and the 30-day window are the founder's
+ * default per PRD section 9 and remain open founder decisions pending
+ * confirmation before go-live.
+ */
+export const PASS_PRICE_CENTS = 1499;
+
+/**
+ * Storage cap while a Pass is live: up to 25 saved application packages
+ * instead of the free tier's 1. This constant MUST match the `25` hardcoded
+ * in the three-tier enforce_package_limit() trigger (migration
+ * 0002_pass.sql) - it exists here only so the /konto storage meter can
+ * render "N / 25" without querying the trigger definition. The cap of 25 is
+ * the founder's default per PRD section 9 and remains an open founder
+ * decision pending confirmation before go-live.
+ */
+export const PASS_STORAGE_CAP = 25;
+
 export type PaymentIntentLike = {
   id: string;
   status: string;

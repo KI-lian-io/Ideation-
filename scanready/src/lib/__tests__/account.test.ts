@@ -8,7 +8,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { mapSaveError, saveApplicationPackage } from '../account.ts'
+import { mapSaveError, saveApplicationPackage, checkPassEntitlement, updatePackageTitle } from '../account.ts'
 
 test('mapSaveError: package_limit trigger message -> reason "limit"', () => {
   const result = mapSaveError({ message: 'package_limit' })
@@ -111,4 +111,47 @@ test('saveApplicationPackage: blocked (limit) save cleans up the orphaned cvs ro
     delete process.env.NEXT_PUBLIC_SUPABASE_URL
     delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   }
+})
+
+// ---------------------------------------------------------------------------
+// checkPassEntitlement: pure live-pass window check
+// ---------------------------------------------------------------------------
+
+test('checkPassEntitlement: null row -> false', () => {
+  assert.equal(checkPassEntitlement(null), false)
+})
+
+test('checkPassEntitlement: null expires_at -> false', () => {
+  assert.equal(checkPassEntitlement({ expires_at: null }), false)
+})
+
+test('checkPassEntitlement: past expires_at -> false', () => {
+  const past = new Date(Date.now() - 60_000).toISOString()
+  assert.equal(checkPassEntitlement({ expires_at: past }), false)
+})
+
+test('checkPassEntitlement: future expires_at -> true', () => {
+  const future = new Date(Date.now() + 60_000).toISOString()
+  assert.equal(checkPassEntitlement({ expires_at: future }), true)
+})
+
+// ---------------------------------------------------------------------------
+// updatePackageTitle: accountsEnabled()-gated no-op
+// ---------------------------------------------------------------------------
+
+test('updatePackageTitle: accounts disabled -> safe no-op, never calls Supabase', async () => {
+  // No NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY set here, so
+  // accountsEnabled() is false.
+  let called = false
+  const fakeClient = {
+    from() {
+      called = true
+      throw new Error('should not be called when accounts are disabled')
+    },
+  } as unknown as SupabaseClient
+
+  const result = await updatePackageTitle(fakeClient, 'pkg-1', 'New Title')
+
+  assert.deepEqual(result, { ok: false, message: 'accounts_disabled' })
+  assert.equal(called, false)
 })

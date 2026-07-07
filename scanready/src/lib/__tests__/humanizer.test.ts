@@ -11,6 +11,7 @@ import {
   checkHumanizerPi,
   checkPaketPi,
   checkHumanizerEntitlement,
+  PASS_PRICE_CENTS,
   type PaymentIntentLike,
 } from '../humanizer.ts'
 
@@ -130,4 +131,12 @@ test('entitlement: unknown feature → wrong_feature', () => {
     ok: false,
     reason: 'wrong_feature',
   })
+})
+
+// ---------------------------------------------------------------------------
+// PASS_PRICE_CENTS: the Bewerbungsphase-Pass price constant
+// ---------------------------------------------------------------------------
+
+test('PASS_PRICE_CENTS is 14,99 EUR in cents', () => {
+  assert.equal(PASS_PRICE_CENTS, 1499)
 })
