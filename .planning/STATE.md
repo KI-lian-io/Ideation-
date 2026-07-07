@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+status: complete
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-07-07T09:43:13.358Z"
+last_activity: 2026-07-07
+last_activity_desc: Phase 7 execution started
+progress:
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 22
+  completed_plans: 15
+  percent: 68
 current_phase: 5
 current_phase_name: distribution-operationalization
-status: complete
-stopped_at: v1.0 feature-complete; analytics backlogged
-last_updated: "2026-07-01T13:22:26Z"
-last_activity: 2026-07-01
-last_activity_desc: v1.0 feature-complete; analytics backlogged
-progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
 ---
 
 # Project State
@@ -24,12 +24,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** German output is native-quality and trustworthy — norm-correct, never fabricated — so a German recruiter takes the applicant seriously in the 8-second scan.
-**Current focus:** Feature-complete (v1.0) — backlog only
+**Current focus:** Phase 7 — Account Library + Honest Pricing (design Phase A)
 
 ## Current Position
 
 v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase.
-Last activity: 2026-07-01 — v1.0 feature-complete; analytics backlogged
+Last activity: 2026-07-07 — Phase 7 execution started
 
 Progress: [██████████] 100%
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 03 P02 | 105s | 2 tasks | 2 files |
 | Phase 04 P01 | 390 | 3 tasks | 7 files |
 | Phase 04 P02 | 228 | 3 tasks | 2 files |
+| Phase 07 P01 | 26min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Landing page motion implemented without 'use client' wrapper
 - [Phase ?]: metadataBase deferred to Plan 03 (needs Vercel deploy URL)
 - [Phase quick]: 260701-jxh: Reconciled globals.css @theme tokens + extracted SKILL_CHIP/NORM_NOTE primitives to match exported ScanReady Design System — Kept shipped accent hover/chip/tint hexes over DESIGN.md's differing frontmatter values since shipped code + export already agree and are live
+- [Phase 07-01]: ui.tsx now carries 'use client' since three of the seven new A0 primitives (KebabMenu, InlineRenameField, BottomSheet) own focus/keyboard state — Pure exports (Btn, CARD, EYEBROW, ...) remain safely importable from Server Components; verified via a clean build with preise/page.tsx unchanged
+- [Phase 07-01]: New A0 primitives (SheetCard, MonoBadge, EmptyState, SavedConfirmationPanel, InlineRenameField, KebabMenu, BottomSheet) use PascalCase, diverging from ui.tsx's existing UPPER_SNAKE style-const convention — Matches the plan's exact grep-checked export names and signals shell components with behavior/props vs one-line style consts
 
 ### Pending Todos
 
@@ -117,6 +120,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-01T12:29:27.448Z
+**Resume file:** None
+
+Last session: 2026-07-07T09:43:13.352Z
 Last activity: 2026-07-06 - Completed quick task 260706-nbd: Record Stage 3 accounts E2E verification in CLAUDE.md and stage3-accounts.md
-Stopped at: v1.0 feature-complete; analytics backlogged
+Stopped at: Completed 07-01-PLAN.md
