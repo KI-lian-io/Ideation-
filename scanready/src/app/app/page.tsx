@@ -24,6 +24,7 @@ import { btnClass, CARD, EYEBROW, NORM_NOTE } from '@/components/ui'
 import { LangProvider, useLang } from '@/lib/i18n'
 import { track } from '@/lib/analytics'
 import { AccountMenu } from '@/components/AccountMenu'
+import { StorageGate } from '@/components/StorageGate'
 import { useAccount } from '@/components/AccountProvider'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { accountsEnabled } from '@/lib/supabase/config'
@@ -1413,12 +1414,15 @@ function SaveApplicationButton({
             </p>
           )}
           {state === 'limit' && (
-            <p className="mt-2 text-sm text-muted">
-              {t.saveApplicationLimitHint}{' '}
-              <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
-                {t.kontoLink}
-              </a>
-            </p>
+            <div className="mt-2">
+              <StorageGate
+                onChoosePass={() => {
+                  // 07-07 ships the real Pass purchase flow (PassModal) and
+                  // replaces this fallback with opening that modal in place.
+                  window.location.assign('/preise')
+                }}
+              />
+            </div>
           )}
           {state === 'error' && (
             <p className="mt-2 text-sm text-red-600">{t.saveApplicationErrorHint}</p>
