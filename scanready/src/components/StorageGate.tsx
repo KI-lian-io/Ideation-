@@ -137,7 +137,11 @@ function DefaultVariant({
         {t.gateStorageStatus} {t.gateSubtitle}
       </p>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {/* Stacked always (not a responsive 2-col grid): this panel only ever renders
+          inside the narrow save rail (~340px), never at the wide standalone width
+          shown in the design deck's 1a anatomy view - see the deck's 1c "in
+          context" view, which stacks the same two cards vertically. */}
+      <div className="mt-4 flex flex-col gap-3">
         {/* Pass offer - featured, the one accent-bordered card in the panel */}
         <div className="rounded-xl border-2 border-accent p-4 shadow-[0_0_0_1px_rgba(10,125,99,0.12)]">
           <div className="flex items-center justify-between gap-2">
