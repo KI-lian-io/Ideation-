@@ -1,0 +1,37 @@
+<!-- @dsCard group="Components" viewport="760x600" name="Editorial — SectionHeader, PullQuote, StatBlock" subtitle="The folio head, the evidence pull quote, and the oversized stat numeral" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--canvas); font-family: var(--font-sans); }
+  .stack { display: flex; flex-direction: column; gap: 32px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { SectionHeader, PullQuote, StatBlock } = window.ScanReadyDesignSystem_81c867;
+  function Demo() {
+    return (
+      <div className="stack">
+        <SectionHeader index="02" eyebrow="How it works" title="Three steps. One honest output." />
+        <PullQuote attribution="DACH recruiter studies, not imported one-page lore">
+          61% of German recruiters prefer a two-page CV.
+        </PullQuote>
+        <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          <StatBlock value="64%">call spelling errors a dealbreaker. Native-quality German is the bar.</StatBlock>
+          <StatBlock value="8" unit="sec">is what your application gets on first scan.</StatBlock>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!-- @dsCard group="Motion" viewport="700x300" subtitle="The scan light: soft hero loop vs strong parsing loop, over sheet skeletons" name="Scan sweep" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-soft); font-family: var(--font-sans); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .sheet { position: relative; overflow: hidden; background: var(--canvas); border: 1px solid var(--hairline); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sheet); }
+  .kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 12px; }
+  .bar { height: 8px; border-radius: 4px; background: rgba(27,36,48,0.11); margin-bottom: 8px; }
+  .sweep { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .sweep > div { position: absolute; left: 0; right: 0; height: 40%; }
+  .soft > div { background: linear-gradient(to bottom, transparent 0%, var(--scan-tint) 45%, var(--scan-tint) 55%, transparent 100%); border-top: 2px solid var(--scan-rule); animation: sr-scan var(--dur-scan) var(--ease-scan) infinite; }
+  .strong > div { background: linear-gradient(to bottom, transparent 0%, var(--scan-tint-strong) 45%, var(--scan-tint-strong) 55%, transparent 100%); border-top: 2px solid var(--scan-rule-strong); animation: sr-scan var(--dur-scan-parse) var(--ease-scan) infinite; }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="kicker">Hero · soft · 4.5s</div>
+    <div class="bar" style="width:72%"></div><div class="bar" style="width:50%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:40%"></div>
+    <div class="sweep soft"><div></div></div>
+  </div>
+  <div class="sheet">
+    <div class="kicker">Parsing · strong · 2.2s</div>
+    <div class="bar" style="width:72%"></div><div class="bar" style="width:50%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:40%"></div>
+    <div class="sweep strong"><div></div></div>
+  </div>
+</body>
+</html>

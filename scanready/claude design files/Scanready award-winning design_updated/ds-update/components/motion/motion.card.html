@@ -1,0 +1,45 @@
+<!-- @dsCard group="Components" viewport="760x420" name="Motion — ScanSweep, NormTicker" subtitle="The signature scan light and the norm-conversion marquee — the only sanctioned loops" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-soft); font-family: var(--font-sans); }
+  .stack { display: flex; flex-direction: column; gap: 18px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { ScanSweep, NormTicker } = window.ScanReadyDesignSystem_81c867;
+  const bar = (w, s = {}) => (
+    <div style={{ height: 8, width: w, borderRadius: 4, background: 'rgba(27,36,48,0.11)', ...s }} />
+  );
+  function Demo() {
+    return (
+      <div className="stack">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--canvas)', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-lg)', padding: 22, boxShadow: 'var(--shadow-sheet)' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: 12 }}>Parsing · strong</div>
+            <div className="stack" style={{ gap: 8 }}>{bar('72%')}{bar('50%')}{bar('86%')}{bar('62%')}{bar('40%')}</div>
+            <ScanSweep variant="loop" duration="var(--dur-scan-parse)" intensity="strong" />
+          </div>
+          <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--canvas)', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-lg)', padding: 22, boxShadow: 'var(--shadow-sheet)' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: 12 }}>Hero · soft</div>
+            <div className="stack" style={{ gap: 8 }}>{bar('72%')}{bar('50%')}{bar('86%')}{bar('62%')}{bar('40%')}</div>
+            <ScanSweep variant="loop" intensity="soft" />
+          </div>
+        </div>
+        <NormTicker />
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

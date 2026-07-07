@@ -1,0 +1,63 @@
+:root {
+  /* ── Font families — four voices ──────────────── */
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Charter', Georgia, serif; /* display headlines */
+  --font-serif-text: 'Source Serif 4', 'Iowan Old Style', Charter, Georgia, serif; /* reading serif — the generated document voice */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; /* UI */
+  --font-mono: 'Geist Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace; /* code + eyebrow */
+
+  /* ── Type sizes ───────────────────────────────── */
+  --fs-hero-display: 72px;
+  --fs-display-lg: 56px;
+  --fs-h1: 48px;
+  --fs-h2: 36px;
+  --fs-h3: 28px;
+  --fs-h4: 22px;
+  --fs-h5: 18px;
+  --fs-subtitle: 18px;
+  --fs-doc: 16px;          /* reading-serif document body */
+  --fs-body-md: 16px;
+  --fs-body-sm: 14px;
+  --fs-caption: 13px;
+  --fs-eyebrow: 12px;
+  --fs-button: 14px;
+  --fs-code-md: 14px;
+  --fs-code-sm: 13px;
+  --fs-code-inline: 13px;
+
+  /* ── Line heights ─────────────────────────────── */
+  --lh-hero-display: 1.05; /* @kind font */
+  --lh-display-lg: 1.10;   /* @kind font */
+  --lh-h1: 1.12;           /* @kind font */
+  --lh-h2: 1.20;           /* @kind font */
+  --lh-h3: 1.25;           /* @kind font */
+  --lh-h4: 1.30;           /* @kind font */
+  --lh-h5: 1.40;           /* @kind font */
+  --lh-subtitle: 1.55;     /* @kind font */
+  --lh-doc: 1.65;          /* @kind font */
+  --lh-body-md: 1.55;      /* @kind font */
+  --lh-body-sm: 1.50;      /* @kind font */
+  --lh-caption: 1.40;      /* @kind font */
+  --lh-eyebrow: 1.40;      /* @kind font */
+  --lh-button: 1.30;       /* @kind font */
+  --lh-code-md: 1.55;      /* @kind font */
+  --lh-code-sm: 1.40;      /* @kind font */
+  --lh-code-inline: 1.30;  /* @kind font */
+
+  /* ── Letter spacing (tracking) ────────────────── */
+  --ls-hero-display: -1.5px; /* @kind font */
+  --ls-display-lg: -1px;     /* @kind font */
+  --ls-h1: -0.5px;           /* @kind font */
+  --ls-eyebrow: 0.18em;      /* @kind font */
+
+  /* ── Weights ──────────────────────────────────── */
+  --fw-regular: 400;  /* @kind font */
+  --fw-medium: 500;   /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold: 700;     /* @kind font */
+
+  /* ── Semantic type aliases ────────────────────── */
+  --type-display: var(--font-serif);        /* hero-display → heading-2 */
+  --type-document: var(--font-serif-text);  /* generated Lebenslauf / Anschreiben */
+  --type-ui: var(--font-sans);              /* heading-3 down, body, buttons */
+  --type-code: var(--font-mono);            /* code + eyebrow label */
+}

@@ -4,3 +4,6 @@
 
 # macOS noise
 .DS_Store
+
+# Design-session round-trip zips (redundant with the extracted folder we commit)
+scanready/claude design files/*.zip

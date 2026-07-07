@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#e8e5de">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#e8e5de"/>
+    <rect x="420" y="220" width="360" height="360" rx="24" fill="#fdfcf9" stroke="#1b2430" stroke-width="6"/>
+    <rect x="470" y="290" width="180" height="18" rx="9" fill="#1b2430" opacity="0.75"/>
+    <rect x="470" y="330" width="240" height="12" rx="6" fill="#1b2430" opacity="0.3"/>
+    <rect x="470" y="360" width="200" height="12" rx="6" fill="#1b2430" opacity="0.3"/>
+    <rect x="470" y="390" width="220" height="12" rx="6" fill="#1b2430" opacity="0.3"/>
+    <rect x="420" y="430" width="360" height="44" fill="#0a7d63" opacity="0.22"/>
+    <rect x="420" y="428" width="360" height="5" fill="#0a7d63"/>
+    <rect x="470" y="500" width="150" height="14" rx="7" fill="#0a7d63"/>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/colors.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/typography.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/radius.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/shadows.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/styles.css">
+<script src="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #e8e5de; }
+  @keyframes sr-scan { 0% { transform: translateY(-120%); } 55% { transform: translateY(340%); } 100% { transform: translateY(340%); } }
+  @keyframes sr-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes sr-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes sr-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @keyframes sr-en-out { 0%, 30% { opacity: 1; } 40%, 92% { opacity: 0; } 99%, 100% { opacity: 1; } }
+  @keyframes sr-de-in { 0%, 32% { opacity: 0; transform: translateX(12px); } 44%, 92% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; transform: translateX(12px); } }
+  @keyframes sr-note-in { 0%, 42% { opacity: 0; transform: translateY(6px); } 52%, 92% { opacity: 1; transform: translateY(0); } 99%, 100% { opacity: 0; transform: translateY(6px); } }
+  @keyframes sr-date-pop { 0%, 42% { opacity: 0; transform: scale(0.9); } 48% { opacity: 1; transform: scale(1.08); } 53%, 92% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+  @keyframes sr-scan-cycle { 0%, 26% { transform: translateY(-130%); } 48% { transform: translateY(380%); } 100% { transform: translateY(380%); } }
+</style>
+</helmet>
+
+<section style="padding: 56px 64px 88px; display: flex; flex-direction: column; gap: 40px;">
+
+  <div style="display: flex; align-items: baseline; gap: 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">
+    <span style="color: var(--ink); font-weight: 500;">Turn 2</span>
+    <span>Final assembly — <a href="#2a" style="color: var(--accent);">2a</a> merged landing · <a href="#2b" style="color: var(--accent);">2b</a> input &amp; parsing · <a href="#2c" style="color: var(--accent);">2c</a> questions · <a href="#2d" style="color: var(--accent);">2d</a> result + Humanizer+ · <a href="#2e" style="color: var(--accent);">2e</a> mobile</span>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 96px; flex-wrap: wrap;">
+
+    <!-- ═══════════════ 2a — FINAL LANDING · 1a RHYTHM + ANIMATED HERO ═══════════════ -->
+    <div id="2a" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--accent); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">2a</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Final landing</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">1a&rsquo;s banded rhythm + 1b&rsquo;s live EN&rarr;DE converting hero</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--canvas); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+
+        <!-- Masthead -->
+        <header style="background: var(--canvas); border-bottom: 2px solid var(--ink); box-shadow: 0 5px 0 -2.5px var(--hairline); position: relative; z-index: 5;">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="26" alt="ScanReady" />
+            <div style="flex: 1; text-align: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Bewerbung · Deutschland · Erstausgabe 2026</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <span style="font-family: var(--font-sans); font-size: 14px; color: var(--steel);">How it works</span>
+              <span style="font-family: var(--font-sans); font-size: 14px; color: var(--steel);">Privacy</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="sm" hint-size="96px,36px">Try it free</x-import>
+            </div>
+          </div>
+        </header>
+
+        <!-- Hero: copy left, live-converting sheet right -->
+        <div style="background: var(--canvas);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 88px 32px 80px; display: grid; grid-template-columns: 1.02fr 0.98fr; gap: 64px; align-items: center;">
+            <div>
+              <div style="margin-bottom: 24px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="320px,16px">For internationals applying in Germany</x-import></div>
+              <h1 style="font-family: var(--font-serif); font-size: 68px; font-weight: 600; line-height: 1.05; letter-spacing: -1.5px; color: var(--ink); margin: 0; max-width: 13ch;">Win the German recruiter&rsquo;s <span style="box-shadow: inset 0 -3px 0 var(--accent-soft), inset 0 -5px 0 var(--accent);">first scan</span>.</h1>
+              <p style="font-family: var(--font-sans); font-size: 18px; line-height: 1.55; color: var(--steel); margin: 28px 0 0; max-width: 46ch;">Your CV, re-typeset into the German Lebenslauf and an Anschreiben that sounds like you — grounded only in your real facts, never invented. Every change annotated, so you trust what you send.</p>
+              <div style="display: flex; align-items: center; gap: 14px; margin-top: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="lg" hint-size="150px,48px">See an example</x-import>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 24px; font-family: var(--font-sans); font-size: 14px; color: var(--stone);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Nothing is stored. Processing is stateless and zero-retention.
+              </div>
+            </div>
+
+            <!-- Live-converting sheet -->
+            <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 40px 44px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 24px 56px rgba(27,36,48,0.10); overflow: hidden;">
+              <!-- EN overlay -->
+              <div style="position: absolute; inset: 0; z-index: 2; background: var(--canvas); border-radius: 12px; padding: 40px 44px; animation: sr-en-out 11s cubic-bezier(0.23,1,0.32,1) infinite both;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone);">resume.docx</div>
+                  <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand-error); border: 1px solid rgba(192,80,60,0.35); border-radius: 4px; padding: 3px 8px; white-space: nowrap;">US format</span>
+                </div>
+                <div style="font-family: var(--font-sans); font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; margin-top: 14px;">AMARA OKAFOR</div>
+                <div style="font-family: var(--font-sans); font-size: 12px; color: var(--steel); margin-top: 4px;">Berlin, Germany · amara.okafor@mail.de</div>
+                <div style="height: 1px; background: var(--hairline); margin: 18px 0;"></div>
+                <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin-bottom: 8px;">PROFESSIONAL SUMMARY</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 0;">Results-driven product professional with strong communication skills…</p>
+                <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 20px 0 8px;">EXPERIENCE</div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+                  <span style="font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--ink);">Senior Product Manager — Acme GmbH</span>
+                  <span style="font-family: var(--font-mono); font-size: 11px; color: var(--brand-error); white-space: nowrap;">Mar 2021 – Present</span>
+                </div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 5px 0 0;">Owned product strategy for a team of 12; grew revenue 40%.</p>
+                <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 20px 0 8px;">SKILLS</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 0;">Excel, SQL, Figma, Forecasting, Driver&rsquo;s license</p>
+                <p style="font-family: var(--font-sans); font-size: 12px; color: var(--stone); margin: 20px 0 0;">References available upon request.</p>
+              </div>
+              <!-- Scan sweep -->
+              <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 3;">
+                <div style="position: absolute; left: 0; right: 0; height: 36%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.08) 45%, rgba(10,125,99,0.08) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.45); animation: sr-scan-cycle 11s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+              </div>
+              <!-- DE layer -->
+              <div style="position: relative; animation: sr-de-in 11s cubic-bezier(0.23,1,0.32,1) infinite both;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Lebenslauf</div>
+                <div style="font-family: var(--font-serif); font-size: 24px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; margin-top: 14px;">Amara Okafor</div>
+                <div style="font-family: var(--font-sans); font-size: 12px; color: var(--steel); margin-top: 4px;">Senior Product Managerin · Berlin · amara.okafor@mail.de</div>
+                <div style="height: 1px; background: var(--hairline); margin: 18px 0;"></div>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Berufserfahrung</div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+                  <span style="font-family: var(--font-serif-text); font-size: 14px; font-weight: 600; color: var(--ink);">Senior Product Managerin · Acme GmbH</span>
+                  <span style="display: inline-block; font-family: var(--font-mono); font-size: 11px; color: var(--accent); font-weight: 500; white-space: nowrap; animation: sr-date-pop 11s cubic-bezier(0.23,1,0.32,1) infinite both;">03/2021 – heute</span>
+                </div>
+                <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.65; color: var(--charcoal); margin: 5px 0 0;">Produktstrategie für ein Team von zwölf Personen; Umsatz um 40&nbsp;% gesteigert.</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 20px 0 8px;">Kenntnisse</div>
+                <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.65; color: var(--charcoal); margin: 0;">IT-Kenntnisse: Excel, SQL, Figma · Fachkenntnisse: Forecasting</p>
+                <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">DIN 5008</span></div>
+                  <div style="display: flex; align-items: center; gap: 8px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 0.3s;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">&ldquo;Present&rdquo; &rarr; &ldquo;heute&rdquo;</span></div>
+                  <div style="display: flex; align-items: center; gap: 8px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 0.6s;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">Foto optional · AGG</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Norm ticker -->
+        <div style="border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--surface-soft); overflow: hidden; padding: 12px 0;">
+          <div style="display: flex; width: max-content; animation: sr-marquee 36s linear infinite;">
+            <div style="display: flex; gap: 40px; padding-right: 40px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+              <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+              <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+              <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              <span>Foto optional · AGG</span><span style="color: var(--eyebrow);">·</span>
+              <span>Skills <span style="color: var(--accent);">→</span> IT-Kenntnisse · Fachkenntnisse</span><span style="color: var(--eyebrow);">·</span>
+              <span>Zwei Seiten, nicht eine</span><span style="color: var(--eyebrow);">·</span>
+            </div>
+            <div style="display: flex; gap: 40px; padding-right: 40px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+              <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+              <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+              <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              <span>Foto optional · AGG</span><span style="color: var(--eyebrow);">·</span>
+              <span>Skills <span style="color: var(--accent);">→</span> IT-Kenntnisse · Fachkenntnisse</span><span style="color: var(--eyebrow);">·</span>
+              <span>Zwei Seiten, nicht eine</span><span style="color: var(--eyebrow);">·</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 01 Pathways -->
+        <div style="background: var(--surface); position: relative; overflow: hidden;">
+          <div style="position: absolute; top: 24px; right: 12px; font-family: var(--font-serif); font-size: 280px; line-height: 1; font-weight: 600; color: rgba(27,36,48,0.045); user-select: none;">01</div>
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; position: relative;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">01</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="90px,16px">Pathways</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 48px; max-width: 20ch;">Two documents. Both have to survive the scan.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="130px,16px">Authentic voice</x-import>
+                <h3 style="font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--ink); margin: 14px 0 12px; line-height: 1.2;">Sounds like you, not a template.</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 24px;">We ask 3–5 questions about your real motivations and specific achievements. Your answers become the letter — we never invent an employer, title, date, or skill.</p>
+                <div style="background: var(--surface-soft); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 18px;">
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 6px;">Before</div>
+                  <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 14px;">&ldquo;I am a results-driven professional with strong communication skills…&rdquo;</p>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;">After</div>
+                  <p style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.6; color: var(--ink); margin: 0;">&ldquo;Ich habe mein Vertriebsziel im dritten Quartal um 23&nbsp;% übertroffen, indem ich einen neuen Onboarding-Prozess eingeführt habe.&rdquo;</p>
+                </div>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="170px,16px">German-norm format</x-import>
+                <h3 style="font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--ink); margin: 14px 0 12px; line-height: 1.2;">The format gap, closed.</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 24px;">The rules are the gap, not your experience. Reverse-chronological DIN layout, correct dates, personal-data block, photo guidance — and the rules aren&rsquo;t what most blogs claim.</p>
+                <div style="background: var(--surface-soft); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 18px;">
+                  <div style="font-family: var(--font-serif-text); font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 10px;">Lebenslauf</div>
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <div style="display: flex; align-items: center; gap: 10px;"><div style="height: 7px; width: 90px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span><span style="font-family: var(--font-mono); font-size: 11px; color: var(--slate);">Foto (optional)</span></div>
+                    <div style="height: 7px; width: 150px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                    <div style="display: flex; align-items: center; gap: 10px;"><div style="height: 7px; width: 70px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span><span style="font-family: var(--font-mono); font-size: 11px; color: var(--slate);">01.03.2022 · DIN</span></div>
+                    <div style="height: 7px; width: 120px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figure style="max-width: 720px; margin: 88px auto 0; text-align: center;">
+              <div style="height: 1px; width: 64px; background: rgba(27,36,48,0.3); margin: 0 auto 36px;"></div>
+              <blockquote style="font-family: var(--font-serif-text); font-size: 34px; line-height: 1.35; color: var(--ink); margin: 0; text-indent: -0.45em;"><span style="color: var(--accent);">&ldquo;</span>61% of German recruiters prefer a two-page CV — and 64% call spelling errors a dealbreaker.</blockquote>
+              <figcaption style="margin-top: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone);">DACH recruiter studies, not imported one-page lore</figcaption>
+              <div style="height: 1px; width: 64px; background: rgba(27,36,48,0.3); margin: 36px auto 0;"></div>
+            </figure>
+          </div>
+        </div>
+
+        <!-- 02 How it works -->
+        <div style="background: var(--canvas);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">02</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="110px,16px">How it works</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 56px;">Three steps. One honest output.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;">
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">1</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Paste your CV</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">US, UK, or any English format. No account, no upload, no storage.</p>
+              </div>
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">2</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Get a Lebenslauf + English notes</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">Restructured to the German norm — every formatting change annotated, so you trust what changed and why.</p>
+              </div>
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">3</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Answer 3–5 questions, get your Anschreiben</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">Paste the posting, answer honestly. The letter streams live, grounded only in your own facts.</p>
+              </div>
+            </div>
+            <div style="margin-top: 56px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="lg" hint-size="240px,48px">Start now — it takes 5 minutes</x-import></div>
+          </div>
+        </div>
+
+        <!-- 03 Trust band -->
+        <div style="background: linear-gradient(135deg, var(--band-from), var(--band-to));">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 72px; align-items: center;">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 12px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 20px;"><span style="opacity: 0.7;">03</span><span>Trust</span></div>
+              <h2 style="font-family: var(--font-serif); font-size: 52px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--on-dark); margin: 0 0 20px;">Zero-retention,<br />by design.</h2>
+              <p style="font-family: var(--font-sans); font-size: 17px; line-height: 1.6; color: var(--on-dark-soft); margin: 0; max-width: 44ch;">Your CV text is sent to the AI, the output comes back, and nothing is saved. No database. No account. No training on your data. What you paste here stays between you and your application.</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--hairline-dark);">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">No storage, no account</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">Not used for AI training</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">Grounded, never fabricated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 Founder's note -->
+        <div style="background: var(--surface);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; display: grid; grid-template-columns: 360px 1fr; gap: 72px;">
+            <div>
+              <div style="width: 32px; height: 2px; background: var(--ink); margin-bottom: 20px;"></div>
+              <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+                <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">04</span>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="130px,16px">Founder&rsquo;s note</x-import>
+              </div>
+              <h2 style="font-family: var(--font-serif); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -0.5px; color: var(--ink); margin: 0;">Built by a German, for everyone applying here.</h2>
+            </div>
+            <div style="font-family: var(--font-serif-text); font-size: 17px; line-height: 1.7; color: var(--charcoal); max-width: 60ch;">
+              <p style="margin: 0 0 18px;"><span style="float: left; font-family: var(--font-serif); font-size: 60px; line-height: 0.82; padding: 4px 8px 0 0; font-weight: 600; color: var(--ink);">I</span>&rsquo;m German, born and raised, living in Hamburg. I know the Lebenslauf and Anschreiben conventions from the inside — what a recruiter here expects to see, and what quietly signals &ldquo;this person doesn&rsquo;t know the norms.&rdquo;</p>
+              <p style="margin: 0 0 18px;">I&rsquo;m applying for jobs myself right now, so I test every change against my own real CV before it ships. Existing tools either invented experience I don&rsquo;t have or produced generic filler that sounded nothing like me. So I built this instead.</p>
+              <p style="margin: 0 0 28px;">ScanReady never invents facts. The German is native-quality because I&rsquo;m native. The voice is yours — built from your own answers, not a template.</p>
+              <div style="display: flex; align-items: baseline; gap: 16px;">
+                <span style="font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--ink);">Kilian Hartmann</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Hamburg · 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 Proof -->
+        <div style="background: var(--canvas);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; justify-content: center;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">05</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="190px,16px">What actually changes</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 56px; text-align: center;">Three mechanical fixes, every time.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">Mar 2021 – Present</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-mono); font-size: 14px; color: var(--ink); margin: 0 0 16px;">03/2021 – heute</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">German date format, and &ldquo;heute&rdquo; instead of &ldquo;Present.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">German: fluent, English: native</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-serif-text); font-size: 14px; color: var(--ink); margin: 0 0 16px;">Deutsch: Verhandlungssicher · Englisch: Muttersprache</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">German recruiters expect German CV vocabulary, not &ldquo;fluent.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">Excel, SQL, Forecasting, Driver&rsquo;s license</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-serif-text); font-size: 14px; color: var(--ink); margin: 0 0 16px;">IT-Kenntnisse: Excel, SQL · Fachkenntnisse: Forecasting · Sonstige: Führerschein Klasse B</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">Skills grouped into the categories German recruiters scan for.</p>
+              </div>
+            </div>
+            <p style="text-align: center; font-family: var(--font-sans); font-size: 14px; color: var(--stone); margin: 48px auto 0; max-width: 52ch;">No testimonials yet — the tool is new. Judge the output yourself. The first conversion is free.</p>
+          </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div style="background: var(--surface); border-top: 1px solid var(--hairline);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 112px 32px; text-align: center;">
+            <h2 style="font-family: var(--font-serif); font-size: 56px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--ink); margin: 0 0 32px;">Send the application<br />Germany expects.</h2>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+            <p style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin: 20px 0 0;">No account · No storage · 5 minutes</p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="background: var(--band-from);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 48px 32px;">
+            <p style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin: 0 0 16px;">ScanReady · Seite 1</p>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--on-dark);">ScanReady</span>
+              <div style="display: flex; align-items: center; gap: 24px; font-family: var(--font-sans); font-size: 14px; color: var(--on-dark-soft);">
+                <span>Impressum</span><span>Datenschutz</span><span>AGB</span><span>© 2026</span>
+                <span style="position: relative; width: 18px; height: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; display: inline-block;">
+                  <span style="position: absolute; left: 50%; top: 2px; bottom: 2px; width: 1px; background: rgba(255,255,255,0.3); transform: translateX(-50%);"></span>
+                  <span style="position: absolute; top: 50%; left: 2px; right: 2px; height: 1px; background: rgba(255,255,255,0.3); transform: translateY(-50%);"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════ 2b — CONVERTER · INPUT + PARSING ═══════════════ -->
+    <div id="2b" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">2b</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Converter — paste &amp; parse</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Input state on top; the parsing state (scan-sweep skeleton) below</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+        <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--ink);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1.5px solid var(--ink);"></span>1 Lebenslauf</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--stone);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1px solid var(--stone);"></span>2 Questions</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--stone);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1px solid var(--stone);"></span>3 Anschreiben</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--stone);"><span style="color: var(--ink); font-weight: 500;">EN</span> / DE</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--stone);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Zero-retention
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Input state -->
+        <div style="max-width: 820px; margin: 0 auto; padding: 56px 32px 64px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 20px;">State · Input</div>
+          <h1 style="font-family: var(--font-serif); font-size: 38px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 10px;">Paste your CV.</h1>
+          <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 12px;">US, UK, or any English format — ScanReady re-typesets it into the Lebenslauf a German recruiter expects.</p>
+          <p style="display: flex; align-items: center; gap: 8px; font-family: var(--font-sans); font-size: 14px; color: var(--stone); margin: 0 0 24px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Nothing is stored — your file is read in the browser and never uploaded.
+          </p>
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="170px,40px">Upload PDF or .txt</x-import>
+            <span style="font-family: var(--font-sans); font-size: 14px; color: var(--stone);">or paste / drop the text below</span>
+          </div>
+          <div style="background: var(--canvas); border: 2px solid var(--accent); border-radius: 6px; padding: 18px 20px; min-height: 260px; box-shadow: 0 0 0 3px rgba(10,125,99,0.10);">
+            <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink); margin: 0; white-space: pre-line;">AMARA OKAFOR
+Berlin, Germany · amara.okafor@mail.de · +49 176 2345 6789
+
+PROFESSIONAL SUMMARY
+Results-driven product professional with strong communication skills…
+
+EXPERIENCE
+Senior Product Manager — Acme GmbH · Mar 2021 – Present
+Owned product strategy for a team of 12; grew revenue 40% by launching a new enterprise onboarding process.
+
+Product Manager — Beispiel AG · Jun 2018 – Feb 2021
+Shipped a new onboarding flow; improved activation by 22%.</p>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+            <span style="font-family: var(--font-sans); font-size: 13px; color: var(--stone);">8.412 / 30.000</span>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="lg" hint-size="220px,48px">Convert to Lebenslauf</x-import>
+          </div>
+        </div>
+
+        <!-- Parsing state -->
+        <div style="border-top: 1px solid var(--hairline); background: var(--surface-soft);">
+          <div style="max-width: 820px; margin: 0 auto; padding: 48px 32px 64px;">
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 20px;">State · Parsing</div>
+            <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 44px 52px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06); overflow: hidden;">
+              <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+                <div style="position: absolute; left: 0; right: 0; height: 40%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.10) 45%, rgba(10,125,99,0.10) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.55); animation: sr-scan 2.2s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="height: 18px; width: 34%; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                <div style="height: 9px; width: 52%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 9px; width: 40%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 12px; width: 24%; border-radius: 4px; background: rgba(27,36,48,0.12); margin-top: 16px;"></div>
+                <div style="height: 9px; width: 76%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 9px; width: 66%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 9px; width: 50%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 12px; width: 24%; border-radius: 4px; background: rgba(27,36,48,0.12); margin-top: 16px;"></div>
+                <div style="height: 9px; width: 60%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+                <div style="height: 9px; width: 46%; border-radius: 4px; background: rgba(27,36,48,0.09);"></div>
+              </div>
+            </div>
+            <p style="display: flex; align-items: center; gap: 10px; font-family: var(--font-sans); font-size: 14px; color: var(--steel); margin: 18px 0 0;">
+              <span style="height: 7px; width: 7px; border-radius: 999px; background: var(--accent); animation: sr-pulse 1.4s ease infinite;"></span>
+              Reformatting dates to DIN 5008 — &ldquo;Present&rdquo; becomes &ldquo;heute&rdquo;…
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ 2c — CONVERTER · QUESTIONS ═══════════════ -->
+    <div id="2c" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">2c</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Converter — posting &amp; questions</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">The 5 grounding questions + the conditional Gehaltsvorstellung question the posting triggered</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+        <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>1 Lebenslauf</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--ink);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1.5px solid var(--ink);"></span>2 Questions</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--stone);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1px solid var(--stone);"></span>3 Anschreiben</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--stone);"><span style="color: var(--ink); font-weight: 500;">EN</span> / DE</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--stone);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Zero-retention
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <div style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 72px;">
+          <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+            <div>
+              <h1 style="font-family: var(--font-serif); font-size: 38px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 8px;">Now, the Anschreiben.</h1>
+              <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 32px;">Paste the posting, then answer honestly. The letter is built only from what you write here — never from a template.</p>
+
+              <div style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px;">Job posting <span style="color: var(--brand-error);">*</span></div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 16px 18px;">
+                <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink); margin: 0; white-space: pre-line;">Senior Product Manager (m/w/d) — Acme GmbH, Berlin
+Wir suchen eine erfahrene Produktpersönlichkeit für unser Plattform-Team. Sie verantworten Roadmap und Discovery…
+Bitte nennen Sie Ihre Gehaltsvorstellung und Ihren frühestmöglichen Eintrittstermin.</p>
+              </div>
+              <div style="text-align: right; font-family: var(--font-sans); font-size: 13px; color: var(--stone); margin: 8px 0 32px;">1.874 / 15.000</div>
+
+              <div style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 16px;">Your answers become the letter.</div>
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">Describe one specific achievement from your last role that you&rsquo;re proud of (with a number if you can).</span>
+                  <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 16px; font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--ink);">Grew revenue 40% by fixing enterprise onboarding, not by shipping more features.</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">What specifically about THIS company or role made you apply?</span>
+                  <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 16px; font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--ink);">They make product decisions with data, and I&rsquo;ve run A/B programs for 4 years.</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">What&rsquo;s your main motivation for working in Germany / this position right now?</span>
+                  <div style="background: var(--canvas); border: 2px solid var(--accent); border-radius: 6px; padding: 12px 16px; font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--ink);">Berlin is home now — I want to build for the market I live in.<span style="display: inline-block; width: 2px; height: 16px; background: var(--accent); vertical-align: text-bottom; margin-left: 2px; animation: sr-caret 1s steps(1) infinite;"></span></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">How would colleagues describe your working style in a sentence?</span>
+                  <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 16px; min-height: 44px;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">Any gap, career change, or unusual background you&rsquo;d like to address up front?</span>
+                  <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 16px; min-height: 44px;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-family: var(--font-sans); font-size: 14px; color: var(--slate);">This posting asks for a salary expectation (Gehaltsvorstellung). What figure or range do you want to state?</span>
+                    <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: var(--accent-tint); border-radius: 999px; padding: 3px 10px; white-space: nowrap;">Added — the posting asks</span>
+                  </div>
+                  <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 16px; font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--ink);">72.000–78.000 € brutto/Jahr</div>
+                </div>
+              </div>
+
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 14px 18px; margin-top: 24px;">
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">A native German speaker should review the final letter before you send it.</p>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 28px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="lg" hint-size="230px,48px">Generate the Anschreiben</x-import>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="lg" hint-size="170px,48px">Back to Lebenslauf</x-import>
+              </div>
+            </div>
+
+            <!-- Rail -->
+            <div style="display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px;">
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); padding-bottom: 4px;">Why we ask</div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Grounded, never invented</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">Every claim in the letter comes from your Lebenslauf or the answers on this page. Blank answers are simply skipped — nothing gets made up to fill the gap.</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Your Lebenslauf</div>
+                <p style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.6; color: var(--charcoal); margin: 0;">Amara Okafor — 2 Positionen, 3 Kenntnis-Gruppen, 3 Sprachen</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; color: var(--accent); margin: 10px 0 0;">4 norm gaps fixed ✓</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 4px;">Conditional questions</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 0;">The posting mentions Gehaltsvorstellung and Eintrittstermin — matching questions were added so the letter can answer them the German way.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ 2d — CONVERTER · RESULT + HUMANIZER+ ═══════════════ -->
+    <div id="2d" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">2d</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Converter — Anschreiben result + Humanizer+</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Finished letter with honest placeholders; the one-shot refinement modal open</span>
+      </div>
+
+      <div style="width: 1440px; position: relative; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+        <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>1 Lebenslauf</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>2 Questions</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>3 Anschreiben</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--stone);"><span style="color: var(--ink); font-weight: 500;">EN</span> / DE</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--stone);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Zero-retention
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <div style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 72px;">
+          <div style="margin-bottom: 32px;">
+            <h1 style="font-family: var(--font-serif); font-size: 38px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 8px;">Your Anschreiben is ready.</h1>
+            <p style="font-family: var(--font-sans); font-size: 15px; color: var(--steel); margin: 0;">Grounded in your facts and your own words. Click anywhere in the letter to edit it.</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 64px 72px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06);">
+              <div style="font-family: var(--font-serif-text); font-size: 16px; line-height: 1.7; color: var(--ink);">
+                <p style="margin: 0;">Amara Okafor<br /><span style="background: var(--accent-tint); border-radius: 3px; padding: 0 3px;">[Straße Hausnummer]</span><br /><span style="background: var(--accent-tint); border-radius: 3px; padding: 0 3px;">[PLZ] [Ort]</span></p>
+                <p style="margin: 24px 0 0; text-align: right; color: var(--steel); font-size: 14px;"><span style="background: var(--accent-tint); border-radius: 3px; padding: 0 3px;">[Ort], [Datum]</span></p>
+                <p style="margin: 24px 0 0;">Acme GmbH<br />Personalabteilung<br />Chausseestraße 20<br />10115 Berlin</p>
+                <p style="margin: 32px 0 0; font-weight: 600;">Bewerbung als Senior Product Managerin — Referenz PM-2026-114</p>
+                <p style="margin: 24px 0 0;">Sehr geehrte Damen und Herren,</p>
+                <p style="margin: 18px 0 0;">Produkte baue ich am liebsten dort, wo sie messbar etwas verändern. In den letzten fünf Jahren habe ich bei Acme GmbH eine Produktstrategie verantwortet, die den Umsatz um 40&nbsp;% gesteigert hat: nicht durch mehr Features, sondern durch einen Onboarding-Prozess, der Enterprise-Kunden schneller zum ersten Erfolg führt.</p>
+                <p style="margin: 18px 0 0;">An Ihrer Ausschreibung hat mich der Fokus auf datengetriebene Produktentscheidungen überzeugt. Genau so arbeite ich: Seit vier Jahren verantworte ich A/B-Testing-Programme, zuletzt mit direktem Einfluss auf die Aktivierungsrate. Berlin ist inzwischen mein Zuhause, und ich möchte für den Markt bauen, in dem ich lebe.</p>
+                <p style="margin: 18px 0 0;">Meine Gehaltsvorstellung liegt bei 72.000 bis 78.000 Euro brutto im Jahr. Ein Eintritt ist zum 01.09.2026 möglich. Ich freue mich auf ein persönliches Gespräch.</p>
+                <p style="margin: 24px 0 0;">Mit freundlichen Grüßen<br />Amara Okafor</p>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); padding-bottom: 4px;">Next steps</div>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" hint-size="100%,40px" style="width:100%">Humanizer+ — refine the register</x-import>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" hint-size="100%,40px" style="width:100%">Copy letter</x-import>
+              <div style="display: flex; gap: 10px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="50%,40px" style="flex:1">Download .txt</x-import>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="50%,40px" style="flex:1">Regenerate</x-import>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 14px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Note</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">Green marks are placeholders — fill in your address and date. A native German speaker should review before you send.</p>
+              </div>
+              <div style="border-top: 1px solid var(--hairline); padding-top: 16px;">
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 0 0 12px;">Applying to another posting? Reuse the same Lebenslauf.</p>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="sm" hint-size="150px,36px">Write a new letter</x-import>
+              </div>
+              <span style="font-family: var(--font-sans); font-size: 13px; color: var(--stone); text-decoration: underline; text-underline-offset: 2px;">Start over</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Humanizer+ modal overlay -->
+        <div style="position: absolute; inset: 0; background: rgba(27,36,48,0.45); display: flex; align-items: center; justify-content: center; padding: 32px; z-index: 10;">
+          <div style="width: 520px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px 32px; box-shadow: 0 24px 64px -16px rgba(27,36,48,0.4); display: flex; flex-direction: column; gap: 18px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+              <div>
+                <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 6px;">Humanizer+</div>
+                <h2 style="font-family: var(--font-serif); font-size: 26px; font-weight: 600; color: var(--ink); margin: 0;">Feinschliff, in your register.</h2>
+              </div>
+              <span style="font-family: var(--font-sans); font-size: 22px; color: var(--stone); line-height: 1;">×</span>
+            </div>
+            <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--steel); margin: 0;">Choose a direction. Style only — every fact, number and date stays exactly as it is.</p>
+
+            <div style="border: 2px solid var(--accent); background: var(--canvas); border-radius: 12px; padding: 16px 18px;">
+              <span style="display: inline-block; font-family: var(--font-sans); font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 12px; margin-bottom: 8px;">Recommended for this posting</span>
+              <div style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--ink);">Formeller</div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 4px 0 8px;">The traditional Konzern &amp; Mittelstand register — conservative structure, classical courtesy.</p>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.5; color: var(--slate); margin: 0;">&bdquo;Über die Gelegenheit zu einem persönlichen Gespräch würde ich mich sehr freuen.&ldquo;</p>
+            </div>
+            <div style="border: 1px solid var(--hairline); background: var(--canvas); border-radius: 12px; padding: 16px 18px;">
+              <div style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--ink);">Moderner</div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 4px 0 8px;">Direct and energetic, for startups &amp; scale-ups — professional Sie-Form stays.</p>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.5; color: var(--slate); margin: 0;">&bdquo;Lassen Sie uns sprechen, am liebsten direkt über die nächsten Schritte.&ldquo;</p>
+            </div>
+            <div style="border: 1px solid var(--hairline); background: var(--canvas); border-radius: 12px; padding: 16px 18px;">
+              <div style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--ink);">Prägnanter</div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 4px 0 8px;">Noticeably shorter — redundancy removed, every fact and your voice preserved.</p>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.5; color: var(--slate); margin: 0;">&bdquo;Ich freue mich auf ein Gespräch.&ldquo;</p>
+            </div>
+
+            <p style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin: 0;">You can restore the original letter at any time.</p>
+            <p style="font-family: var(--font-sans); font-size: 12px; color: var(--stone); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">One-shot purchase · Delivered in seconds · <span style="text-decoration: underline;">AGB</span> / <span style="text-decoration: underline;">Datenschutz</span> / <span style="text-decoration: underline;">Impressum</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ 2e — MOBILE ═══════════════ -->
+    <div id="2e" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">2e</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Mobile — 390px</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Landing · Lebenslauf result · Anschreiben result</span>
+      </div>
+
+      <div style="display: flex; gap: 40px; align-items: flex-start;">
+
+        <!-- M1: Landing mobile -->
+        <div style="width: 390px; background: var(--canvas); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden; flex-shrink: 0;">
+          <header style="border-bottom: 2px solid var(--ink); box-shadow: 0 4px 0 -2px var(--hairline); padding: 0 20px; height: 56px; display: flex; align-items: center; justify-content: space-between;">
+            <img src="assets/scanready-lockup.svg" height="20" alt="ScanReady" />
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="sm" hint-size="90px,32px">Try it free</x-import>
+          </header>
+          <div style="padding: 48px 20px 40px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 16px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="240px,14px">For internationals in Germany</x-import></div>
+            <h1 style="font-family: var(--font-serif); font-size: 40px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--ink); margin: 0;">Win the recruiter&rsquo;s <span style="box-shadow: inset 0 -2px 0 var(--accent-soft), inset 0 -4px 0 var(--accent);">first scan</span>.</h1>
+            <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 16px 0 0;">Your CV, re-typeset into the German Lebenslauf and an Anschreiben in your voice — never invented.</p>
+            <div style="margin-top: 24px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="100%,48px" style="width:100%">Convert your CV — it&rsquo;s free</x-import></div>
+            <p style="display: flex; align-items: center; justify-content: center; gap: 6px; font-family: var(--font-sans); font-size: 12px; color: var(--stone); margin: 14px 0 0;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Nothing stored · Zero-retention
+            </p>
+          </div>
+          <div style="padding: 0 20px 40px;">
+            <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.08); overflow: hidden;">
+              <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 3;">
+                <div style="position: absolute; left: 0; right: 0; height: 36%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.08) 45%, rgba(10,125,99,0.08) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.45); animation: sr-scan-cycle 11s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Lebenslauf</div>
+              <div style="font-family: var(--font-serif); font-size: 19px; font-weight: 600; color: var(--ink); margin-top: 10px;">Amara Okafor</div>
+              <div style="height: 1px; background: var(--hairline); margin: 12px 0;"></div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px;">
+                <span style="font-family: var(--font-serif-text); font-size: 12px; font-weight: 600; color: var(--ink);">Senior Product Managerin</span>
+                <span style="font-family: var(--font-mono); font-size: 10px; color: var(--accent); font-weight: 500; white-space: nowrap;">03/2021 – heute</span>
+              </div>
+              <p style="font-family: var(--font-serif-text); font-size: 12px; line-height: 1.6; color: var(--charcoal); margin: 4px 0 0;">Umsatz um 40&nbsp;% gesteigert; neuer Onboarding-Prozess.</p>
+              <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--hairline); display: flex; flex-wrap: wrap; gap: 6px 14px;">
+                <span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">DIN 5008</span>
+                <span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">&ldquo;Present&rdquo; &rarr; &ldquo;heute&rdquo;</span>
+                <span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">Foto optional</span>
+              </div>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--surface-soft); overflow: hidden; padding: 9px 0;">
+            <div style="display: flex; width: max-content; animation: sr-marquee 30s linear infinite;">
+              <div style="display: flex; gap: 28px; padding-right: 28px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+                <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+                <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+                <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              </div>
+              <div style="display: flex; gap: 28px; padding-right: 28px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+                <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+                <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+                <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--surface); padding: 48px 20px;">
+            <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">01</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="80px,14px">Pathways</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 28px; font-weight: 600; line-height: 1.15; color: var(--ink); margin: 0 0 24px;">Two documents. Both have to survive the scan.</h2>
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 22px; margin-bottom: 16px;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="120px,14px">Authentic voice</x-import>
+              <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink); margin: 10px 0 8px;">Sounds like you, not a template.</h3>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--steel); margin: 0;">3–5 honest questions become the letter — no invented employers, titles, dates, or skills.</p>
+            </div>
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 22px;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="150px,14px">German-norm format</x-import>
+              <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink); margin: 10px 0 8px;">The format gap, closed.</h3>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.55; color: var(--steel); margin: 0;">Reverse-chronological DIN layout, correct dates, personal-data block, photo guidance.</p>
+            </div>
+          </div>
+          <div style="background: linear-gradient(135deg, var(--band-from), var(--band-to)); padding: 48px 20px; text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 14px;">03 · Trust</div>
+            <h2 style="font-family: var(--font-serif); font-size: 30px; font-weight: 600; line-height: 1.1; color: var(--on-dark); margin: 0 0 12px;">Zero-retention, by design.</h2>
+            <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--on-dark-soft); margin: 0;">No database. No account. No training on your data.</p>
+          </div>
+          <div style="background: var(--surface); padding: 48px 20px; text-align: center; border-top: 1px solid var(--hairline);">
+            <h2 style="font-family: var(--font-serif); font-size: 30px; font-weight: 600; line-height: 1.1; color: var(--ink); margin: 0 0 20px;">Send the application Germany expects.</h2>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="100%,48px" style="width:100%">Convert your CV — it&rsquo;s free</x-import>
+            <p style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin: 14px 0 0;">No account · 5 minutes</p>
+          </div>
+          <footer style="background: var(--band-from); padding: 24px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--on-dark);">ScanReady</span>
+            <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4);">Seite 1 · © 2026</span>
+          </footer>
+        </div>
+
+        <!-- M2: Lebenslauf result mobile -->
+        <div style="width: 390px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden; flex-shrink: 0;">
+          <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline); padding: 0 16px; height: 52px; display: flex; align-items: center; justify-content: space-between;">
+            <img src="assets/scanready-lockup.svg" height="18" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 4px; color: var(--accent);"><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent);"></span>1</span>
+              <span style="height: 1px; width: 14px; background: var(--hairline);"></span>
+              <span style="color: var(--stone);">2</span>
+              <span style="height: 1px; width: 14px; background: var(--hairline);"></span>
+              <span style="color: var(--stone);">3</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--stone);">EN/DE</span>
+          </header>
+          <div style="padding: 28px 16px 40px;">
+            <h1 style="font-family: var(--font-serif); font-size: 26px; font-weight: 600; letter-spacing: -0.3px; color: var(--ink); margin: 0 0 6px;">Your Lebenslauf, norm-correct.</h1>
+            <p style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin: 0 0 20px;"><span style="color: var(--accent); font-weight: 600;">4 norm gaps fixed</span> — notes below the document.</p>
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px 24px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                <div>
+                  <div style="font-family: var(--font-serif); font-size: 21px; font-weight: 600; color: var(--ink);">Amara Okafor</div>
+                  <div style="font-family: var(--font-sans); font-size: 11px; color: var(--steel); margin-top: 4px;">Berlin · amara.okafor@mail.de</div>
+                </div>
+                <div style="width: 52px; height: 66px; border: 1px dashed var(--hairline); border-radius: 4px; display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); line-height: 1.5; position: relative; flex-shrink: 0;">Foto<span style="position: absolute; top: -6px; right: -6px; height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center;">1</span></div>
+              </div>
+              <div style="height: 1px; background: var(--hairline); margin: 16px 0;"></div>
+              <div style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Berufserfahrung</div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px;">
+                <span style="font-family: var(--font-serif-text); font-size: 13px; font-weight: 600; color: var(--ink);">Senior Product Managerin · Acme GmbH</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;"><span style="font-family: var(--font-mono); font-size: 10px; color: var(--accent); font-weight: 500; background: var(--accent-tint); padding: 1px 6px; border-radius: 3px;">03/2021 – heute</span><span style="height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">2</span></span>
+              </div>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.6; color: var(--charcoal); margin: 6px 0 0;">Produktstrategie für zwölf Personen; Umsatz um 40&nbsp;% gesteigert.</p>
+              <div style="display: flex; align-items: center; gap: 6px; margin: 18px 0 8px;"><span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Kenntnisse</span><span style="height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">3</span></div>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.7; color: var(--charcoal); margin: 0;"><span style="font-weight: 600; color: var(--ink);">IT:</span> SQL, Figma · <span style="font-weight: 600; color: var(--ink);">Fach:</span> Forecasting</p>
+              <div style="display: flex; align-items: center; gap: 6px; margin: 18px 0 8px;"><span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Sprachen</span><span style="height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">4</span></div>
+              <p style="font-family: var(--font-serif-text); font-size: 13px; line-height: 1.6; color: var(--charcoal); margin: 0;">Englisch: Muttersprache · Deutsch: Verhandlungssicher</p>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 24px 0 12px;">Norm notes</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px;">
+                <span style="height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">2</span>
+                <p style="font-family: var(--font-sans); font-size: 12px; line-height: 1.5; color: var(--ink-soft); margin: 0;">&ldquo;Mar 2021 – Present&rdquo; &rarr; &ldquo;03/2021 – heute&rdquo; — DIN 5008 date format.</p>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px;">
+                <span style="height: 15px; width: 15px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 9px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">4</span>
+                <p style="font-family: var(--font-sans); font-size: 12px; line-height: 1.5; color: var(--ink-soft); margin: 0;">&ldquo;Fluent&rdquo; &rarr; &ldquo;Verhandlungssicher&rdquo; — German CV vocabulary.</p>
+              </div>
+              <span style="font-family: var(--font-sans); font-size: 12px; color: var(--stone); text-decoration: underline; text-underline-offset: 2px;">Show all 4 notes</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" hint-size="100%,44px" style="width:100%">Write the Anschreiben</x-import>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="100%,44px" style="width:100%">Copy Lebenslauf</x-import>
+            </div>
+          </div>
+        </div>
+
+        <!-- M3: Anschreiben result mobile -->
+        <div style="width: 390px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden; flex-shrink: 0;">
+          <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline); padding: 0 16px; height: 52px; display: flex; align-items: center; justify-content: space-between;">
+            <img src="assets/scanready-lockup.svg" height="18" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 4px; color: var(--accent);"><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent);"></span>1</span>
+              <span style="height: 1px; width: 14px; background: var(--hairline);"></span>
+              <span style="color: var(--accent);">2</span>
+              <span style="height: 1px; width: 14px; background: var(--hairline);"></span>
+              <span style="color: var(--ink);">3</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--stone);">EN/DE</span>
+          </header>
+          <div style="padding: 28px 16px 40px;">
+            <h1 style="font-family: var(--font-serif); font-size: 26px; font-weight: 600; letter-spacing: -0.3px; color: var(--ink); margin: 0 0 6px;">Your Anschreiben is ready.</h1>
+            <p style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin: 0 0 20px;">Tap anywhere in the letter to edit it.</p>
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px 24px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06);">
+              <div style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--ink);">
+                <p style="margin: 0; font-weight: 600;">Bewerbung als Senior Product Managerin</p>
+                <p style="margin: 14px 0 0;">Sehr geehrte Damen und Herren,</p>
+                <p style="margin: 12px 0 0;">Produkte baue ich am liebsten dort, wo sie messbar etwas verändern. In den letzten fünf Jahren habe ich eine Produktstrategie verantwortet, die den Umsatz um 40&nbsp;% gesteigert hat…</p>
+                <p style="margin: 12px 0 0;">Meine Gehaltsvorstellung liegt bei 72.000 bis 78.000 Euro brutto im Jahr. Ein Eintritt ist zum 01.09.2026 möglich.</p>
+                <p style="margin: 14px 0 0;">Mit freundlichen Grüßen<br />Amara Okafor</p>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" hint-size="100%,44px" style="width:100%">Humanizer+ — refine the register</x-import>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" hint-size="100%,44px" style="width:100%">Copy letter</x-import>
+              <div style="display: flex; gap: 10px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="50%,44px" style="flex:1">Download .txt</x-import>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="50%,44px" style="flex:1">Regenerate</x-import>
+              </div>
+            </div>
+            <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 12px 14px; margin-top: 16px;">
+              <p style="font-family: var(--font-sans); font-size: 12px; line-height: 1.5; color: var(--ink-soft); margin: 0;">A native German speaker should review the final letter before you send it.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="padding: 56px 64px 96px; display: flex; flex-direction: column; gap: 40px;">
+
+  <div style="display: flex; align-items: baseline; gap: 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">
+    <span style="color: var(--ink); font-weight: 500;">Turn 1</span>
+    <span>ScanReady, elevated — <a href="#1a" style="color: var(--accent);">1a</a> Erstausgabe landing · <a href="#1b" style="color: var(--accent);">1b</a> Document-first landing · <a href="#1c" style="color: var(--accent);">1c</a> Converter, Lebenslauf · <a href="#1d" style="color: var(--accent);">1d</a> Converter, Anschreiben</span>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 96px; flex-wrap: wrap;">
+
+    <!-- ═══════════════════════════ 1a — LANDING · ERSTAUSGABE ═══════════════════════════ -->
+    <div id="1a" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1a</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Landing — "Erstausgabe"</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Broadsheet rhythm: banded sections, ticker, folio numerals, hero theater</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--canvas); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+
+        <!-- Masthead -->
+        <header style="background: var(--canvas); border-bottom: 2px solid var(--ink); box-shadow: 0 5px 0 -2.5px var(--hairline); position: relative; z-index: 5;">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="26" alt="ScanReady" />
+            <div style="flex: 1; text-align: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Bewerbung · Deutschland · Erstausgabe 2026</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <span style="font-family: var(--font-sans); font-size: 14px; color: var(--steel);">How it works</span>
+              <span style="font-family: var(--font-sans); font-size: 14px; color: var(--steel);">Privacy</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="sm" hint-size="96px,36px">Try it free</x-import>
+            </div>
+          </div>
+        </header>
+
+        <!-- Hero -->
+        <div style="background: var(--canvas);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px 88px; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 72px; align-items: center;">
+            <div>
+              <div style="margin-bottom: 24px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="320px,16px">For internationals applying in Germany</x-import></div>
+              <h1 style="font-family: var(--font-serif); font-size: 68px; font-weight: 600; line-height: 1.05; letter-spacing: -1.5px; color: var(--ink); margin: 0; max-width: 13ch;">Win the German recruiter&rsquo;s <span style="box-shadow: inset 0 -3px 0 var(--accent-soft), inset 0 -5px 0 var(--accent);">first scan</span>.</h1>
+              <p style="font-family: var(--font-sans); font-size: 18px; line-height: 1.55; color: var(--steel); margin: 28px 0 0; max-width: 46ch;">Your CV, re-typeset into the German Lebenslauf and an Anschreiben that sounds like you — grounded only in your real facts, never invented. Every change annotated, so you trust what you send.</p>
+              <div style="display: flex; align-items: center; gap: 14px; margin-top: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="lg" hint-size="150px,48px">See an example</x-import>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 24px; font-family: var(--font-sans); font-size: 14px; color: var(--stone);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Nothing is stored. Processing is stateless and zero-retention.
+              </div>
+            </div>
+
+            <!-- Typesetting theater -->
+            <div style="display: grid; grid-template-columns: 1fr 36px 1.15fr; gap: 16px; align-items: center;">
+              <div style="transform: rotate(-1.6deg); background: var(--surface-soft); border: 1px solid var(--hairline); border-radius: 8px; padding: 20px; box-shadow: 0 1px 2px rgba(27,36,48,0.06); opacity: 0.85;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 14px;">resume.docx</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="height: 7px; width: 76%; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                  <div style="height: 7px; width: 52%; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--brand-error); margin-top: 8px; text-decoration: line-through;">Mar 2024 – Present</div>
+                  <div style="height: 7px; width: 100%; border-radius: 4px; background: rgba(27,36,48,0.12); margin-top: 8px;"></div>
+                  <div style="height: 7px; width: 64%; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                </div>
+              </div>
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none" style="justify-self: center; color: var(--stone);"><path d="M1 8H26M26 8L19 1M26 8L19 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.08); overflow: hidden;">
+                <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+                  <div style="position: absolute; left: 0; right: 0; height: 42%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.10) 45%, rgba(10,125,99,0.10) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.55); animation: sr-scan 4.5s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 14px;">Lebenslauf</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="height: 7px; width: 76%; border-radius: 4px; background: rgba(27,36,48,0.14);"></div>
+                  <div style="height: 7px; width: 52%; border-radius: 4px; background: rgba(27,36,48,0.14);"></div>
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-top: 8px; font-weight: 500;">03/2024 – heute</div>
+                  <div style="height: 7px; width: 100%; border-radius: 4px; background: rgba(27,36,48,0.14); margin-top: 8px;"></div>
+                  <div style="height: 7px; width: 64%; border-radius: 4px; background: rgba(27,36,48,0.14);"></div>
+                </div>
+                <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">DIN 5008</span></div>
+                  <div style="display: flex; align-items: center; gap: 8px;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">Rückwärts chronologisch</span></div>
+                  <div style="display: flex; align-items: center; gap: 8px;"><span style="height: 1px; width: 16px; background: var(--hairline);"></span><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow);">Foto optional · AGG</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Norm ticker -->
+        <div style="border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--surface-soft); overflow: hidden; padding: 12px 0;">
+          <div style="display: flex; width: max-content; animation: sr-marquee 36s linear infinite;">
+            <div style="display: flex; gap: 40px; padding-right: 40px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+              <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+              <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+              <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              <span>Foto optional · AGG</span><span style="color: var(--eyebrow);">·</span>
+              <span>Skills <span style="color: var(--accent);">→</span> IT-Kenntnisse · Fachkenntnisse</span><span style="color: var(--eyebrow);">·</span>
+              <span>Zwei Seiten, nicht eine</span><span style="color: var(--eyebrow);">·</span>
+            </div>
+            <div style="display: flex; gap: 40px; padding-right: 40px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap;">
+              <span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span>
+              <span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span>
+              <span>DIN 5008</span><span style="color: var(--eyebrow);">·</span>
+              <span>Foto optional · AGG</span><span style="color: var(--eyebrow);">·</span>
+              <span>Skills <span style="color: var(--accent);">→</span> IT-Kenntnisse · Fachkenntnisse</span><span style="color: var(--eyebrow);">·</span>
+              <span>Zwei Seiten, nicht eine</span><span style="color: var(--eyebrow);">·</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 01 Pathways — surface band -->
+        <div style="background: var(--surface); position: relative; overflow: hidden;">
+          <div style="position: absolute; top: 24px; right: 12px; font-family: var(--font-serif); font-size: 280px; line-height: 1; font-weight: 600; color: rgba(27,36,48,0.045); user-select: none;">01</div>
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; position: relative;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">01</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="90px,16px">Pathways</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 48px; max-width: 20ch;">Two documents. Both have to survive the scan.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="130px,16px">Authentic voice</x-import>
+                <h3 style="font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--ink); margin: 14px 0 12px; line-height: 1.2;">Sounds like you, not a template.</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 24px;">We ask 3–5 questions about your real motivations and specific achievements. Your answers become the letter — we never invent an employer, title, date, or skill.</p>
+                <div style="background: var(--surface-soft); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 18px;">
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 6px;">Before</div>
+                  <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 14px;">&ldquo;I am a results-driven professional with strong communication skills…&rdquo;</p>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;">After</div>
+                  <p style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.6; color: var(--ink); margin: 0;">&ldquo;Ich habe mein Vertriebsziel im dritten Quartal um 23&nbsp;% übertroffen, indem ich einen neuen Onboarding-Prozess eingeführt habe.&rdquo;</p>
+                </div>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 36px;">
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="170px,16px">German-norm format</x-import>
+                <h3 style="font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--ink); margin: 14px 0 12px; line-height: 1.2;">The format gap, closed.</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0 0 24px;">The rules are the gap, not your experience. Reverse-chronological DIN layout, correct dates, personal-data block, photo guidance — and the rules aren&rsquo;t what most blogs claim.</p>
+                <div style="background: var(--surface-soft); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 18px;">
+                  <div style="font-family: var(--font-serif-text); font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 10px;">Lebenslauf</div>
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <div style="display: flex; align-items: center; gap: 10px;"><div style="height: 7px; width: 90px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span><span style="font-family: var(--font-mono); font-size: 11px; color: var(--slate);">Foto (optional)</span></div>
+                    <div style="height: 7px; width: 150px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                    <div style="display: flex; align-items: center; gap: 10px;"><div style="height: 7px; width: 70px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div><span style="height: 5px; width: 5px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span><span style="font-family: var(--font-mono); font-size: 11px; color: var(--slate);">01.03.2022 · DIN</span></div>
+                    <div style="height: 7px; width: 120px; border-radius: 4px; background: rgba(27,36,48,0.12);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pull quote -->
+            <figure style="max-width: 720px; margin: 88px auto 0; text-align: center;">
+              <div style="height: 1px; width: 64px; background: rgba(27,36,48,0.3); margin: 0 auto 36px;"></div>
+              <blockquote style="font-family: var(--font-serif-text); font-size: 34px; line-height: 1.35; color: var(--ink); margin: 0; text-indent: -0.45em;"><span style="color: var(--accent);">&ldquo;</span>61% of German recruiters prefer a two-page CV — and 64% call spelling errors a dealbreaker.</blockquote>
+              <figcaption style="margin-top: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone);">DACH recruiter studies, not imported one-page lore</figcaption>
+              <div style="height: 1px; width: 64px; background: rgba(27,36,48,0.3); margin: 36px auto 0;"></div>
+            </figure>
+          </div>
+        </div>
+
+        <!-- 02 How it works -->
+        <div style="background: var(--canvas); position: relative; overflow: hidden;">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">02</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="110px,16px">How it works</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 56px;">Three steps. One honest output.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;">
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">1</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Paste your CV</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">US, UK, or any English format. No account, no upload, no storage.</p>
+              </div>
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">2</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Get a Lebenslauf + English notes</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">Restructured to the German norm — every formatting change annotated, so you trust what changed and why.</p>
+              </div>
+              <div style="border-left: 1px solid var(--hairline); padding: 8px 32px 8px 28px;">
+                <div style="font-family: var(--font-serif); font-size: 88px; line-height: 1; font-weight: 500; color: var(--accent); margin-bottom: 20px;">3</div>
+                <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 8px;">Answer 3–5 questions, get your Anschreiben</h3>
+                <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0;">Paste the posting, answer honestly. The letter streams live, grounded only in your own facts.</p>
+              </div>
+            </div>
+            <div style="margin-top: 56px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="lg" hint-size="240px,48px">Start now — it takes 5 minutes</x-import></div>
+          </div>
+        </div>
+
+        <!-- 03 Trust band -->
+        <div style="background: linear-gradient(135deg, var(--band-from), var(--band-to));">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 72px; align-items: center;">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 12px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 20px;"><span style="opacity: 0.7;">03</span><span>Trust</span></div>
+              <h2 style="font-family: var(--font-serif); font-size: 52px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--on-dark); margin: 0 0 20px;">Zero-retention,<br />by design.</h2>
+              <p style="font-family: var(--font-sans); font-size: 17px; line-height: 1.6; color: var(--on-dark-soft); margin: 0; max-width: 44ch;">Your CV text is sent to the AI, the output comes back, and nothing is saved. No database. No account. No training on your data. What you paste here stays between you and your application.</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--hairline-dark);">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">No storage, no account</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">Not used for AI training</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; padding: 20px 4px; border-bottom: 1px solid var(--hairline-dark);">
+                <span style="height: 8px; width: 8px; border-radius: 999px; background: var(--accent); flex-shrink: 0;"></span>
+                <span style="font-family: var(--font-sans); font-size: 16px; color: var(--on-dark-soft);">Grounded, never fabricated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 Founder's note -->
+        <div style="background: var(--surface);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px; display: grid; grid-template-columns: 360px 1fr; gap: 72px;">
+            <div>
+              <div style="width: 32px; height: 2px; background: var(--ink); margin-bottom: 20px;"></div>
+              <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+                <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">04</span>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="130px,16px">Founder&rsquo;s note</x-import>
+              </div>
+              <h2 style="font-family: var(--font-serif); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -0.5px; color: var(--ink); margin: 0;">Built by a German, for everyone applying here.</h2>
+            </div>
+            <div style="font-family: var(--font-serif-text); font-size: 17px; line-height: 1.7; color: var(--charcoal); max-width: 60ch;">
+              <p style="margin: 0 0 18px;"><span style="float: left; font-family: var(--font-serif); font-size: 60px; line-height: 0.82; padding: 4px 8px 0 0; font-weight: 600; color: var(--ink);">I</span>&rsquo;m German, born and raised, living in Hamburg. I know the Lebenslauf and Anschreiben conventions from the inside — what a recruiter here expects to see, and what quietly signals &ldquo;this person doesn&rsquo;t know the norms.&rdquo;</p>
+              <p style="margin: 0 0 18px;">I&rsquo;m applying for jobs myself right now, so I test every change against my own real CV before it ships. Existing tools either invented experience I don&rsquo;t have or produced generic filler that sounded nothing like me. So I built this instead.</p>
+              <p style="margin: 0 0 28px;">ScanReady never invents facts. The German is native-quality because I&rsquo;m native. The voice is yours — built from your own answers, not a template.</p>
+              <div style="display: flex; align-items: baseline; gap: 16px;">
+                <span style="font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--ink);">Kilian Hartmann</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Hamburg · 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 Proof -->
+        <div style="background: var(--canvas);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 96px 32px;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; justify-content: center;">
+              <span style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--eyebrow); opacity: 0.6;">05</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="190px,16px">What actually changes</x-import>
+            </div>
+            <h2 style="font-family: var(--font-serif); font-size: 44px; font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin: 0 0 56px; text-align: center;">Three mechanical fixes, every time.</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">Mar 2021 – Present</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-mono); font-size: 14px; color: var(--ink); margin: 0 0 16px;">03/2021 – heute</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">German date format, and &ldquo;heute&rdquo; instead of &ldquo;Present.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">German: fluent, English: native</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-serif-text); font-size: 14px; color: var(--ink); margin: 0 0 16px;">Deutsch: Verhandlungssicher · Englisch: Muttersprache</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">German recruiters expect German CV vocabulary, not &ldquo;fluent.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px;">Before</div>
+                <p style="font-family: var(--font-sans); font-size: 14px; color: var(--stone); text-decoration: line-through; margin: 0 0 16px;">Excel, SQL, Forecasting, Driver&rsquo;s license</p>
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">After</div>
+                <p style="font-family: var(--font-serif-text); font-size: 14px; color: var(--ink); margin: 0 0 16px;">IT-Kenntnisse: Excel, SQL · Fachkenntnisse: Forecasting · Sonstige: Führerschein Klasse B</p>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 0; border-top: 1px solid var(--hairline-soft); padding-top: 12px;">Skills grouped into the categories German recruiters scan for.</p>
+              </div>
+            </div>
+            <p style="text-align: center; font-family: var(--font-sans); font-size: 14px; color: var(--stone); margin: 48px auto 0; max-width: 52ch;">No testimonials yet — the tool is new. Judge the output yourself. The first conversion is free.</p>
+          </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div style="background: var(--surface); border-top: 1px solid var(--hairline);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 112px 32px; text-align: center;">
+            <h2 style="font-family: var(--font-serif); font-size: 56px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--ink); margin: 0 0 32px;">Send the application<br />Germany expects.</h2>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+            <p style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin: 20px 0 0;">No account · No storage · 5 minutes</p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="background: var(--band-from);">
+          <div style="max-width: 1200px; margin: 0 auto; padding: 48px 32px;">
+            <p style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin: 0 0 16px;">ScanReady · Seite 1</p>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--on-dark);">ScanReady</span>
+              <div style="display: flex; align-items: center; gap: 24px; font-family: var(--font-sans); font-size: 14px; color: var(--on-dark-soft);">
+                <span>Impressum</span><span>Datenschutz</span><span>AGB</span><span>© 2026</span>
+                <span style="position: relative; width: 18px; height: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; display: inline-block;">
+                  <span style="position: absolute; left: 50%; top: 2px; bottom: 2px; width: 1px; background: rgba(255,255,255,0.3); transform: translateX(-50%);"></span>
+                  <span style="position: absolute; top: 50%; left: 2px; right: 2px; height: 1px; background: rgba(255,255,255,0.3); transform: translateY(-50%);"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════ 1b — LANDING · DAS DOKUMENT ═══════════════════════════ -->
+    <div id="1b" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1b</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Landing — "Das Dokument"</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Document-first: the annotated Lebenslauf is the hero; founder&rsquo;s note as a letter</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+
+        <!-- Nav -->
+        <header style="background: var(--surface); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1240px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between;">
+            <img src="assets/scanready-lockup.svg" height="24" alt="ScanReady" />
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Lebenslauf · Anschreiben · DIN 5008</div>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="sm" hint-size="130px,36px">Convert your CV</x-import>
+          </div>
+        </header>
+
+        <!-- Hero: centered headline over annotated document -->
+        <div style="padding: 88px 32px 0; text-align: center;">
+          <div style="margin-bottom: 20px; display: flex; justify-content: center;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="320px,16px">For internationals applying in Germany</x-import></div>
+          <h1 style="font-family: var(--font-serif); font-size: 76px; font-weight: 600; line-height: 1.04; letter-spacing: -1.5px; color: var(--ink); margin: 0 auto; max-width: 17ch;">Your CV, re-typeset<br />for Germany.</h1>
+          <p style="font-family: var(--font-sans); font-size: 18px; line-height: 1.55; color: var(--steel); margin: 24px auto 0; max-width: 52ch;">One paste. Out comes the Lebenslauf a German recruiter expects and an Anschreiben in your voice — with every change annotated in plain English.</p>
+          <div style="display: flex; justify-content: center; gap: 14px; margin: 36px 0 0;">
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+          </div>
+          <p style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin: 18px 0 0;">Zero-retention · No account · 5 minutes</p>
+        </div>
+
+        <!-- Annotated document stage -->
+        <div style="max-width: 1240px; margin: 0 auto; padding: 72px 32px 104px; display: grid; grid-template-columns: 270px 620px 270px; gap: 24px; justify-content: center; align-items: start;">
+          <!-- Left margin notes -->
+          <div style="display: flex; flex-direction: column; gap: 40px; padding-top: 96px;">
+            <div style="text-align: right; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both;">
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0;">
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500;">Persönliche Daten</span>
+                <span style="height: 1px; width: 48px; background: var(--accent); opacity: 0.4; margin-left: 12px;"></span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 8px 0 0;">The personal-data block German recruiters expect — photo optional under the AGG.</p>
+            </div>
+            <div style="text-align: right; padding-top: 64px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 0.5s;">
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0;">
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500;">MM/JJJJ · heute</span>
+                <span style="height: 1px; width: 48px; background: var(--accent); opacity: 0.4; margin-left: 12px;"></span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 8px 0 0;">Dates reformatted to DIN — &ldquo;Present&rdquo; becomes &ldquo;heute&rdquo;, months become numerals.</p>
+            </div>
+          </div>
+
+          <!-- The sheet -->
+          <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 56px 60px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 24px 56px rgba(27,36,48,0.10); overflow: hidden;">
+            <!-- EN source overlay: visible first, fades as the scan passes -->
+            <div style="position: absolute; inset: 0; z-index: 2; background: var(--canvas); border-radius: 12px; padding: 56px 60px; animation: sr-en-out 11s cubic-bezier(0.23,1,0.32,1) infinite both;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+                <div style="font-family: var(--font-sans); font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px;">AMARA OKAFOR</div>
+                <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand-error); border: 1px solid rgba(192,80,60,0.35); border-radius: 4px; padding: 3px 8px; white-space: nowrap;">US format</span>
+              </div>
+              <div style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin-top: 6px;">Berlin, Germany · amara.okafor@mail.de · linkedin.com/in/amaraokafor</div>
+              <div style="height: 1px; background: var(--hairline); margin: 24px 0;"></div>
+              <div style="font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin-bottom: 10px;">PROFESSIONAL SUMMARY</div>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--steel); margin: 0;">Results-driven product professional with strong communication skills and a passion for innovation…</p>
+              <div style="font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 26px 0 10px;">EXPERIENCE</div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <span style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--ink);">Senior Product Manager — Acme GmbH</span>
+                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--brand-error);">Mar 2021 – Present</span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--steel); margin: 6px 0 0;">Owned product strategy for a team of 12; grew revenue 40% by launching a new enterprise onboarding process.</p>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px;">
+                <span style="font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--ink);">Product Manager — Beispiel AG</span>
+                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--steel);">Jun 2018 – Feb 2021</span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--steel); margin: 6px 0 0;">Shipped a new onboarding flow; improved activation by 22%.</p>
+              <div style="font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 26px 0 10px;">SKILLS</div>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--steel); margin: 0;">Excel, SQL, Figma, Amplitude, Forecasting, Driver&rsquo;s license</p>
+              <div style="font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 26px 0 10px;">LANGUAGES</div>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--steel); margin: 0;">English: native · German: fluent</p>
+              <p style="font-family: var(--font-sans); font-size: 13px; color: var(--stone); margin: 26px 0 0;">References available upon request.</p>
+            </div>
+            <!-- Scan sweep above both layers -->
+            <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 3;">
+              <div style="position: absolute; left: 0; right: 0; height: 36%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.08) 45%, rgba(10,125,99,0.08) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.45); animation: sr-scan-cycle 11s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+            </div>
+            <!-- DE typeset layer -->
+            <div style="position: relative; animation: sr-de-in 11s cubic-bezier(0.23,1,0.32,1) infinite both;">
+            <div style="font-family: var(--font-serif); font-size: 30px; font-weight: 600; color: var(--ink); letter-spacing: -0.5px;">Amara Okafor</div>
+            <div style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin-top: 6px;">Senior Product Managerin · Berlin · amara.okafor@mail.de</div>
+            <div style="height: 1px; background: var(--hairline); margin: 24px 0;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 12px;">Persönliche Daten</div>
+            <div style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--charcoal);">Geboren am 14.02.1991 in Lagos · Ledig · Aufenthaltstitel: Blaue Karte EU</div>
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 28px 0 12px;">Berufserfahrung</div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-family: var(--font-serif-text); font-size: 15px; font-weight: 600; color: var(--ink);">Senior Product Managerin · Acme GmbH</span>
+              <span style="display: inline-block; font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 500; animation: sr-date-pop 11s cubic-bezier(0.23,1,0.32,1) infinite both;">03/2021 – heute</span>
+            </div>
+            <p style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--charcoal); margin: 6px 0 0;">Produktstrategie für ein Team von zwölf Personen; Umsatz um 40&nbsp;% gesteigert. Einführung eines neuen Onboarding-Prozesses für Enterprise-Kunden.</p>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px;">
+              <span style="font-family: var(--font-serif-text); font-size: 15px; font-weight: 600; color: var(--ink);">Product Managerin · Beispiel AG</span>
+              <span style="font-family: var(--font-mono); font-size: 12px; color: var(--charcoal);">06/2018 – 02/2021</span>
+            </div>
+            <p style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--charcoal); margin: 6px 0 0;">Neuer Onboarding-Flow; Aktivierungsrate um 22&nbsp;% verbessert.</p>
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 28px 0 12px;">Kenntnisse</div>
+            <div style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--charcoal);">IT-Kenntnisse: SQL, Figma, Amplitude · Fachkenntnisse: Produktstrategie, Forecasting</div>
+            <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 28px 0 12px;">Sprachen</div>
+            <div style="font-family: var(--font-serif-text); font-size: 14px; line-height: 1.65; color: var(--charcoal);">Englisch: Muttersprache · Deutsch: Verhandlungssicher (C1)</div>
+            <div style="height: 1px; background: var(--hairline); margin: 28px 0 16px;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-family: var(--font-serif-text); font-size: 13px; font-style: normal; color: var(--steel);">Berlin, den 05.07.2026</span>
+              <span style="font-family: var(--font-serif); font-size: 17px; color: var(--ink);">A. Okafor</span>
+            </div>
+            </div>
+          </div>
+
+          <!-- Right margin notes -->
+          <div style="display: flex; flex-direction: column; gap: 40px; padding-top: 220px;">
+            <div style="animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 0.25s;">
+              <div style="display: flex; align-items: center; gap: 0;">
+                <span style="height: 1px; width: 48px; background: var(--accent); opacity: 0.4; margin-right: 12px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500;">Rückwärts chronologisch</span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 8px 0 0;">Newest role first — the order a German recruiter scans in.</p>
+            </div>
+            <div style="padding-top: 48px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 0.75s;">
+              <div style="display: flex; align-items: center; gap: 0;">
+                <span style="height: 1px; width: 48px; background: var(--accent); opacity: 0.4; margin-right: 12px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500;">Kenntnis-Kategorien</span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 8px 0 0;">Skills regrouped into IT-, Fach- and Sonstige Kenntnisse.</p>
+            </div>
+            <div style="padding-top: 32px; animation: sr-note-in 11s cubic-bezier(0.23,1,0.32,1) infinite both; animation-delay: 1s;">
+              <div style="display: flex; align-items: center; gap: 0;">
+                <span style="height: 1px; width: 48px; background: var(--accent); opacity: 0.4; margin-right: 12px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500;">Ort, Datum, Unterschrift</span>
+              </div>
+              <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--steel); margin: 8px 0 0;">The closing block that signals you know the convention.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="background: var(--accent-tint); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1240px; margin: 0 auto; padding: 80px 32px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; align-items: start;">
+            <div>
+              <div style="font-family: var(--font-serif); font-size: 96px; line-height: 1; font-weight: 600; letter-spacing: -2px; color: var(--accent);">61%</div>
+              <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--charcoal); margin: 16px 0 0; max-width: 30ch;">of German recruiters prefer a two-page CV — not the imported one-page rule.</p>
+            </div>
+            <div>
+              <div style="font-family: var(--font-serif); font-size: 96px; line-height: 1; font-weight: 600; letter-spacing: -2px; color: var(--accent);">64%</div>
+              <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--charcoal); margin: 16px 0 0; max-width: 30ch;">call spelling errors a dealbreaker. Native-quality German is the bar.</p>
+            </div>
+            <div>
+              <div style="font-family: var(--font-serif); font-size: 96px; line-height: 1; font-weight: 600; letter-spacing: -2px; color: var(--accent);">8<span style="font-size: 56px; letter-spacing: 0;">&nbsp;sec</span></div>
+              <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--charcoal); margin: 16px 0 0; max-width: 30ch;">is what your application gets on first scan. The format decides it.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Steps as margin index -->
+        <div style="max-width: 1240px; margin: 0 auto; padding: 96px 32px;">
+          <div style="display: grid; grid-template-columns: 360px 1fr; gap: 72px;">
+            <div>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="110px,16px">How it works</x-import>
+              <h2 style="font-family: var(--font-serif); font-size: 40px; font-weight: 600; line-height: 1.12; letter-spacing: -0.5px; color: var(--ink); margin: 14px 0 0;">Three steps.<br />One honest output.</h2>
+              <div style="margin-top: 32px;"><x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" hint-size="160px,40px">Start now — free</x-import></div>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <div style="display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 28px 0; border-top: 1px solid var(--hairline);">
+                <div style="font-family: var(--font-serif); font-size: 40px; font-weight: 500; color: var(--accent); line-height: 1;">01</div>
+                <div>
+                  <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 6px;">Paste your CV</h3>
+                  <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0; max-width: 56ch;">US, UK, or any English format. No account, no upload, no storage.</p>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 28px 0; border-top: 1px solid var(--hairline);">
+                <div style="font-family: var(--font-serif); font-size: 40px; font-weight: 500; color: var(--accent); line-height: 1;">02</div>
+                <div>
+                  <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 6px;">Get a Lebenslauf + English notes</h3>
+                  <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0; max-width: 56ch;">Restructured to the German norm — every change annotated in the margin, exactly like the sheet above.</p>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 28px 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);">
+                <div style="font-family: var(--font-serif); font-size: 40px; font-weight: 500; color: var(--accent); line-height: 1;">03</div>
+                <div>
+                  <h3 style="font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin: 0 0 6px;">Answer 3–5 questions, get your Anschreiben</h3>
+                  <p style="font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--steel); margin: 0; max-width: 56ch;">Paste the posting, answer honestly. The letter streams live, grounded only in your own facts.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust band -->
+        <div style="max-width: 1240px; margin: 0 auto; padding: 0 32px 96px;">
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.SignatureBand" eyebrow="Privacy" title="Zero-retention, by design." hint-size="100%,260px">Your CV text is sent to the AI, the output comes back, and nothing is saved. No database. No account. No training on your data.</x-import>
+        </div>
+
+        <!-- Founder letter -->
+        <div style="background: var(--surface); border-top: 1px solid var(--hairline);">
+          <div style="max-width: 760px; margin: 0 auto; padding: 96px 32px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="130px,16px">Founder&rsquo;s note</x-import>
+            </div>
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 56px 64px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06);">
+              <div style="font-family: var(--font-serif-text); font-size: 16px; line-height: 1.7; color: var(--charcoal);">
+                <p style="margin: 0 0 16px; text-align: right; font-size: 14px; color: var(--steel);">Hamburg, den 05.07.2026</p>
+                <p style="margin: 0 0 16px;">I&rsquo;m German, born and raised. I know the Lebenslauf and Anschreiben conventions from the inside — what a recruiter here expects, and what quietly signals &ldquo;this person doesn&rsquo;t know the norms.&rdquo;</p>
+                <p style="margin: 0 0 16px;">I&rsquo;m applying for jobs myself right now, so I test every change against my own real applications before it ships. Existing tools invented experience I don&rsquo;t have, or produced filler that sounded nothing like me. So I built this instead.</p>
+                <p style="margin: 0 0 28px;">ScanReady never invents facts. The German is native-quality because I&rsquo;m native. The voice is yours.</p>
+                <div style="font-family: var(--font-serif); font-size: 24px; color: var(--ink);">Kilian Hartmann</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Final CTA + footer -->
+        <div style="background: linear-gradient(135deg, var(--band-from), var(--band-to)); text-align: center;">
+          <div style="max-width: 1240px; margin: 0 auto; padding: 104px 32px 88px;">
+            <h2 style="font-family: var(--font-serif); font-size: 56px; font-weight: 600; line-height: 1.08; letter-spacing: -1px; color: var(--on-dark); margin: 0 0 28px;">Win the first scan.</h2>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="250px,48px">Convert your CV — it&rsquo;s free</x-import>
+            <p style="font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin: 20px 0 0;">No account · No storage · 5 minutes</p>
+          </div>
+          <div style="border-top: 1px solid var(--hairline-dark);">
+            <div style="max-width: 1240px; margin: 0 auto; padding: 24px 32px; display: flex; justify-content: space-between; font-family: var(--font-sans); font-size: 13px; color: var(--on-dark-muted);">
+              <span>© 2026 ScanReady · Impressum · Datenschutz · AGB</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;">Seite 1</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════ 1c — CONVERTER · LEBENSLAUF RESULT ═══════════════════════════ -->
+    <div id="1c" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1c</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Converter — Lebenslauf result</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Document + margin annotations (the two-column layout the spec calls for but never built)</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+
+        <!-- App bar -->
+        <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>1 Lebenslauf</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--stone);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1px solid var(--stone);"></span>2 Questions</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--stone);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1px solid var(--stone);"></span>3 Anschreiben</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--stone);"><span style="color: var(--ink); font-weight: 500;">EN</span> / DE</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--stone);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Zero-retention
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <div style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 72px;">
+          <!-- Header row -->
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px;">
+            <div>
+              <h1 style="font-family: var(--font-serif); font-size: 38px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 8px;">Your Lebenslauf, norm-correct.</h1>
+              <p style="font-family: var(--font-sans); font-size: 15px; color: var(--steel); margin: 0;"><span style="color: var(--accent); font-weight: 600;">4 norm gaps fixed</span> — each one annotated in the margin. Click any field to edit.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="150px,40px">Copy Lebenslauf</x-import>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" hint-size="180px,40px">Write the Anschreiben</x-import>
+            </div>
+          </div>
+
+          <!-- Document + margin -->
+          <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+            <!-- Sheet -->
+            <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 56px 64px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-family: var(--font-serif); font-size: 32px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink);">Amara Okafor</div>
+                  <div style="font-family: var(--font-sans); font-size: 13px; color: var(--steel); margin-top: 6px;">Torstraße 112 · 10119 Berlin · amara.okafor@mail.de · +49 176 2345 6789</div>
+                </div>
+                <div style="width: 88px; height: 112px; border: 1px dashed var(--hairline); border-radius: 6px; display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); line-height: 1.5; position: relative;">Foto<br />optional<span style="position: absolute; top: -7px; right: -7px; height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">1</span></div>
+              </div>
+              <div style="height: 1px; background: var(--hairline); margin: 28px 0;"></div>
+
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 14px;">Persönliche Daten</div>
+              <div style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.65; color: var(--charcoal);">Geboren am 14.02.1991 in Lagos, Nigeria · Ledig · Aufenthaltstitel: Blaue Karte EU</div>
+
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 32px 0 14px;">Berufserfahrung</div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; position: relative;">
+                <span style="font-family: var(--font-serif-text); font-size: 16px; font-weight: 600; color: var(--ink);">Senior Product Managerin · Acme GmbH, Berlin</span>
+                <span style="display: inline-flex; align-items: center; gap: 8px;"><span style="font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; background: var(--accent-tint); padding: 2px 8px; border-radius: 4px;">03/2021 – heute</span><span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">2</span></span>
+              </div>
+              <ul style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.65; color: var(--charcoal); margin: 10px 0 0; padding-left: 20px;">
+                <li>Produktstrategie und Roadmap für ein Team von zwölf Personen; Umsatz um 40&nbsp;% gesteigert.</li>
+                <li>Einführung eines neuen Onboarding-Prozesses für Enterprise-Kunden.</li>
+              </ul>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 22px;">
+                <span style="font-family: var(--font-serif-text); font-size: 16px; font-weight: 600; color: var(--ink);">Product Managerin · Beispiel AG, München</span>
+                <span style="font-family: var(--font-mono); font-size: 13px; color: var(--charcoal);">06/2018 – 02/2021</span>
+              </div>
+              <ul style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.65; color: var(--charcoal); margin: 10px 0 0; padding-left: 20px;">
+                <li>Neuer Onboarding-Flow; Aktivierungsrate um 22&nbsp;% verbessert.</li>
+              </ul>
+
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); margin: 32px 0 14px;">Ausbildung</div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <span style="font-family: var(--font-serif-text); font-size: 15px; color: var(--charcoal);">M.Sc. Wirtschaftsinformatik · Universität Lagos</span>
+                <span style="font-family: var(--font-mono); font-size: 13px; color: var(--charcoal);">10/2012 – 09/2014</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px; margin: 32px 0 14px;"><span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Kenntnisse</span><span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">3</span></div>
+              <div style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.8; color: var(--charcoal);">
+                <span style="font-weight: 600; color: var(--ink);">IT-Kenntnisse:</span> SQL, Figma, Amplitude<br />
+                <span style="font-weight: 600; color: var(--ink);">Fachkenntnisse:</span> Produktstrategie, Forecasting, A/B-Testing<br />
+                <span style="font-weight: 600; color: var(--ink);">Sonstige Kenntnisse:</span> Führerschein Klasse B
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px; margin: 32px 0 14px;"><span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Sprachen</span><span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center;">4</span></div>
+              <div style="font-family: var(--font-serif-text); font-size: 15px; line-height: 1.65; color: var(--charcoal);">Englisch: Muttersprache · Deutsch: Verhandlungssicher (C1) · Französisch: Grundkenntnisse</div>
+            </div>
+
+            <!-- Margin rail -->
+            <div style="display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px;">
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); padding-bottom: 4px;">Norm notes · What changed &amp; why</div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px; display: flex; gap: 12px;">
+                <span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">1</span>
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Foto · AGG</div>
+                  <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">A photo is optional under the AGG. A reserved slot is included — many German recruiters still expect one.</p>
+                </div>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px; display: flex; gap: 12px;">
+                <span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">2</span>
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Datum · DIN 5008</div>
+                  <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">&ldquo;Mar 2021 – Present&rdquo; reformatted to &ldquo;03/2021 – heute&rdquo; — MM/JJJJ numerals, German &ldquo;heute&rdquo;.</p>
+                </div>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px; display: flex; gap: 12px;">
+                <span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">3</span>
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Kenntnis-Kategorien</div>
+                  <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">Your flat skill list was grouped into IT-, Fach- and Sonstige Kenntnisse — the categories recruiters scan for.</p>
+                </div>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px; display: flex; gap: 12px;">
+                <span style="height: 18px; width: 18px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">4</span>
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Sprachniveau</div>
+                  <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">&ldquo;Fluent&rdquo; became &ldquo;Verhandlungssicher (C1)&rdquo; — the vocabulary and CEFR level German recruiters expect.</p>
+                </div>
+              </div>
+              <div style="border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px; background: var(--canvas);">
+                <div style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px;">Next: the Anschreiben</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--steel); margin: 0 0 14px;">Paste the job posting and answer 3–5 honest questions. The letter is grounded only in your facts.</p>
+                <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="sm" hint-size="100%,36px" style="width:100%">Write the Anschreiben</x-import>
+              </div>
+              <span style="font-family: var(--font-sans); font-size: 13px; color: var(--stone); text-decoration: underline; text-underline-offset: 2px; align-self: flex-start;">Start over with a different CV</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════ 1d — CONVERTER · ANSCHREIBEN STREAMING ═══════════════════════════ -->
+    <div id="1d" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1d</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Converter — Anschreiben streaming</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">The letter typesets itself live; your answers stay visible as its grounding</span>
+      </div>
+
+      <div style="width: 1440px; background: var(--surface); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 24px 64px -24px rgba(27,36,48,0.25); border: 1px solid var(--hairline); overflow: hidden;">
+
+        <!-- App bar -->
+        <header style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+          <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+            <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+            <div style="display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;">
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>1 Lebenslauf</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--accent);"><span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent);"></span>2 Questions</span>
+              <span style="height: 1px; width: 28px; background: var(--hairline);"></span>
+              <span style="display: flex; align-items: center; gap: 6px; color: var(--ink);"><span style="height: 6px; width: 6px; border-radius: 999px; border: 1.5px solid var(--ink);"></span>3 Anschreiben</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--stone);"><span style="color: var(--ink); font-weight: 500;">EN</span> / DE</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 13px; color: var(--stone);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Zero-retention
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <div style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 72px;">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px;">
+            <div>
+              <h1 style="font-family: var(--font-serif); font-size: 38px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 8px;">Your Anschreiben is being typeset.</h1>
+              <p style="font-family: var(--font-sans); font-size: 15px; color: var(--steel); margin: 0; display: flex; align-items: center; gap: 10px;"><span style="height: 7px; width: 7px; border-radius: 999px; background: var(--accent); animation: sr-pulse 1.4s ease infinite;"></span>Grounded only in your answers — nothing invented. You can edit every line when it&rsquo;s done.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+            <!-- Letter sheet -->
+            <div style="position: relative; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 64px 72px; box-shadow: 0 1px 1px rgba(27,36,48,0.04), 0 2px 4px rgba(27,36,48,0.04), 0 6px 12px rgba(27,36,48,0.05), 0 16px 32px rgba(27,36,48,0.06); overflow: hidden;">
+              <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+                <div style="position: absolute; left: 0; right: 0; height: 34%; background: linear-gradient(to bottom, transparent 0%, rgba(10,125,99,0.07) 45%, rgba(10,125,99,0.07) 55%, transparent 100%); border-top: 2px solid rgba(10,125,99,0.4); animation: sr-scan 3.4s cubic-bezier(0.23,1,0.32,1) infinite;"></div>
+              </div>
+              <div style="font-family: var(--font-serif-text); font-size: 16px; line-height: 1.7; color: var(--ink);">
+                <p style="margin: 0; text-align: right; color: var(--steel); font-size: 14px;">Berlin, den 05.07.2026</p>
+                <p style="margin: 28px 0 0;">Acme GmbH<br />Personalabteilung<br />Chausseestraße 20<br />10115 Berlin</p>
+                <p style="margin: 32px 0 0; font-weight: 600;">Bewerbung als Senior Product Managerin — Referenz PM-2026-114</p>
+                <p style="margin: 24px 0 0;">Sehr geehrte Damen und Herren,</p>
+                <p style="margin: 18px 0 0;">Produkte baue ich am liebsten dort, wo sie messbar etwas verändern. In den letzten fünf Jahren habe ich bei Acme GmbH eine Produktstrategie verantwortet, die den Umsatz um 40&nbsp;% gesteigert hat — nicht durch mehr Features, sondern durch einen Onboarding-Prozess, der Enterprise-Kunden schneller zum ersten Erfolg führt.</p>
+                <p style="margin: 18px 0 0;">An Ihrer Ausschreibung hat mich besonders der Fokus auf datengetriebene Produktentscheidungen überzeugt. Genau so arbeite ich: Mein letztes A/B-Testing-Programm<span style="display: inline-block; width: 9px; height: 19px; background: var(--accent); vertical-align: text-bottom; margin-left: 2px; animation: sr-caret 1s steps(1) infinite;"></span></p>
+              </div>
+            </div>
+
+            <!-- Grounding rail -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); padding-bottom: 4px;">Grounded in your answers</div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 6px;">Why this role?</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--charcoal); margin: 0;">&ldquo;They make product decisions with data, and I&rsquo;ve run A/B programs for 4 years.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 6px;">Proudest achievement?</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--charcoal); margin: 0;">&ldquo;Grew revenue 40% by fixing enterprise onboarding, not by shipping more features.&rdquo;</p>
+              </div>
+              <div style="background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow); margin-bottom: 6px;">Earliest start date?</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--charcoal); margin: 0;">&ldquo;Zum 01.09.2026.&rdquo;</p>
+              </div>
+              <div style="background: var(--accent-tint); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 16px 18px;">
+                <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 4px;">Note</div>
+                <p style="font-family: var(--font-sans); font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0;">A native German speaker should review the final letter before you send it.</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--stone); padding-top: 8px;">
+                <span style="height: 6px; width: 6px; border-radius: 999px; background: var(--accent); animation: sr-pulse 1.4s ease infinite;"></span>
+                Setzt&hellip; Absatz 2 von 4
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+</body>
+</html>

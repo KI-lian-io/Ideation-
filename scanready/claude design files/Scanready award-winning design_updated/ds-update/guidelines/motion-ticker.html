@@ -1,0 +1,20 @@
+<!-- @dsCard group="Motion" viewport="700x170" subtitle="Caret at the live text edge, status pulse, and the marquee's mono conversions" name="Caret, pulse & ticker voice" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--canvas); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 18px; }
+  .caret { display: inline-block; width: 9px; height: 19px; background: var(--accent); vertical-align: text-bottom; margin-left: 2px; animation: sr-caret var(--dur-caret) steps(1) infinite; }
+  .dot { height: 7px; width: 7px; border-radius: 999px; background: var(--accent); animation: sr-pulse var(--dur-pulse) ease infinite; display: inline-block; }
+  .status { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--stone); }
+  .pairs { display: flex; gap: 32px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate); white-space: nowrap; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--surface-soft); padding: 12px 16px; overflow: hidden; }
+</style>
+</head>
+<body>
+  <div style="font-family: var(--font-serif-text); font-size: 16px; line-height: 1.7; color: var(--ink);">Mein letztes A/B-Testing-Programm<span class="caret"></span></div>
+  <div class="status"><span class="dot"></span>Setzt&hellip; Absatz 2 von 4</div>
+  <div class="pairs"><span>Mar 2021 – Present <span style="color: var(--accent);">→</span> 03/2021 – heute</span><span style="color: var(--eyebrow);">·</span><span>Fluent <span style="color: var(--accent);">→</span> Verhandlungssicher</span><span style="color: var(--eyebrow);">·</span><span>DIN 5008</span></div>
+</body>
+</html>

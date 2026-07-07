@@ -1,0 +1,39 @@
+<!-- @dsCard group="Layout" viewport="700x400" subtitle="Canvas/surface alternation, one navy band, folio heads with ghost numerals, navy footer folio" name="Banded rhythm" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--canvas); font-family: var(--font-sans); }
+  .band { position: relative; overflow: hidden; padding: 26px 28px; }
+  .folio { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow); }
+  .folio .n { opacity: 0.6; }
+  h2 { font-family: var(--font-serif); font-size: 24px; font-weight: 600; letter-spacing: -0.5px; color: var(--ink); margin: 0; }
+  .ghost { position: absolute; top: -6px; right: 6px; font-family: var(--font-serif); font-size: 110px; line-height: 1; font-weight: 600; color: var(--ink-ghost); user-select: none; }
+</style>
+</head>
+<body>
+  <div class="band" style="background: var(--canvas); border-bottom: 1px solid var(--hairline);">
+    <div class="folio"><span>Hero · canvas</span></div>
+    <h2>Win the German recruiter&rsquo;s first scan.</h2>
+  </div>
+  <div class="band" style="background: var(--surface);">
+    <div class="ghost">01</div>
+    <div class="folio"><span class="n">01</span><span>Pathways · surface</span></div>
+    <h2>Two documents. Both have to survive the scan.</h2>
+  </div>
+  <div class="band" style="background: var(--canvas);">
+    <div class="folio"><span class="n">02</span><span>How it works · canvas</span></div>
+    <h2>Three steps. One honest output.</h2>
+  </div>
+  <div class="band" style="background: linear-gradient(135deg, var(--band-from), var(--band-to));">
+    <div class="folio" style="color: rgba(255,255,255,0.4);"><span class="n">03</span><span>Trust · the one navy band</span></div>
+    <h2 style="color: var(--on-dark);">Zero-retention, by design.</h2>
+  </div>
+  <div class="band" style="background: var(--band-from); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--on-dark);">ScanReady</span>
+    <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4);">Seite 1 · © 2026</span>
+  </div>
+</body>
+</html>

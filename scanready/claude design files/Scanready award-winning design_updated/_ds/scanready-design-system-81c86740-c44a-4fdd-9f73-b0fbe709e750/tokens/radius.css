@@ -1,0 +1,10 @@
+:root {
+  /* ── Radius — tight editorial discipline ──────── */
+  --radius-xs: 4px;     /* inline code chips, micro tags */
+  --radius-sm: 6px;     /* inputs, sidebar items, type/required badges */
+  --radius-button: 6px; /* every button — editorial square-ish corner */
+  --radius-md: 8px;     /* norm-note / annotation, larger inputs */
+  --radius-lg: 12px;    /* every rectangular card, signature band, hero mockup */
+  --radius-xl: 16px;    /* larger feature panels */
+  --radius-full: 9999px;/* skill chips, badges, pill tabs, status dots only */
+}
