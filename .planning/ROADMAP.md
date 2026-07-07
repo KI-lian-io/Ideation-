@@ -169,12 +169,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   7. /preise shows the 4-card ladder (2,99 / 4,99 / 14,99 featured with per-application math / Plus 5,99 "Geplant" non-buyable), the free-tier manifesto pull quote, and the anti-Abofalle before/after comparison; prices match the code constants
   8. The six founder SVGs are in public/, favicon + openGraph.images wired in layout.tsx, src/app/not-found.tsx built from surface 06; npx tsc --noEmit, the full test suite, and next build all pass; no em-dash in any new copy; all new surfaces are inert when accounts/Stripe env vars are unset
 
-**Plans**: 1/8 plans executed
+**Plans**: 2/8 plans executed
 
 **Wave 1** *(parallel - no file overlap; the authorized A0 + A1 foundation)*
 
 - [x] 07-01-PLAN.md — A0 foundation: shadow tokens + seven ui.tsx primitives + founder assets/favicon/OG metadata + surface-06 not-found (Wave 1)
-- [ ] 07-02-PLAN.md — A1 Pass data: migration 0002 (expires_at + three-tier limit) + [BLOCKING] live schema push + PASS_PRICE_CENTS/PASS_STORAGE_CAP + account helpers + tests (Wave 1)
+- [x] 07-02-PLAN.md — A1 Pass data: migration 0002 (expires_at + three-tier limit) + [BLOCKING] live schema push + PASS_PRICE_CENTS/PASS_STORAGE_CAP + account helpers + tests (Wave 1)
 
 **Wave 2** *(parallel - Pass API, save moment, and preise touch disjoint files)*
 
@@ -205,7 +205,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
-| 7. Account Library + Honest Pricing (design Phase A) | 1/8 | In Progress|  |
+| 7. Account Library + Honest Pricing (design Phase A) | 2/8 | In Progress|  |
 
 ## Backlog
 

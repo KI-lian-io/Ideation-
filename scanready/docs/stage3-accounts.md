@@ -39,6 +39,17 @@ Status as of 2026-07-06 (live founder session):
 - [ ] Vercel env vars (Preview first, Production only after legal review)
 - [ ] Subscription: Stripe Price + webhook (section 7) and §312k legal
       review (section 8)
+- [x] Migration 0002_pass applied (2026-07-07, phase 07 plan 07-02): applied
+      via `mcp__supabase__apply_migration` to project `thgmhbzimnjcaoqyyiyp`
+      (success:true). Live verification confirmed:
+      `humanizer_purchases.expires_at` column exists, constraint
+      `humanizer_purchases_pass_requires_user` exists,
+      `enforce_package_limit()` definition contains `pass_30d` and `>= 25`,
+      trigger `trg_enforce_package_limit` present. Security advisors showed
+      zero new findings from this migration (only the two pre-existing
+      WARNs: the intentional `delete_own_account` SECURITY DEFINER RPC, and
+      the auth leaked-password-protection dashboard toggle, both known
+      founder items).
 
 Follow-ups found during the 2026-07-06 E2E (not fixed by this doc edit):
 - KNOWN ISSUE: `saveApplicationPackage` inserts the `cvs` row before the
