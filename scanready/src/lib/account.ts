@@ -307,18 +307,18 @@ export async function getLatestPass(
 export async function listPaketPurchases(
   client: SupabaseClient,
   userId: string
-): Promise<{ amount_cents: number; created_at: string }[]> {
+): Promise<{ id: string; amount_cents: number; created_at: string }[]> {
   if (!accountsEnabled()) return [];
 
   const { data, error } = await client
     .from("humanizer_purchases")
-    .select("amount_cents, created_at")
+    .select("id, amount_cents, created_at")
     .eq("user_id", userId)
     .eq("kind", "paket")
     .order("created_at", { ascending: false });
 
   if (error) return [];
-  return (data ?? []) as { amount_cents: number; created_at: string }[];
+  return (data ?? []) as { id: string; amount_cents: number; created_at: string }[];
 }
 
 /**

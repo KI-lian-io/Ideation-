@@ -51,7 +51,9 @@ export function StorageGate({ onChoosePass }: { onChoosePass: () => void }) {
   const { t } = useLang()
   const { user } = useAccount()
   const [dismissed, setDismissed] = useState(false)
-  const [purchases, setPurchases] = useState<{ amount_cents: number; created_at: string }[]>([])
+  const [purchases, setPurchases] = useState<
+    { id: string; amount_cents: number; created_at: string }[]
+  >([])
 
   // Read the dismissal flag once on mount. sessionStorage may be unavailable
   // (private mode, etc.); a read failure just leaves the panel shown, same
@@ -209,7 +211,7 @@ function AnchorVariant({
   onChoosePass,
   onDismiss,
 }: {
-  purchases: { amount_cents: number; created_at: string }[]
+  purchases: { id: string; amount_cents: number; created_at: string }[]
   passPriceFormatted: string
   onChoosePass: () => void
   onDismiss: () => void
@@ -224,7 +226,7 @@ function AnchorVariant({
 
       <div className="mt-3 flex flex-col gap-1.5 rounded-lg border border-hair bg-faint px-4 py-3 max-w-sm">
         {purchases.map((p) => (
-          <div key={p.created_at} className="flex justify-between gap-4 font-mono text-xs text-slate">
+          <div key={p.id} className="flex justify-between gap-4 font-mono text-xs text-slate">
             <span>{t.gateAnchorLineItem(formatPurchaseDate(p.created_at))}</span>
             <span>{formatEuroCents(p.amount_cents)}</span>
           </div>
