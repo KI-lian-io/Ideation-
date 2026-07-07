@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed 07-05-PLAN.md
-last_updated: "2026-07-07T10:51:56.568Z"
+stopped_at: Completed 07-06-PLAN.md
+last_updated: "2026-07-07T11:06:00.572Z"
 last_activity: 2026-07-07
-last_activity_desc: Phase 7 execution in progress, 07-04 (A2 save moment) complete
+last_activity_desc: Phase 7 execution in progress, 07-06 (A3 storage gate) complete
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 22
-  completed_plans: 20
-  percent: 71
+  completed_plans: 21
+  percent: 95
 current_phase: 7
 current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
 ---
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 ## Current Position
 
 v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase.
-Last activity: 2026-07-07 — Phase 7 execution in progress, 07-04 (A2 save moment) complete
+Last activity: 2026-07-07 — Phase 7 execution in progress, 07-06 (A3 storage gate) complete: 07-07 (Pass modal + lifecycle) remains
 
-Progress: [██████████] 100%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 07 P04 | 20min | 2 tasks | 2 files |
 | Phase 07 P08 | 25min | 2 tasks | 1 files |
 | Phase 07 P05 | 25min | 3 tasks | 3 files |
+| Phase 07-account-library-honest-pricing-design-reconciliation-phase-a P06 | 25min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 07-05]: packageCompanyCity() duplicated in KontoClient.tsx and app/page.tsx rather than shared — A five-line pure derivation with no other shared import between the two files
 - [Phase 07-05]: Read-only rows hide the rename kebab item entirely; delete always stays available — RLS-silently-no-ops guardrail applied at the UI layer
 - [Phase 07-05]: Konto Oeffnen/Neue Bewerbung aus dieser hand off to /app via a plain window.location query-string bridge — /konto has no tool reducer to load a package into; avoids next/navigation useSearchParams Suspense requirement for a one-shot deep link
+- [Phase 07-06]: StorageGate fetches its own anchor data via useAccount()+listPaketPurchases; Pass/Plus cards stack in a plain flex-col (not a viewport-breakpoint grid) since the panel only ever renders inside the narrow save rail
 
 ### Pending Todos
 
@@ -135,6 +137,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T10:51:47.706Z
+Last session: 2026-07-07T11:06:00.379Z
 Last activity: 2026-07-07 - Completed 07-04-PLAN.md: A2 save moment (SaveApplicationButton rebuilt as a save card + SavedConfirmationPanel on both result views)
-Stopped at: Completed 07-05-PLAN.md
+Stopped at: Completed 07-06-PLAN.md
