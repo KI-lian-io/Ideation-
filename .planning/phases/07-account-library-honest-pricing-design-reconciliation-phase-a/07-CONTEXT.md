@@ -24,7 +24,7 @@ Reconcile the six Phase-A surfaces of the claude.ai/design export ("Scanready aw
 - Copy the six SVGs from the export `assets/` into `public/`: favicon.svg, og-scanready.svg (replaces off-brand public/og-image.svg), scanready-lockup.svg, scanready-lockup-dark.svg, scanready-mark.svg, scanready-stacked.svg. Wire `icons` + explicit `openGraph.images` in `src/app/layout.tsx` metadata. Build `src/app/not-found.tsx` from surface 06's "misprint correction notice" spec (full DE/EN copy in the .dc.html, reduced-motion-safe, no animation). Regenerate favicon.ico. All marks are stand-ins pending the naming decision (naming-shortlist.md).
 
 ### A1 Pass data + API
-- New migration `supabase/migrations/0002_pass.sql`: `humanizer_purchases.expires_at timestamptz` (nullable); Pass rows use `kind='pass_30d'` and REQUIRE `user_id` (anonymous humanizer/paket rows keep user_id null); no RLS change (select-own covers it). Re-create `enforce_package_limit()` with three tiers: active subscription = unlimited; else live pass (`pass_30d` row, `expires_at > now()`) = limit 25; else limit 1. KEEP the per-user advisory-lock race guard. The DB trigger stays the ONLY place the limit is enforced.
+- New migration `scanready/supabase/migrations/0002_pass.sql` (the migrations dir lives INSIDE scanready/): `humanizer_purchases.expires_at timestamptz` (nullable); Pass rows use `kind='pass_30d'` and REQUIRE `user_id` (anonymous humanizer/paket rows keep user_id null); no RLS change (select-own covers it). Re-create `enforce_package_limit()` with three tiers: active subscription = unlimited; else live pass (`pass_30d` row, `expires_at > now()`) = limit 25; else limit 1. KEEP the per-user advisory-lock race guard. The DB trigger stays the ONLY place the limit is enforced.
 - Pass expiry reuses the existing downgrade path (`mark_packages_read_only()` keeps the newest editable); no new function.
 - `PASS_PRICE_CENTS = 1499` beside HUMANIZER_PRICE_CENTS/PAKET_PRICE_CENTS in `src/lib/humanizer.ts`.
 - New `/api/pass/intent`: mints a Stripe PaymentIntent with `metadata.feature='pass'`; REQUIRES an authenticated user (unlike paket/humanizer). On payment success, write the `pass_30d` row with `expires_at = now() + 30 days`. Pass logic must NOT leak into the anonymous `/api/paket/intent` stateless-token path.
@@ -35,7 +35,7 @@ Reconcile the six Phase-A surfaces of the claude.ai/design export ("Scanready aw
 - Kebab actions: Öffnen / Neue Bewerbung aus dieser / Umbenennen / Löschen.
 - States: normal, hover+menu, inline-rename (accent ring + "Enter speichern · Esc abbrechen"), keyboard focus, free-tier 1/1 (real explainer panel, not a fake locked card), read-only-after-downgrade (newest keeps sheet shadow + BEARBEITBAR pill; older go flat + NUR LESEN, and Umbenennen is REMOVED, not disabled). Fix the existing gap: KontoClient currently shows delete unconditionally regardless of read_only display state (delete stays allowed by contract; rename/edit controls must hide on read_only).
 - Storage-transparency footer, exact copy: "Ihren CV-Text, den Lebenslauf, das Anschreiben, die Stellenanzeige und Ihre Antworten. Keine Fotos."
-- New helper `updatePackageTitle(client, id, title)` in `src/lib/supabase/account.ts`; gate client-side on read_only.
+- New helper `updatePackageTitle(client, id, title)` in `src/lib/account.ts` (NOTE: the account helpers live at `scanready/src/lib/account.ts`, NOT under `src/lib/supabase/`); gate client-side on read_only.
 - Duplicate-and-tailor = existing "New Anschreiben, same Lebenslauf" path made per-card via LOAD_PACKAGE-style flow with an empty posting step; the duplicate is only saved on explicit save and goes through the DB limit trigger.
 - Gallery is client-side filterable by title/company text (no server search).
 - Save moment: rebuild `SaveApplicationButton` into a save card on BOTH result views (Lebenslauf and Anschreiben): title pre-filled AND pre-selected from `derivePackageTitle(jobPosting)` (exists in lebenslauf-utils.ts), provenance line "Vorschlag aus der Stellenanzeige", contents-reminder line. Saved-confirmation panel replaces the card in place (green-tint, checkmark, "Gespeichert" + timestamp, editable title with pencil, "In Meine Bewerbungen öffnen" link). Commit on Speichern click only; never on blur/navigation.
@@ -100,10 +100,10 @@ Reconcile the six Phase-A surfaces of the claude.ai/design export ("Scanready aw
 - `scanready/src/components/PaketModal.tsx` + `scanready/src/components/HumanizerModal.tsx` - modal/payment UX + a11y patterns PassModal mirrors
 - `scanready/src/app/konto/KontoClient.tsx` - SavedPackagesSection to rebuild
 - `scanready/src/app/app/page.tsx` - SavedApplications list, SaveApplicationButton (~1056: state==='limit' hint), LOAD_PACKAGE flow
-- `scanready/src/lib/supabase/account.ts` - saveApplicationPackage, load/delete helpers; add updatePackageTitle()
+- `scanready/src/lib/account.ts` - saveApplicationPackage, load/delete helpers; add updatePackageTitle() (NOT under src/lib/supabase/, which only holds admin/client/config/server)
 - `scanready/src/lib/humanizer.ts` - price constants, checkHumanizerEntitlement
 - `scanready/src/app/api/paket/intent/route.ts` + `scanready/src/app/api/paket/verify/route.ts` + `scanready/src/app/api/humanizer/intent/route.ts` - Stripe-as-token rails /api/pass/intent parallels
-- `supabase/migrations/0001_stage3_accounts.sql` - enforce_package_limit(), advisory lock, mark_packages_read_only(), RLS to extend in 0002
+- `scanready/supabase/migrations/0001_stage3_accounts.sql` - enforce_package_limit(), advisory lock, mark_packages_read_only(), RLS to extend in 0002
 - `scanready/src/lib/i18n.tsx` - the t.* dictionary new copy maps into
 - `scanready/src/app/preise/page.tsx` - page to rebuild
 - `scanready/src/app/layout.tsx` - metadata to extend (icons, openGraph.images)
