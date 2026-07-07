@@ -25,6 +25,7 @@ import { LangProvider, useLang } from '@/lib/i18n'
 import { track } from '@/lib/analytics'
 import { AccountMenu } from '@/components/AccountMenu'
 import { StorageGate } from '@/components/StorageGate'
+import { PassStatusChip } from '@/components/PassStatusChip'
 import { useAccount } from '@/components/AccountProvider'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { accountsEnabled } from '@/lib/supabase/config'
@@ -34,6 +35,8 @@ import {
   listPackages,
   deletePackage,
   getPackage,
+  getActivePass,
+  getLatestPass,
   type ApplicationPackageRow,
   type SaveResult,
 } from '@/lib/account'
@@ -50,6 +53,7 @@ import {
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
 const PaketModal = dynamic(() => import('@/components/PaketModal'), { ssr: false })
+const PassModal = dynamic(() => import('@/components/PassModal'), { ssr: false })
 
 /** sessionStorage key for a paid Bewerbungspaket: stores ONLY the PaymentIntent
  * id (never document content), so a reload restores the unlock after a server
@@ -1034,6 +1038,7 @@ function ResultView({
   paketUnlocked,
   onRequestPaket,
   onSavePackage,
+  onRequestPass,
   jobPosting,
 }: {
   lebenslauf: LebenslaufWithUids
@@ -1052,6 +1057,10 @@ function ResultView({
    * step) under the given title. Renders nothing via SaveApplicationButton when
    * accounts are disabled. */
   onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
+  /** Opens PassModal (07-07) - StorageGate's Pass CTA in the save rail's
+   * state==='limit' branch routes through this seam instead of the 07-06
+   * /preise fallback. */
+  onRequestPass: () => void
   /** Feeds the save card's title suggestion (derivePackageTitle) - empty until
    * the user has moved past this step at least once, same value the Anschreiben
    * step already carries in reducer state. */
@@ -1188,7 +1197,7 @@ function ResultView({
         {/* Stage 3 accounts: save this Lebenslauf (anschreiben: null at this step).
             Renders nothing when accounts are disabled. */}
         <div className="mt-4">
-          <SaveApplicationButton onSave={onSavePackage} jobPosting={jobPosting} />
+          <SaveApplicationButton onSave={onSavePackage} onRequestPass={onRequestPass} jobPosting={jobPosting} />
         </div>
 
         {/* Ort/Datum for the printed signature block – editable so the user controls
@@ -1265,9 +1274,13 @@ function PencilGlyph() {
 // ---------------------------------------------------------------------------
 function SaveApplicationButton({
   onSave,
+  onRequestPass,
   jobPosting,
 }: {
   onSave: (title: string) => Promise<SaveResult | 'signed_out'>
+  /** Opens PassModal (07-07) - passed straight through to StorageGate's
+   * onChoosePass in the state==='limit' branch below. */
+  onRequestPass: () => void
   jobPosting: string
 }) {
   const { t } = useLang()
@@ -1415,13 +1428,7 @@ function SaveApplicationButton({
           )}
           {state === 'limit' && (
             <div className="mt-2">
-              <StorageGate
-                onChoosePass={() => {
-                  // 07-07 ships the real Pass purchase flow (PassModal) and
-                  // replaces this fallback with opening that modal in place.
-                  window.location.assign('/preise')
-                }}
-              />
+              <StorageGate onChoosePass={onRequestPass} />
             </div>
           )}
           {state === 'error' && (
@@ -1682,6 +1689,7 @@ function CoverLetterResultView({
   paketPi,
   onRequestPaket,
   onSavePackage,
+  onRequestPass,
 }: {
   letterText: string
   setLetterText: (text: string) => void
@@ -1699,6 +1707,8 @@ function CoverLetterResultView({
   /** Stage 3 accounts: saves the current Lebenslauf + letter under the given
    * title. Renders nothing via SaveApplicationButton when accounts are disabled. */
   onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
+  /** Opens PassModal (07-07) - passed straight through to SaveApplicationButton. */
+  onRequestPass: () => void
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1876,7 +1886,7 @@ function CoverLetterResultView({
 
       {/* Stage 3 accounts: save this Lebenslauf + letter. Renders nothing when
           accounts are disabled. */}
-      <SaveApplicationButton onSave={onSavePackage} jobPosting={jobPosting} />
+      <SaveApplicationButton onSave={onSavePackage} onRequestPass={onRequestPass} jobPosting={jobPosting} />
 
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
@@ -2007,6 +2017,63 @@ function AppShell() {
   // application by design ("pro Bewerbung", spec D3): RESET clears it.
   const [paketPi, setPaketPi] = useState<string | null>(null)
   const [paketOpen, setPaketOpen] = useState(false)
+
+  // Bewerbungsphase-Pass (07-07): a standing DB-row entitlement, not a Stripe
+  // PI token, so its status is read fresh from the account.ts helpers rather
+  // than persisted in sessionStorage. passRow is the most recent pass_30d row
+  // (active or expired, or null if the user never bought one) - fed straight
+  // into PassStatusChip, which derives active/expired via checkPassEntitlement.
+  // packageCount is the signed-in user's saved-application count, shown as the
+  // storage meter's numerator once a Pass is active.
+  const [passRow, setPassRow] = useState<{ expires_at: string } | null>(null)
+  const [packageCount, setPackageCount] = useState(0)
+  const [passOpen, setPassOpen] = useState(false)
+
+  // Fetches the signed-in user's Pass status + saved-application count.
+  // getActivePass is the same RLS-scoped entitlement source the fulfillment
+  // routes (/api/humanize, /api/paket/verify) use server-side; when it's null
+  // the most recent Pass may simply have lapsed, so getLatestPass (no expiry
+  // filter) sources the real date for the neutral expired chip. `cancelled`
+  // is an optional guard for the mount effect below (same idiom as
+  // SavedApplications' own fetch effect); handlePassPurchased below fires it
+  // without one since the modal it responds to is unmounting either way.
+  async function refreshPassStatus(cancelled?: () => boolean) {
+    if (!accountsEnabled() || !user) {
+      if (!cancelled?.()) {
+        setPassRow(null)
+        setPackageCount(0)
+      }
+      return
+    }
+    const client = getSupabaseBrowserClient()
+    const active = await getActivePass(client, user.id)
+    const [row, packages] = await Promise.all([
+      active ? Promise.resolve(active) : getLatestPass(client, user.id),
+      listPackages(client, user.id),
+    ])
+    if (cancelled?.()) return
+    setPassRow(row)
+    setPackageCount(packages.length)
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    // Same accepted pattern as SavedApplications'/StorageGate's own mount-time
+    // data-fetch effects in this file: an async read that resolves into local
+    // state has no non-effect equivalent here (there is no external
+    // subscription to attach to - it's a one-shot Supabase read).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshPassStatus(() => cancelled)
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshPassStatus closes over `user`, which is the deliberate trigger
+  }, [user])
+
+  function handlePassPurchased() {
+    setPassOpen(false)
+    refreshPassStatus()
+  }
 
   // Restore a paid Paket after a reload: never trust the stored id alone,
   // ask the server (Stripe) whether it is a succeeded paket PI. On a definitive
@@ -2409,6 +2476,7 @@ function AppShell() {
             <span className="text-eyebrow font-mono text-sm ml-1">DE</span>
           </a>
           <div className="flex items-center gap-4">
+            <PassStatusChip pass={passRow} packageCount={packageCount} compact />
             <AccountMenu />
             <LangToggle />
           </div>
@@ -2452,6 +2520,7 @@ function AppShell() {
               paketUnlocked={paketPi !== null}
               onRequestPaket={() => setPaketOpen(true)}
               onSavePackage={(title) => handleSavePackage(null, title)}
+              onRequestPass={() => setPassOpen(true)}
               jobPosting={state.jobPosting}
             />
           </div>
@@ -2517,6 +2586,7 @@ function AppShell() {
                 dispatch({ type: 'START_COVER_LETTER' })
               }}
               onSavePackage={(title) => handleSavePackage(letterText, title)}
+              onRequestPass={() => setPassOpen(true)}
             />
           </div>
         )}
@@ -2559,6 +2629,16 @@ function AppShell() {
         <PaketModal
           onClose={() => setPaketOpen(false)}
           onUnlocked={handlePaketUnlocked}
+        />
+      )}
+
+      {/* Bewerbungsphase-Pass purchase (07-07) - mounted at shell level for the
+          same reason as PaketModal: both result views' SaveApplicationButton can
+          open it, and next/dynamic keeps Stripe.js out of the page until it does. */}
+      {passOpen && (
+        <PassModal
+          onClose={() => setPassOpen(false)}
+          onPurchased={handlePassPurchased}
         />
       )}
     </>

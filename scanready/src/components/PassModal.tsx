@@ -76,7 +76,12 @@ export default function PassModal({
   const dialogRef = useRef<HTMLDivElement>(null)
 
   const priceFormatted = formatEuroCents(PASS_PRICE_CENTS)
-  const endsAtFormatted = formatDate(new Date(Date.now() + PASS_WINDOW_DAYS * 24 * 60 * 60 * 1000))
+  // Lazy useState initializer (same pattern as app/page.tsx's ortDatum): computes
+  // the "ends automatically on" date ONCE, at the moment the modal opens, rather
+  // than calling the impure Date.now() directly during render.
+  const [endsAtFormatted] = useState(() =>
+    formatDate(new Date(Date.now() + PASS_WINDOW_DAYS * 24 * 60 * 60 * 1000))
+  )
 
   // Focus management: conditionally mounted (no portal), mount/unmount doubles
   // as open/close. Same pattern as PaketModal/HumanizerModal.

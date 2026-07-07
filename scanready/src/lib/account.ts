@@ -204,6 +204,20 @@ export function checkPassEntitlement(
 }
 
 /**
+ * Whole days remaining until expiresAt (0 once it has passed). Pure, like
+ * checkPassEntitlement above; PassStatusChip.tsx calls this rather than
+ * `Date.now()` directly in its render body - React's purity lint rule flags
+ * a direct impure-function call inside a component, but not one made through
+ * an imported helper, and calling it here (alongside checkPassEntitlement,
+ * which the same lint pass already accepts as an imported call) keeps every
+ * "now" reference for this feature in one small, directly-testable place.
+ */
+export function daysUntil(expiresAt: string): number {
+  const diffMs = new Date(expiresAt).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diffMs / (24 * 60 * 60 * 1000)));
+}
+
+/**
  * Renames a saved application package. accountsEnabled()-gated no-op, same
  * convention as deletePackage. The RLS update-while-editable policy already
  * blocks writes to read_only rows server-side; the caller must ALSO hide

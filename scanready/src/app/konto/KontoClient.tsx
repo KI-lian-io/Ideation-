@@ -10,6 +10,7 @@
  * as every other Stage 3 entry point.
  */
 import { useEffect, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useAccount } from '@/components/AccountProvider'
 import { useLang } from '@/lib/i18n'
 import { accountsEnabled } from '@/lib/supabase/config'
@@ -19,8 +20,10 @@ import {
   deletePackage,
   deleteAccount,
   updatePackageTitle,
+  getLatestPass,
   type ApplicationPackageRow,
 } from '@/lib/account'
+import { PassStatusChip } from '@/components/PassStatusChip'
 import {
   btnClass,
   EYEBROW,
@@ -31,6 +34,11 @@ import {
   InlineRenameField,
   type KebabMenuItem,
 } from '@/components/ui'
+
+// Dynamic: keeps Stripe.js (and its cookies) out of /konto until the
+// re-purchase CTA in PassStatusChip's expired state actually opens it - same
+// reason /app defers PaketModal/PassModal via next/dynamic.
+const PassModal = dynamic(() => import('@/components/PassModal'), { ssr: false })
 
 type SubscriptionRow = {
   stripe_subscription_id: string
@@ -81,10 +89,62 @@ export function KontoClient() {
         <p className="text-muted">{user.email}</p>
       </div>
 
+      <PassSection userId={user.id} />
       <SavedPackagesSection userId={user.id} />
       <SubscriptionSection />
       <DangerZoneSection onSignOut={signOut} />
     </main>
+  )
+}
+
+/**
+ * Bewerbungsphase-Pass section (07-07): PassStatusChip's full "Ihr Zugang"
+ * card, active or the neutral expired state with a real re-purchase CTA.
+ * Renders nothing when the signed-in user has never purchased a Pass -
+ * StorageGate (in /app's save rail) is the cross-sell entry point for that
+ * case, not this dashboard.
+ */
+function PassSection({ userId }: { userId: string }) {
+  const [pass, setPass] = useState<{ expires_at: string } | null>(null)
+  const [packageCount, setPackageCount] = useState(0)
+  const [modalOpen, setModalOpen] = useState(false)
+
+  async function refresh() {
+    const client = getSupabaseBrowserClient()
+    const [passRow, packages] = await Promise.all([
+      getLatestPass(client, userId),
+      listPackages(client, userId),
+    ])
+    setPass(passRow)
+    setPackageCount(packages.length)
+  }
+
+  useEffect(() => {
+    // One-shot Supabase read on mount, same accepted pattern as
+    // SavedPackagesSection's own refresh effect just below - no external
+    // subscription exists here to attach to instead.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh()
+    // Deliberately runs once per mount: userId is stable for the lifetime of
+    // this page, same convention as SavedPackagesSection's own refresh effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (!pass) return null
+
+  return (
+    <section className="flex flex-col gap-4">
+      <PassStatusChip pass={pass} packageCount={packageCount} onRepurchase={() => setModalOpen(true)} />
+      {modalOpen && (
+        <PassModal
+          onClose={() => setModalOpen(false)}
+          onPurchased={() => {
+            setModalOpen(false)
+            refresh()
+          }}
+        />
+      )}
+    </section>
   )
 }
 

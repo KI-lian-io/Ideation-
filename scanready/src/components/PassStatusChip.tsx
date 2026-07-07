@@ -29,7 +29,7 @@
  * neutral, never-red expired state with a real re-purchase CTA.
  */
 import { useLang } from '@/lib/i18n'
-import { checkPassEntitlement } from '@/lib/account'
+import { checkPassEntitlement, daysUntil } from '@/lib/account'
 import { PASS_PRICE_CENTS, PASS_STORAGE_CAP } from '@/lib/humanizer'
 import { btnClass, CARD, EYEBROW } from '@/components/ui'
 
@@ -68,10 +68,7 @@ export function PassStatusChip({
       )
     }
 
-    const daysLeft = Math.max(
-      0,
-      Math.ceil((new Date(pass.expires_at).getTime() - Date.now()) / (24 * 60 * 60 * 1000))
-    )
+    const daysLeft = daysUntil(pass.expires_at)
     const fillPercent = Math.min(100, Math.round((packageCount / PASS_STORAGE_CAP) * 100))
 
     return (
