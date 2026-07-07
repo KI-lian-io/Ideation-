@@ -9,13 +9,28 @@
  * "not available yet" line when accountsEnabled() is false, same convention
  * as every other Stage 3 entry point.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAccount } from '@/components/AccountProvider'
 import { useLang } from '@/lib/i18n'
 import { accountsEnabled } from '@/lib/supabase/config'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
-import { listPackages, deletePackage, deleteAccount, type ApplicationPackageRow } from '@/lib/account'
-import { btnClass, EYEBROW } from '@/components/ui'
+import {
+  listPackages,
+  deletePackage,
+  deleteAccount,
+  updatePackageTitle,
+  type ApplicationPackageRow,
+} from '@/lib/account'
+import {
+  btnClass,
+  EYEBROW,
+  SheetCard,
+  MonoBadge,
+  EmptyState,
+  KebabMenu,
+  InlineRenameField,
+  type KebabMenuItem,
+} from '@/components/ui'
 
 type SubscriptionRow = {
   stripe_subscription_id: string
@@ -73,9 +88,116 @@ export function KontoClient() {
   )
 }
 
+/**
+ * Derives the "company · city" line from the package's own saved Lebenslauf
+ * (most recent experience entry, index 0). Grounded in data the user already
+ * saved - never a separate stored field, never invented. Returns null when
+ * the Lebenslauf has no experience entries, so the caller skips the line
+ * entirely rather than rendering an empty one.
+ */
+function packageCompanyCity(pkg: ApplicationPackageRow): string | null {
+  const latest = pkg.lebenslauf.experience[0]
+  if (!latest) return null
+  return latest.location ? `${latest.company} · ${latest.location}` : latest.company
+}
+
+/** One saved-package card: mono date + kebab, serif title (or inline rename),
+ * company · city, hairline, mono document-type badge row. Read-only rows
+ * render flat (no shadow) and HIDE the Umbenennen action entirely (delete
+ * always stays available) per the RLS-silently-no-ops guardrail. */
+function PackageCard({
+  pkg,
+  anyReadOnly,
+  isRenaming,
+  renameValue,
+  onRenameChange,
+  onRenameStart,
+  onRenameCommit,
+  onRenameCancel,
+  onOpen,
+  onDuplicate,
+  onDelete,
+}: {
+  pkg: ApplicationPackageRow
+  anyReadOnly: boolean
+  isRenaming: boolean
+  renameValue: string
+  onRenameChange: (value: string) => void
+  onRenameStart: (pkg: ApplicationPackageRow) => void
+  onRenameCommit: (pkg: ApplicationPackageRow, value: string) => void
+  onRenameCancel: () => void
+  onOpen: (pkg: ApplicationPackageRow) => void
+  onDuplicate: (pkg: ApplicationPackageRow) => void
+  onDelete: (pkg: ApplicationPackageRow) => void
+}) {
+  const { t } = useLang()
+  const companyCity = packageCompanyCity(pkg)
+
+  const items: KebabMenuItem[] = [
+    { label: t.libraryMenuOpen, onSelect: () => onOpen(pkg) },
+    { label: t.libraryMenuDuplicate, onSelect: () => onDuplicate(pkg) },
+    ...(pkg.read_only ? [] : [{ label: t.libraryMenuRename, onSelect: () => onRenameStart(pkg) }]),
+    { label: t.libraryMenuDelete, onSelect: () => onDelete(pkg), destructive: true },
+  ]
+
+  return (
+    <div
+      className={
+        pkg.read_only
+          ? 'flex flex-col gap-2.5 rounded-xl border border-hair bg-paper px-5 py-4'
+          : `${SheetCard} flex flex-col gap-2.5 px-5 py-4`
+      }
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone">
+          {new Date(pkg.updated_at).toLocaleDateString('de-DE')}
+        </span>
+        <KebabMenu items={items} ariaLabel={t.libraryMenuAriaLabel(pkg.title)} />
+      </div>
+
+      {isRenaming ? (
+        <InlineRenameField
+          value={renameValue}
+          onChange={onRenameChange}
+          onSave={(value) => onRenameCommit(pkg, value)}
+          onCancel={onRenameCancel}
+          ariaLabel={t.saveTitleAriaLabel}
+        />
+      ) : (
+        <span className={`font-serif-text text-lg font-semibold leading-tight ${pkg.read_only ? 'text-slate' : 'text-ink'}`}>
+          {pkg.title}
+        </span>
+      )}
+      {isRenaming && <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-stone">{t.libraryRenameHelper}</p>}
+
+      {companyCity && <span className="text-sm text-muted">{companyCity}</span>}
+
+      <div className="h-px bg-hair" />
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        <MonoBadge>LL</MonoBadge>
+        {pkg.anschreiben ? <MonoBadge>AS</MonoBadge> : <MonoBadge variant="ghost">AS fehlt</MonoBadge>}
+        {pkg.job_posting ? (
+          <MonoBadge>STELLENANZEIGE</MonoBadge>
+        ) : (
+          <MonoBadge variant="ghost">STELLENANZEIGE fehlt</MonoBadge>
+        )}
+        {pkg.read_only ? (
+          <MonoBadge variant="readonly">{t.libraryReadonlyBadge}</MonoBadge>
+        ) : anyReadOnly ? (
+          <MonoBadge variant="editable">{t.libraryEditableBadge}</MonoBadge>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
 function SavedPackagesSection({ userId }: { userId: string }) {
   const { t } = useLang()
   const [packages, setPackages] = useState<ApplicationPackageRow[] | null>(null)
+  const [filter, setFilter] = useState('')
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
 
   async function refresh() {
     const rows = await listPackages(getSupabaseBrowserClient(), userId)
@@ -95,43 +217,128 @@ function SavedPackagesSection({ userId }: { userId: string }) {
     await refresh()
   }
 
+  function handleRenameStart(pkg: ApplicationPackageRow) {
+    setRenamingId(pkg.id)
+    setRenameValue(pkg.title)
+  }
+
+  function handleRenameCancel() {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  async function handleRenameCommit(pkg: ApplicationPackageRow, value: string) {
+    const trimmed = value.trim()
+    setRenamingId(null)
+    if (!trimmed || trimmed === pkg.title) return
+    await updatePackageTitle(getSupabaseBrowserClient(), pkg.id, trimmed)
+    await refresh()
+  }
+
+  // /konto has no tool reducer state to load into - open/duplicate hand off to
+  // /app via a plain query-string bridge that AppShell reads once on mount.
+  function handleOpen(pkg: ApplicationPackageRow) {
+    window.location.assign(`/app?package=${pkg.id}&action=open`)
+  }
+
+  function handleDuplicate(pkg: ApplicationPackageRow) {
+    window.location.assign(`/app?package=${pkg.id}&action=duplicate`)
+  }
+
+  const filtered = useMemo(() => {
+    if (!packages) return null
+    const needle = filter.trim().toLowerCase()
+    if (!needle) return packages
+    return packages.filter((pkg) => {
+      const companyCity = packageCompanyCity(pkg) ?? ''
+      return pkg.title.toLowerCase().includes(needle) || companyCity.toLowerCase().includes(needle)
+    })
+  }, [packages, filter])
+
+  const anyReadOnly = packages?.some((pkg) => pkg.read_only) ?? false
+
   return (
-    <section className="flex flex-col gap-3">
-      <p className={EYEBROW}>{t.kontoSavedHeading}</p>
-      <p className="text-muted">{t.kontoSavedHint}</p>
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className={EYEBROW}>{t.libraryTitle}</p>
+        <a href="/app" className={btnClass('secondary', 'sm')}>
+          {t.libraryNewCta}
+        </a>
+      </div>
+
       {packages === null ? (
         <p className="text-muted">{t.kontoLoading}</p>
       ) : packages.length === 0 ? (
-        <p className="text-muted">{t.savedApplicationsEmpty}</p>
+        <EmptyState
+          status={t.libraryEmptyStatus}
+          body={t.libraryEmptyBody}
+          ctaLabel={t.libraryEmptyCta}
+          ctaHref="/app"
+        />
       ) : (
-        <ul className="flex flex-col gap-2">
-          {packages.map((pkg) => (
-            <li
-              key={pkg.id}
-              className="flex items-center justify-between gap-3 rounded-md border border-hair bg-paper px-4 py-3"
-            >
-              <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="font-semibold text-ink truncate">{pkg.title}</span>
-                <span className="text-xs text-muted">
-                  {t.savedApplicationsUpdated(new Date(pkg.updated_at).toLocaleDateString('de-DE'))}
-                  {pkg.read_only && (
-                    <span className="ml-2 font-mono uppercase tracking-[0.1em] text-eyebrow">
-                      {t.savedApplicationsReadOnlyBadge}
-                    </span>
-                  )}
-                </span>
-              </div>
-              <button
-                onClick={() => handleDelete(pkg)}
-                className={`${btnClass('secondary')} shrink-0`}
-              >
-                {t.kontoDeleteCta}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          {anyReadOnly && <p className="text-sm text-muted">{t.libraryReadonlyBanner}</p>}
+
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={t.libraryFilterPlaceholder}
+            aria-label={t.libraryFilterPlaceholder}
+            className="w-full max-w-xs rounded-md border border-hair bg-paper px-3 py-1.5 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none sm:w-72"
+          />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {(filtered ?? []).map((pkg) => (
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg}
+                anyReadOnly={anyReadOnly}
+                isRenaming={renamingId === pkg.id}
+                renameValue={renameValue}
+                onRenameChange={setRenameValue}
+                onRenameStart={handleRenameStart}
+                onRenameCommit={handleRenameCommit}
+                onRenameCancel={handleRenameCancel}
+                onOpen={handleOpen}
+                onDuplicate={handleDuplicate}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+
+          <div className="flex items-start gap-2 border-t border-hair pt-4 text-sm text-muted">
+            <LockGlyph />
+            <span>
+              {t.libraryFooterContents}{' '}
+              <a href="/datenschutz" className="underline" lang="de">
+                {t.humanizerPrivacyLink}
+              </a>
+            </span>
+          </div>
+        </>
       )}
     </section>
+  )
+}
+
+function LockGlyph() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="mt-0.5 shrink-0 text-accent"
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
   )
 }
 
