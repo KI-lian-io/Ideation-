@@ -31,6 +31,17 @@
   --color-band-from: #1b2430;
   --color-band-to: #234038;
 
+  /* Elevation: flat by default, shadow is the exception (from the exported
+     ScanReady Design System, ds-update/tokens/shadows.css). --shadow-sheet is
+     the generated document card shell (library gallery, print-sheet cards);
+     --shadow-sheet-hero is the deeper variant for the one sheet above the
+     fold; --shadow-modal is for dialogs and floating menus over the scrim. */
+  --shadow-sheet: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+    rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.06) 0px 16px 32px;
+  --shadow-sheet-hero: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+    rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.10) 0px 24px 56px;
+  --shadow-modal: rgba(27, 36, 48, 0.40) 0px 24px 64px -16px;
+
   /* Four voices: display serif · reading serif (the document output) · Inter (UI) · Geist Mono (labels). */
   --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Charter", Georgia, serif;
   --font-serif-text: var(--font-source-serif), "Iowan Old Style", Georgia, "Times New Roman", serif;
