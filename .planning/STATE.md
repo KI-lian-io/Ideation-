@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed 07-08-PLAN.md
-last_updated: "2026-07-07T10:31:43.415Z"
+stopped_at: Completed 07-05-PLAN.md
+last_updated: "2026-07-07T10:51:56.568Z"
 last_activity: 2026-07-07
 last_activity_desc: Phase 7 execution in progress, 07-04 (A2 save moment) complete
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 22
-  completed_plans: 19
+  completed_plans: 20
   percent: 71
 current_phase: 7
 current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
@@ -67,6 +67,7 @@ Progress: [██████████] 100%
 | Phase 07 P03 | 32min | 3 tasks | 4 files |
 | Phase 07 P04 | 20min | 2 tasks | 2 files |
 | Phase 07 P08 | 25min | 2 tasks | 1 files |
+| Phase 07 P05 | 25min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 07-03]: /api/pass/verify requires pi.metadata.user_id to match the caller's session before writing the pass_30d row, closing a cross-user credit forgery vector (T-07-03-02)
 - [Phase 07-04]: Abbrechen in the rebuilt save card resets the title field to the derivePackageTitle suggestion (no separate collapsed/open state exists to close out of); SavedConfirmationPanel's single timestamp prop carries a composed "Gespeichert · HH:MM" string since the primitive (built in 07-01) has no separate status-label slot
 - [Phase 07-08]: Preise: prices formatted from HUMANIZER_PRICE_CENTS/PAKET_PRICE_CENTS/PASS_PRICE_CENTS via de-DE Intl formatter; Plus tier stays a literal (no code constant, unbuilt/undecided price); non-buyable Plus CTA is a mailto: link, not a disabled button
+- [Phase 07-05]: packageCompanyCity() duplicated in KontoClient.tsx and app/page.tsx rather than shared — A five-line pure derivation with no other shared import between the two files
+- [Phase 07-05]: Read-only rows hide the rename kebab item entirely; delete always stays available — RLS-silently-no-ops guardrail applied at the UI layer
+- [Phase 07-05]: Konto Oeffnen/Neue Bewerbung aus dieser hand off to /app via a plain window.location query-string bridge — /konto has no tool reducer to load a package into; avoids next/navigation useSearchParams Suspense requirement for a one-shot deep link
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T10:31:43.409Z
+Last session: 2026-07-07T10:51:47.706Z
 Last activity: 2026-07-07 - Completed 07-04-PLAN.md: A2 save moment (SaveApplicationButton rebuilt as a save card + SavedConfirmationPanel on both result views)
-Stopped at: Completed 07-08-PLAN.md
+Stopped at: Completed 07-05-PLAN.md
