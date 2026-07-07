@@ -28,7 +28,9 @@ export type AnalyticsEvent =
   | "humanizer_paid"
   | "humanizer_done"
   | "paket_opened"
-  | "paket_paid";
+  | "paket_paid"
+  | "pass_opened"
+  | "pass_paid";
 
 type AnalyticsProps = {
   copy_download: {

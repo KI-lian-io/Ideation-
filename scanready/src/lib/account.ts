@@ -252,6 +252,39 @@ export async function getActivePass(
 }
 
 /**
+ * Fetches the signed-in user's most recent Pass (pass_30d) row, active OR
+ * expired, or null if they have never purchased one. Deliberately distinct
+ * from getActivePass above: that helper is the server-side entitlement gate
+ * used by the fulfillment routes (/api/humanize, /api/paket/verify) and is
+ * scoped to expires_at > now on purpose, so it correctly returns null once a
+ * Pass lapses. PassStatusChip (src/components/PassStatusChip.tsx) needs the
+ * opposite: it must render a NEUTRAL expired state with the real expiry date
+ * once the most recent Pass has lapsed, so this query intentionally has no
+ * expiry filter - "most recent by expires_at" is always either the currently
+ * active Pass (if any) or the most recently expired one. RLS select-own
+ * already scopes the read to the caller; accountsEnabled()-gated no-op like
+ * the other read helpers.
+ */
+export async function getLatestPass(
+  client: SupabaseClient,
+  userId: string
+): Promise<{ expires_at: string } | null> {
+  if (!accountsEnabled()) return null;
+
+  const { data, error } = await client
+    .from("humanizer_purchases")
+    .select("expires_at")
+    .eq("user_id", userId)
+    .eq("kind", "pass_30d")
+    .order("expires_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as { expires_at: string };
+}
+
+/**
  * Lists the signed-in user's paket purchase history (amount + timestamp,
  * newest first) for the storage-gate "you already paid" anchor variant. RLS
  * select-own already scopes it to the caller; accountsEnabled()-gated no-op

@@ -184,6 +184,36 @@ type Dict = {
   paketIncludedRefinementNotice: string
   paketRefinementSpentNotice: string
 
+  // PassModal (Bewerbungsphase-Pass) chrome. Same legal-text-stays-German rule
+  // as Humanizer/Paket, but this is a DISTINCT declaration: the Pass is a
+  // 30-day fixed-term SERVICE, not digital content, so its Widerruf consent
+  // uses the proportional-value-substitute formula (§356(4)/§357a BGB), never
+  // Paket's §356(5) digital-content declaration. Wording pending
+  // native-speaker + legal review (PRD section 9, Q3).
+  passEyebrow: string
+  passModalTitle: string
+  passModalPriceUnit: string
+  passFeatureUnlimitedPaket: string
+  passFeaturePdfExport: string
+  passFeatureStorage: string
+  passFeatureEndsAutomatically: (date: string) => string
+  passContinueCta: string
+  passPayCta: string
+  passWiderrufText: string
+  passVerifyError: string
+  passFooterLegal: string
+  // PassStatusChip: read-only lifecycle indicator (top bar + /konto)
+  passAccessHeading: string
+  passActiveBadge: string
+  passChipActive: (date: string) => string
+  passActiveUntilDays: (date: string, days: number) => string
+  passStorageLabel: string
+  passEndsAutomaticallyFooter: string
+  passExpiredBadge: (date: string) => string
+  passExpiredBody: (count: number) => string
+  passExpiredFooter: string
+  passRepurchaseCta: (priceFormatted: string) => string
+
   // LebenslaufEditor chrome
   addOptionalFields: string
   photoDetailsSummary: string
@@ -512,6 +542,31 @@ const en = {
   paketRefinementSpentNotice:
     'The refinement included in your Bewerbungspaket has already been used. A further refinement costs 2,99 €.',
 
+  passEyebrow: 'Bewerbungsphase-Pass',
+  passModalTitle: 'Every application. 30 days.',
+  passModalPriceUnit: 'One-time · No subscription',
+  passFeatureUnlimitedPaket: 'Unlimited application packages',
+  passFeaturePdfExport: 'PDF export and refinement',
+  passFeatureStorage: 'Storage for 25 applications',
+  passFeatureEndsAutomatically: (date) => `Ends automatically on ${date}`,
+  passContinueCta: 'Continue to payment',
+  passPayCta: 'Zahlungspflichtig bestellen (14,99 €)',
+  passWiderrufText:
+    'Ich verlange, dass der Pass sofort beginnt. Widerrufe ich innerhalb von 14 Tagen, zahle ich anteiligen Wertersatz für die bereits genutzte Laufzeit.',
+  passVerifyError: 'Payment succeeded, but the Pass could not be activated yet. Please try again.',
+  passFooterLegal: 'Total price incl. VAT. Ends automatically, no renewal.',
+  passAccessHeading: 'Your access',
+  passActiveBadge: 'Active',
+  passChipActive: (date) => `Pass active until ${date}`,
+  passActiveUntilDays: (date, days) => `Active until ${date} · ${days === 1 ? '1 day' : `${days} days`} left`,
+  passStorageLabel: 'Storage',
+  passEndsAutomaticallyFooter: 'Ends automatically. No cancellation needed.',
+  passExpiredBadge: (date) => `Expired on ${date}`,
+  passExpiredBody: (count) =>
+    `Your ${count === 1 ? '1 application stays' : `${count} applications stay`} stored and readable. The newest stays editable; older ones are read-only: viewing, loading, duplicating and deleting always work.`,
+  passExpiredFooter: 'Nothing was charged. The Pass never renews.',
+  passRepurchaseCta: (priceFormatted) => `Buy Pass again · ${priceFormatted}`,
+
   addOptionalFields: '+ Add optional fields (Nationalität, Geburtsdatum)',
   photoDetailsSummary: 'Photo (optional) – details',
   addExperience: '+ Add work experience',
@@ -829,6 +884,31 @@ const de = {
     'In Ihrem Bewerbungspaket enthalten, keine weitere Zahlung nötig.',
   paketRefinementSpentNotice:
     'Der im Bewerbungspaket enthaltene Feinschliff wurde bereits genutzt. Ein weiterer Feinschliff kostet 2,99 €.',
+
+  passEyebrow: 'Bewerbungsphase-Pass',
+  passModalTitle: 'Alle Bewerbungen. 30 Tage.',
+  passModalPriceUnit: 'Einmalig · Kein Abo',
+  passFeatureUnlimitedPaket: 'Unbegrenzte Bewerbungspakete',
+  passFeaturePdfExport: 'PDF-Export und Feinschliff',
+  passFeatureStorage: 'Speicher für 25 Bewerbungen',
+  passFeatureEndsAutomatically: (date) => `Endet automatisch am ${date}`,
+  passContinueCta: 'Weiter zur Zahlung',
+  passPayCta: 'Zahlungspflichtig bestellen (14,99 €)',
+  passWiderrufText:
+    'Ich verlange, dass der Pass sofort beginnt. Widerrufe ich innerhalb von 14 Tagen, zahle ich anteiligen Wertersatz für die bereits genutzte Laufzeit.',
+  passVerifyError: 'Die Zahlung war erfolgreich, aber der Pass konnte noch nicht aktiviert werden. Bitte versuchen Sie es erneut.',
+  passFooterLegal: 'Gesamtpreis inkl. MwSt. Endet automatisch, keine Verlängerung.',
+  passAccessHeading: 'Ihr Zugang',
+  passActiveBadge: 'Aktiv',
+  passChipActive: (date) => `Pass aktiv bis ${date}`,
+  passActiveUntilDays: (date, days) => `Aktiv bis ${date} · noch ${days === 1 ? '1 Tag' : `${days} Tage`}`,
+  passStorageLabel: 'Speicher',
+  passEndsAutomaticallyFooter: 'Endet automatisch. Keine Kündigung nötig.',
+  passExpiredBadge: (date) => `Abgelaufen am ${date}`,
+  passExpiredBody: (count) =>
+    `Ihre ${count === 1 ? '1 Bewerbung bleibt' : `${count} Bewerbungen bleiben`} gespeichert und lesbar. Die neueste bleibt bearbeitbar, ältere sind schreibgeschützt: ansehen, laden, duplizieren und löschen geht immer.`,
+  passExpiredFooter: 'Es wurde nichts abgebucht. Der Pass verlängert sich nie.',
+  passRepurchaseCta: (priceFormatted) => `Pass erneut kaufen · ${priceFormatted}`,
 
   addOptionalFields: '+ Optionale Felder hinzufügen (Nationalität, Geburtsdatum)',
   photoDetailsSummary: 'Foto (optional) – Details',
