@@ -266,6 +266,27 @@ type Dict = {
   saveCancelCta: string
   saveTitleAriaLabel: string
   saveRenameAria: string
+  // Library gallery (design surface 01) - card gallery on /konto and the compact
+  // in-tool gallery on /app. Copy lifted verbatim from 01-library.dc.html's 1f
+  // copy deck; document-type badges (LL/AS/STELLENANZEIGE) stay German-only,
+  // same convention as the DIN section labels, so they are not i18n keys.
+  libraryTitle: string
+  libraryEmptyStatus: string
+  libraryEmptyBody: string
+  libraryEmptyCta: string
+  libraryNewCta: string
+  libraryMenuOpen: string
+  libraryMenuDuplicate: string
+  libraryMenuRename: string
+  libraryMenuDelete: string
+  libraryMenuAriaLabel: (title: string) => string
+  libraryRenameHelper: string
+  libraryFilterPlaceholder: string
+  libraryReadonlyBadge: string
+  libraryReadonlyBanner: string
+  libraryEditableBadge: string
+  libraryStorageFree: string
+  libraryFooterContents: string
   kontoLink: string
   savedApplicationsHeading: string
   savedApplicationsUpdated: (date: string) => string
@@ -532,6 +553,26 @@ const en = {
   saveCancelCta: 'Cancel',
   saveTitleAriaLabel: 'Application title',
   saveRenameAria: 'Edit title',
+  libraryTitle: 'My applications',
+  libraryEmptyStatus: 'No saved applications yet',
+  libraryEmptyBody:
+    'Save a finished application and you can reopen it here, rename it, and duplicate it as the starting point for your next role.',
+  libraryEmptyCta: 'Create application',
+  libraryNewCta: 'New application',
+  libraryMenuOpen: 'Open',
+  libraryMenuDuplicate: 'New application from this one',
+  libraryMenuRename: 'Rename',
+  libraryMenuDelete: 'Delete',
+  libraryMenuAriaLabel: (title) => `More actions for ${title}`,
+  libraryRenameHelper: 'Enter to save · Esc to cancel',
+  libraryFilterPlaceholder: 'Filter by title or company',
+  libraryReadonlyBadge: 'Read-only',
+  libraryReadonlyBanner:
+    'Your newest application stays editable. Older ones are read-only: viewing, loading, duplicating, exporting and deleting always work.',
+  libraryEditableBadge: 'Editable',
+  libraryStorageFree: '1 of 1 saved · Free',
+  libraryFooterContents:
+    'Your CV text, the Lebenslauf, the Anschreiben, the job posting and your answers. No photos.',
   kontoLink: 'Account',
   savedApplicationsHeading: 'Saved applications',
   savedApplicationsUpdated: (date) => `Updated ${date}`,
@@ -799,6 +840,26 @@ const de = {
   saveCancelCta: 'Abbrechen',
   saveTitleAriaLabel: 'Titel der Bewerbung',
   saveRenameAria: 'Titel bearbeiten',
+  libraryTitle: 'Meine Bewerbungen',
+  libraryEmptyStatus: 'Noch keine gespeicherten Bewerbungen',
+  libraryEmptyBody:
+    'Wenn Sie eine fertige Bewerbung speichern, können Sie sie hier wieder öffnen, umbenennen und als Vorlage für die nächste Stelle duplizieren.',
+  libraryEmptyCta: 'Bewerbung erstellen',
+  libraryNewCta: 'Neue Bewerbung',
+  libraryMenuOpen: 'Öffnen',
+  libraryMenuDuplicate: 'Neue Bewerbung aus dieser',
+  libraryMenuRename: 'Umbenennen',
+  libraryMenuDelete: 'Löschen',
+  libraryMenuAriaLabel: (title) => `Weitere Aktionen für ${title}`,
+  libraryRenameHelper: 'Enter speichern · Esc abbrechen',
+  libraryFilterPlaceholder: 'Nach Titel oder Firma filtern',
+  libraryReadonlyBadge: 'Nur Lesen',
+  libraryReadonlyBanner:
+    'Ihre neueste Bewerbung bleibt bearbeitbar. Ältere sind schreibgeschützt: ansehen, laden, duplizieren, exportieren und löschen geht immer.',
+  libraryEditableBadge: 'Bearbeitbar',
+  libraryStorageFree: '1 von 1 gespeichert · Kostenlos',
+  libraryFooterContents:
+    'Ihren CV-Text, den Lebenslauf, das Anschreiben, die Stellenanzeige und Ihre Antworten. Keine Fotos.',
   kontoLink: 'Konto',
   savedApplicationsHeading: 'Gespeicherte Bewerbungen',
   savedApplicationsUpdated: (date) => `Aktualisiert ${date}`,
