@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users (completed 2026-06-23)
 - [x] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned (completed 2026-06-23)
 - [x] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts (completed 2026-06-24)
+- [ ] **Phase 7: Account Library + Honest Pricing (design Phase A)** - Reconcile the six claude.ai/design Phase-A surfaces into the live app behind Stage 3 env gates: library card gallery, Bewerbungsphase-Pass SKU, storage gate, Pass modal, preise v2, foundation primitives + founder assets
 
 ## Phase Details
 
@@ -151,6 +152,27 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-02-PLAN.md — GTM-02 SEO keyword plan: EN + DE clusters ("German CV" head term), 2 cornerstone guides, 6-month cadence with Sept–Oct stretch goal + Keyword-Planner validation step (Wave 1)
 - [x] 05-03-PLAN.md — GTM-03 paid-test spec: one Google Search keyword, cost-per-completed-flow metric, €100 cap, organic-proof gate (N≈50), Phase-6 analytics dependency flagged BLOCKED (Wave 1)
 
+### Phase 7: Account Library + Honest Pricing (design Phase A)
+
+**Goal**: The six Phase-A design surfaces (01-library, 02-storage-gate, 03-pass, 04-preise, 05-save-moment, 06-founder-assets) are reconciled into the live app behind the existing Stage 3 env gates: saved applications render as a card gallery with rename/duplicate/delete, the save moment becomes an editable-title save card, the free storage limit shows an honest Pass/Plus chooser, the Bewerbungsphase-Pass (14,99 EUR, 30 days, non-renewing, account-required) is purchasable on new rails with DB-tier storage limits, /preise shows the 4-card ladder, and founder assets + 404 ship. Everything stays inert until founder keys exist.
+**Mode:** mvp
+**Depends on**: Phase 5 (plus the post-v1.0 Stage 3 accounts stack, Humanizer+/Bewerbungspaket rails, and the committed design export - not GSD phases)
+**Requirements**: TBD (spec lives in scanready/docs/design-impl-plan-library-pricing.md + scanready/docs/prd-account-library-pricing.md)
+**Success Criteria** (what must be TRUE):
+
+  1. Saved packages render as the card gallery on both /konto (SavedPackagesSection) and /app (SavedApplications): mono date + kebab row, serif title, company line, badge row (LL / AS / STELLENANZEIGE with dashed "fehlt"), inline rename, "Neue Bewerbung aus dieser", delete with confirm, NN/g empty state, storage-transparency footer; read-only rows HIDE edit controls (never disable); no photos anywhere in cards
+  2. SaveApplicationButton is a save card on BOTH result views: title pre-filled AND pre-selected from derivePackageTitle with provenance line, saved-confirmation panel (checkmark + timestamp + editable title + library link); saving stays explicit-only (no autosave/blur-save)
+  3. Migration supabase/migrations/0002_pass.sql adds humanizer_purchases.expires_at + kind='pass_30d' (requires user_id) and re-creates enforce_package_limit() with three tiers (subscription unlimited, live pass 25, free 1) keeping the advisory-lock race guard; PASS_PRICE_CENTS = 1499 exists beside the other price constants
+  4. /api/pass/intent mints a Pass PaymentIntent ONLY for authenticated users; a live pass window (pass_30d, expires_at > now()) grants PDF export + refinements via the extended entitlement check; anonymous humanizer/paket stateless rails are byte-for-byte untouched in behavior
+  5. StorageGate replaces the state==='limit' text hint as an inline dismissible panel (Pass featured + Plus "Geplant", honest delete-instead footer, purchase-history anchor variant at 2+ paket purchases, dismissal persisted in sessionStorage, no countdowns or fake scarcity)
+  6. PassModal mirrors PaketModal's payment UX but with the DISTINCT proportional Widerruf consent wording (§356(4)/§357a BGB, NOT Paket's §356(5) text) and "Endet automatisch" framed as a feature; active chip ("Pass aktiv bis TT.MM.JJJJ" + storage meter) and neutral expired state exist; new German copy + Widerruf variant flagged for native-speaker + legal review
+  7. /preise shows the 4-card ladder (2,99 / 4,99 / 14,99 featured with per-application math / Plus 5,99 "Geplant" non-buyable), the free-tier manifesto pull quote, and the anti-Abofalle before/after comparison; prices match the code constants
+  8. The six founder SVGs are in public/, favicon + openGraph.images wired in layout.tsx, src/app/not-found.tsx built from surface 06; npx tsc --noEmit, the full test suite, and next build all pass; no em-dash in any new copy; all new surfaces are inert when accounts/Stripe env vars are unset
+
+**Plans**: TBD
+
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -160,6 +182,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
+| 7. Account Library + Honest Pricing (design Phase A) | 0 | Planning | - |
 
 ## Backlog
 
