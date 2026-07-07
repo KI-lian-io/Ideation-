@@ -31,10 +31,20 @@ import {
   saveApplicationPackage,
   updatePackageTitle,
   listPackages,
+  deletePackage,
+  getPackage,
   type ApplicationPackageRow,
   type SaveResult,
 } from '@/lib/account'
-import { SavedConfirmationPanel, InlineRenameField, SheetCard } from '@/components/ui'
+import {
+  SavedConfirmationPanel,
+  InlineRenameField,
+  SheetCard,
+  MonoBadge,
+  KebabMenu,
+  BottomSheet,
+  type KebabMenuItem,
+} from '@/components/ui'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
@@ -565,6 +575,7 @@ function InputView({
   onTextChange,
   onSubmit,
   onLoadPackage,
+  onDuplicatePackage,
 }: {
   resumeText: string
   onTextChange: (text: string) => void
@@ -572,6 +583,9 @@ function InputView({
   /** Stage 3 accounts: dispatches LOAD_PACKAGE for the chosen saved application.
    * SavedApplications renders nothing when accounts are disabled or signed out. */
   onLoadPackage: (pkg: ApplicationPackageRow) => void
+  /** Stage 3 accounts: "Neue Bewerbung aus dieser" - loads the package's CV +
+   * Lebenslauf with an EMPTY posting step (never restores the old Anschreiben). */
+  onDuplicatePackage: (pkg: ApplicationPackageRow) => void
 }) {
   const { t } = useLang()
   const RESUME_LIMIT = 30_000
@@ -700,20 +714,163 @@ function InputView({
 
       {/* Stage 3 accounts: saved applications for the signed-in user. Renders
           nothing when accounts are disabled or the user is signed out. */}
-      <SavedApplications onOpen={onLoadPackage} />
+      <SavedApplications onOpen={onLoadPackage} onDuplicate={onDuplicatePackage} />
     </div>
   )
 }
 
 /**
- * Lists the signed-in user's saved application packages on the input view.
- * Fetches once when a user is present (accountsEnabled() && user); renders
- * nothing while signed out or disabled, matching every other Stage 3 UI.
+ * Derives the "company · city" line from the package's own saved Lebenslauf
+ * (most recent experience entry, index 0). Grounded in data the user already
+ * saved - never a separate stored field, never invented. Returns null when
+ * the Lebenslauf has no experience entries, so the caller skips the line
+ * entirely rather than rendering an empty one. Same helper as KontoClient.tsx's
+ * (kept local here rather than shared - the two galleries have no other shared
+ * import today and this is a five-line pure derivation).
  */
-function SavedApplications({ onOpen }: { onOpen: (pkg: ApplicationPackageRow) => void }) {
+function packageCompanyCity(pkg: ApplicationPackageRow): string | null {
+  const latest = pkg.lebenslauf.experience[0]
+  if (!latest) return null
+  return latest.location ? `${latest.company} · ${latest.location}` : latest.company
+}
+
+/** One saved-package card for the compact in-tool gallery: same anatomy and
+ * kebab actions as the /konto gallery (mono date + kebab, serif title or
+ * inline rename, company · city, hairline, mono document-type badge row).
+ * On touch (`sm:hidden` trigger), the kebab is replaced by a BottomSheet the
+ * caller mounts once for whichever card is open (44px targets). */
+function PackageCard({
+  pkg,
+  anyReadOnly,
+  isRenaming,
+  renameValue,
+  onRenameChange,
+  onRenameStart,
+  onRenameCommit,
+  onRenameCancel,
+  onOpen,
+  onDuplicate,
+  onDelete,
+  onOpenSheet,
+}: {
+  pkg: ApplicationPackageRow
+  anyReadOnly: boolean
+  isRenaming: boolean
+  renameValue: string
+  onRenameChange: (value: string) => void
+  onRenameStart: (pkg: ApplicationPackageRow) => void
+  onRenameCommit: (pkg: ApplicationPackageRow, value: string) => void
+  onRenameCancel: () => void
+  onOpen: (pkg: ApplicationPackageRow) => void
+  onDuplicate: (pkg: ApplicationPackageRow) => void
+  onDelete: (pkg: ApplicationPackageRow) => void
+  onOpenSheet: (pkg: ApplicationPackageRow) => void
+}) {
+  const { t } = useLang()
+  const companyCity = packageCompanyCity(pkg)
+
+  const items: KebabMenuItem[] = [
+    { label: t.libraryMenuOpen, onSelect: () => onOpen(pkg) },
+    { label: t.libraryMenuDuplicate, onSelect: () => onDuplicate(pkg) },
+    ...(pkg.read_only ? [] : [{ label: t.libraryMenuRename, onSelect: () => onRenameStart(pkg) }]),
+    { label: t.libraryMenuDelete, onSelect: () => onDelete(pkg), destructive: true },
+  ]
+
+  return (
+    <div
+      className={
+        pkg.read_only
+          ? 'flex flex-col gap-2 rounded-xl border border-hair bg-paper px-4 py-3.5'
+          : `${SheetCard} flex flex-col gap-2 px-4 py-3.5`
+      }
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone">
+          {new Date(pkg.updated_at).toLocaleDateString('de-DE')}
+        </span>
+        {/* Desktop/pointer: floating KebabMenu. Touch (<sm): a plain trigger
+            that opens the shared BottomSheet mounted once by the caller. */}
+        <span className="hidden sm:inline-flex">
+          <KebabMenu items={items} ariaLabel={t.libraryMenuAriaLabel(pkg.title)} />
+        </span>
+        <button
+          type="button"
+          aria-label={t.libraryMenuAriaLabel(pkg.title)}
+          onClick={() => onOpenSheet(pkg)}
+          className="inline-flex h-11 w-11 items-center justify-center rounded text-muted hover:bg-faint sm:hidden"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="5" r="1" />
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="12" cy="19" r="1" />
+          </svg>
+        </button>
+      </div>
+
+      {isRenaming ? (
+        <InlineRenameField
+          value={renameValue}
+          onChange={onRenameChange}
+          onSave={(value) => onRenameCommit(pkg, value)}
+          onCancel={onRenameCancel}
+          ariaLabel={t.saveTitleAriaLabel}
+        />
+      ) : (
+        <span className={`font-serif-text text-base font-semibold leading-tight ${pkg.read_only ? 'text-slate' : 'text-ink'}`}>
+          {pkg.title}
+        </span>
+      )}
+      {isRenaming && <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-stone">{t.libraryRenameHelper}</p>}
+
+      {companyCity && <span className="text-xs text-muted">{companyCity}</span>}
+
+      <div className="h-px bg-hair" />
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        <MonoBadge>LL</MonoBadge>
+        {pkg.anschreiben ? <MonoBadge>AS</MonoBadge> : <MonoBadge variant="ghost">AS fehlt</MonoBadge>}
+        {pkg.job_posting ? (
+          <MonoBadge>STELLENANZEIGE</MonoBadge>
+        ) : (
+          <MonoBadge variant="ghost">STELLENANZEIGE fehlt</MonoBadge>
+        )}
+        {pkg.read_only ? (
+          <MonoBadge variant="readonly">{t.libraryReadonlyBadge}</MonoBadge>
+        ) : anyReadOnly ? (
+          <MonoBadge variant="editable">{t.libraryEditableBadge}</MonoBadge>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Lists the signed-in user's saved application packages on the input view as
+ * the same card gallery as /konto (compact: stacked single column within the
+ * narrower tool card). Fetches once when a user is present (accountsEnabled()
+ * && user); renders nothing while signed out or disabled, matching every
+ * other Stage 3 UI.
+ */
+function SavedApplications({
+  onOpen,
+  onDuplicate,
+}: {
+  onOpen: (pkg: ApplicationPackageRow) => void
+  onDuplicate: (pkg: ApplicationPackageRow) => void
+}) {
   const { t } = useLang()
   const { user } = useAccount()
   const [packages, setPackages] = useState<ApplicationPackageRow[] | null>(null)
+  const [filter, setFilter] = useState('')
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [sheetFor, setSheetFor] = useState<ApplicationPackageRow | null>(null)
+
+  async function refresh() {
+    if (!user) return
+    const rows = await listPackages(getSupabaseBrowserClient(), user.id)
+    setPackages(rows)
+  }
 
   useEffect(() => {
     if (!accountsEnabled() || !user) {
@@ -729,37 +886,95 @@ function SavedApplications({ onOpen }: { onOpen: (pkg: ApplicationPackageRow) =>
     }
   }, [user])
 
+  async function handleDelete(pkg: ApplicationPackageRow) {
+    if (!window.confirm(t.kontoDeleteConfirm)) return
+    await deletePackage(getSupabaseBrowserClient(), pkg.id)
+    await refresh()
+  }
+
+  function handleRenameStart(pkg: ApplicationPackageRow) {
+    setRenamingId(pkg.id)
+    setRenameValue(pkg.title)
+  }
+
+  function handleRenameCancel() {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  async function handleRenameCommit(pkg: ApplicationPackageRow, value: string) {
+    const trimmed = value.trim()
+    setRenamingId(null)
+    if (!trimmed || trimmed === pkg.title) return
+    await updatePackageTitle(getSupabaseBrowserClient(), pkg.id, trimmed)
+    await refresh()
+  }
+
   if (!accountsEnabled() || !user || packages === null) return null
+
+  const needle = filter.trim().toLowerCase()
+  const filtered = needle
+    ? packages.filter((pkg) => {
+        const companyCity = packageCompanyCity(pkg) ?? ''
+        return pkg.title.toLowerCase().includes(needle) || companyCity.toLowerCase().includes(needle)
+      })
+    : packages
+  const anyReadOnly = packages.some((pkg) => pkg.read_only)
+
+  const sheetItems: KebabMenuItem[] = sheetFor
+    ? [
+        { label: t.libraryMenuOpen, onSelect: () => onOpen(sheetFor) },
+        { label: t.libraryMenuDuplicate, onSelect: () => onDuplicate(sheetFor) },
+        ...(sheetFor.read_only ? [] : [{ label: t.libraryMenuRename, onSelect: () => handleRenameStart(sheetFor) }]),
+        { label: t.libraryMenuDelete, onSelect: () => handleDelete(sheetFor), destructive: true },
+      ]
+    : []
 
   return (
     <div className="mt-2 flex flex-col gap-3 border-t border-hair pt-6">
-      <p className={EYEBROW}>{t.savedApplicationsHeading}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className={EYEBROW}>{t.libraryTitle}</p>
+        {packages.length > 0 && (
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={t.libraryFilterPlaceholder}
+            aria-label={t.libraryFilterPlaceholder}
+            className="w-40 rounded-md border border-hair bg-paper px-2.5 py-1 text-xs text-ink placeholder:text-muted focus:border-accent focus:outline-none sm:w-56"
+          />
+        )}
+      </div>
+
       {packages.length === 0 ? (
-        <p className="text-sm text-muted">{t.savedApplicationsEmpty}</p>
+        <p className="text-sm text-muted">{t.libraryEmptyStatus}</p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {packages.map((pkg) => (
-            <li
-              key={pkg.id}
-              className="flex items-center justify-between gap-3 rounded-md border border-hair bg-paper px-4 py-3"
-            >
-              <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-sm font-semibold text-ink truncate">{pkg.title}</span>
-                <span className="text-xs text-muted">
-                  {t.savedApplicationsUpdated(new Date(pkg.updated_at).toLocaleDateString('de-DE'))}
-                  {pkg.read_only && (
-                    <span className="ml-2 font-mono uppercase tracking-[0.1em] text-eyebrow">
-                      {t.savedApplicationsReadOnlyBadge}
-                    </span>
-                  )}
-                </span>
-              </div>
-              <button onClick={() => onOpen(pkg)} className={`${btnClass('secondary')} shrink-0`}>
-                {t.savedApplicationsOpen}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          {anyReadOnly && <p className="text-xs text-muted">{t.libraryReadonlyBanner}</p>}
+          <div className="flex flex-col gap-3">
+            {filtered.map((pkg) => (
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg}
+                anyReadOnly={anyReadOnly}
+                isRenaming={renamingId === pkg.id}
+                renameValue={renameValue}
+                onRenameChange={setRenameValue}
+                onRenameStart={handleRenameStart}
+                onRenameCommit={handleRenameCommit}
+                onRenameCancel={handleRenameCancel}
+                onOpen={onOpen}
+                onDuplicate={onDuplicate}
+                onDelete={handleDelete}
+                onOpenSheet={setSheetFor}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {sheetFor && (
+        <BottomSheet items={sheetItems} onClose={() => setSheetFor(null)} title={sheetFor.title} />
       )}
     </div>
   )
@@ -1767,7 +1982,7 @@ async function describeFetchFailure(
 
 function AppShell() {
   const { t } = useLang()
-  const { user } = useAccount()
+  const { user, loading: accountLoading } = useAccount()
   const [state, dispatch] = useReducer(reducer, initialState)
   const [letterText, setLetterText] = useState('')
   const abortRef = useRef<AbortController | null>(null)
@@ -2132,6 +2347,52 @@ function AppShell() {
     }
   }
 
+  // "Neue Bewerbung aus dieser": loads the package's CV + Lebenslauf via the
+  // same LOAD_PACKAGE action as handleLoadPackage, but with an EMPTY posting
+  // step and no restored Anschreiben - a fresh tailoring pass on the same
+  // Lebenslauf, never an implicit save. The duplicate is only ever persisted
+  // if the user later clicks Speichern, which inserts a NEW row and goes
+  // through the same DB limit trigger as any other save.
+  async function handleDuplicatePackage(pkg: ApplicationPackageRow) {
+    const client = getSupabaseBrowserClient()
+    const { data: cv } = await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()
+    const questions = questionsForPosting('')
+    dispatch({
+      type: 'LOAD_PACKAGE',
+      payload: {
+        resumeText: (cv as { cv_text?: string } | null)?.cv_text ?? '',
+        lebenslauf: pkg.lebenslauf,
+        jobPosting: '',
+        answers: wireAnswersToIds(pkg.answers, questions),
+      },
+    })
+  }
+
+  // Cross-page bridge from /konto, which has no tool reducer of its own:
+  // ?package=<id>&action=open|duplicate loads that package here once the
+  // user's session is known, then strips the query string so a later reload
+  // doesn't repeat it. Plain window.location parsing (not next/navigation's
+  // useSearchParams) so this client component doesn't need a Suspense
+  // boundary just for a one-shot deep link.
+  useEffect(() => {
+    if (accountLoading || !accountsEnabled() || !user) return
+    const params = new URLSearchParams(window.location.search)
+    const packageId = params.get('package')
+    if (!packageId) return
+    const action = params.get('action')
+    window.history.replaceState(null, '', window.location.pathname)
+    ;(async () => {
+      const client = getSupabaseBrowserClient()
+      const pkg = await getPackage(client, packageId)
+      if (!pkg) return
+      if (action === 'duplicate') {
+        await handleDuplicatePackage(pkg)
+      } else {
+        await handleLoadPackage(pkg)
+      }
+    })()
+  }, [accountLoading, user])
+
   return (
     <>
       {/* Top-bar wordmark – links back to the landing (UI-SPEC §F item 2). Same centered
@@ -2162,6 +2423,7 @@ function AppShell() {
               onTextChange={(text) => dispatch({ type: 'SET_RESUME_TEXT', payload: text })}
               onSubmit={handleSubmit}
               onLoadPackage={handleLoadPackage}
+              onDuplicatePackage={handleDuplicatePackage}
             />
           </div>
         )}
