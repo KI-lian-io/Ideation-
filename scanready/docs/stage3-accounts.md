@@ -50,6 +50,20 @@ Status as of 2026-07-06 (live founder session):
       WARNs: the intentional `delete_own_account` SECURITY DEFINER RPC, and
       the auth leaked-password-protection dashboard toggle, both known
       founder items).
+- [x] Migration 0003_pass_requires_user_fix applied (2026-07-07, phase 07
+      code-review fix CR-01): applied via `mcp__supabase__apply_migration` to
+      project `thgmhbzimnjcaoqyyiyp` (success:true). Replaces the 0002
+      `humanizer_purchases_pass_requires_user` CHECK constraint (which broke
+      GDPR account deletion for any Pass purchaser, because the 0001 FK's
+      `ON DELETE SET NULL` UPDATE violated the CHECK) with an INSERT-only
+      trigger `trg_pass_requires_user`. Live verification confirmed: the old
+      CHECK constraint is gone (pg_constraint count 0), the trigger and
+      `enforce_pass_requires_user()` function are present, and the FK still
+      uses `ON DELETE SET NULL` (`confdeltype = 'n'`). Behavioral probes
+      (rolled back, zero residue): a null-owner `pass_30d` insert is still
+      rejected by the trigger, and a deletion-style `UPDATE ... SET user_id =
+      NULL` on an existing `pass_30d` row now succeeds. Security advisors:
+      still only the same two pre-existing WARNs, zero new findings.
 
 Follow-ups found during the 2026-07-06 E2E (not fixed by this doc edit):
 - KNOWN ISSUE: `saveApplicationPackage` inserts the `cvs` row before the
