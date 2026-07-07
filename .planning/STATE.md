@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-07-07T10:08:22.530Z"
+stopped_at: Completed 07-04-PLAN.md
+last_updated: "2026-07-07T10:18:54.540Z"
 last_activity: 2026-07-07
-last_activity_desc: Phase 7 plan 03 (A1 Pass API layer) executed
+last_activity_desc: Phase 7 execution in progress (07-04 done)
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 22
-  completed_plans: 17
-  percent: 77
+  completed_plans: 18
+  percent: 82
 current_phase: 7
 current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
 ---
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 ## Current Position
 
 v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase.
-Last activity: 2026-07-07 — Phase 7 execution started
+Last activity: 2026-07-07 — Phase 7 execution in progress, 07-04 (A2 save moment) complete
 
 Progress: [██████████] 100%
 
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 07 P01 | 26min | 3 tasks | 9 files |
 | Phase 07 P02 | 10min | 3 tasks | 5 files |
 | Phase 07 P03 | 32min | 3 tasks | 4 files |
+| Phase 07 P04 | 20min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Recent decisions affecting current work:
 - [Phase 07-02]: checkPassEntitlement kept as a standalone pure DB-row check in account.ts rather than folded into checkHumanizerEntitlement/PaymentIntentLike in humanizer.ts, since a Pass is a standing window entitlement, not a single-use Stripe PI token
 - [Phase 07-03]: paymentIntentId made optional on /api/humanize and /api/paket/verify so a signed-in Pass holder can omit it entirely; a real non-empty value still runs the original Stripe PI-check path unmodified
 - [Phase 07-03]: /api/pass/verify requires pi.metadata.user_id to match the caller's session before writing the pass_30d row, closing a cross-user credit forgery vector (T-07-03-02)
+- [Phase 07-04]: Abbrechen in the rebuilt save card resets the title field to the derivePackageTitle suggestion (no separate collapsed/open state exists to close out of); SavedConfirmationPanel's single timestamp prop carries a composed "Gespeichert · HH:MM" string since the primitive (built in 07-01) has no separate status-label slot
 
 ### Pending Todos
 
@@ -127,6 +129,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T10:08:22.525Z
-Last activity: 2026-07-07 - Completed 07-03-PLAN.md: A1 Pass API layer (/api/pass/intent, /api/pass/verify, additive Pass fallback in /api/humanize + /api/paket/verify)
-Stopped at: Completed 07-03-PLAN.md
+Last session: 2026-07-07T10:18:00.000Z
+Last activity: 2026-07-07 - Completed 07-04-PLAN.md: A2 save moment (SaveApplicationButton rebuilt as a save card + SavedConfirmationPanel on both result views)
+Stopped at: Completed 07-04-PLAN.md
