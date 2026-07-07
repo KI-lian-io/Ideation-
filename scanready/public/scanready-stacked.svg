@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="120" viewBox="0 0 140 120" fill="none">
+  <rect x="42" y="6" width="56" height="56" rx="14" fill="#1b2430"></rect>
+  <path d="M56 26h28" stroke="#6f6960" stroke-width="3.2" stroke-linecap="round"></path>
+  <path d="M56 34h28" stroke="#0a7d63" stroke-width="4" stroke-linecap="round"></path>
+  <path d="M56 42h18.5" stroke="#6f6960" stroke-width="3.2" stroke-linecap="round"></path>
+  <text x="70" y="96" text-anchor="middle" font-family="Inter, sans-serif" font-size="19" font-weight="600" fill="#1b2430" letter-spacing="-0.4">ScanReady</text>
+</svg>

@@ -21,11 +21,22 @@ export const metadata: Metadata = {
   title: "ScanReady: Win the German Recruiter's First Scan",
   description:
     "Turn your CV into a norm-correct German Lebenslauf and an authentic Anschreiben, grounded only in your real facts. Zero-retention, by design.",
+  // Founder asset set (Typesetting Theater Phase 3 export). These are stand-in
+  // marks pending the naming decision (see naming-shortlist.md); swap when a
+  // name is picked.
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     title: "ScanReady: Win the German Recruiter's First Scan",
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",
+    images: [{ url: "/og-scanready.svg", width: 1200, height: 630, alt: "ScanReady" }],
   },
 };
 

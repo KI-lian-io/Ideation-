@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  
+  <rect width="1200" height="630" fill="#fbfaf7"></rect>
+
+  
+  <g>
+    <rect x="72" y="52" width="34" height="34" rx="9" fill="#1b2430"></rect>
+    <path d="M80.5 64.5h17" stroke="#6f6960" stroke-width="2" stroke-linecap="round"></path>
+    <path d="M80.5 69h17" stroke="#0a7d63" stroke-width="2.4" stroke-linecap="round"></path>
+    <path d="M80.5 73.5h11.5" stroke="#6f6960" stroke-width="2" stroke-linecap="round"></path>
+    <text x="117" y="76" font-family="Inter, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-size="19" font-weight="600" fill="#1b2430" letter-spacing="-0.3">ScanReady</text>
+    <text x="1128" y="74" text-anchor="end" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="12" fill="#9a8b72" letter-spacing="2.2">BEWERBUNG · DEUTSCHLAND · ERSTAUSGABE 2026</text>
+  </g>
+  <rect x="72" y="104" width="1056" height="2" fill="#1b2430"></rect>
+  <rect x="72" y="109" width="1056" height="1" fill="#1b2430" opacity="0.14"></rect>
+
+  
+  <text x="72" y="234" font-family="&#39;Iowan Old Style&#39;, &#39;Palatino Linotype&#39;, Palatino, Georgia, serif" font-size="72" font-weight="600" fill="#1b2430" letter-spacing="-1.4">Win the German</text>
+  <text x="72" y="316" font-family="&#39;Iowan Old Style&#39;, &#39;Palatino Linotype&#39;, Palatino, Georgia, serif" font-size="72" font-weight="600" fill="#1b2430" letter-spacing="-1.4">recruiter’s <tspan fill="#0a7d63">first scan</tspan>.</text>
+  <rect x="374" y="330" width="330" height="5" fill="#0a7d63"></rect>
+
+  <text x="72" y="386" font-family="Inter, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-size="21" fill="#6f6960">Your CV, re-typeset into the Lebenslauf and Anschreiben</text>
+  <text x="72" y="416" font-family="Inter, &#39;Helvetica Neue&#39;, Arial, sans-serif" font-size="21" fill="#6f6960">a German recruiter expects. Every change annotated.</text>
+
+  
+  <text x="72" y="486" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="14" fill="#2a3340" letter-spacing="0.4">Mar 2021 – Present <tspan fill="#0a7d63">→</tspan> 03/2021 – heute  ·  Fluent <tspan fill="#0a7d63">→</tspan> Verhandlungssicher  ·  DIN 5008</text>
+
+  
+  <g>
+    <rect x="836" y="150" width="292" height="372" rx="12" fill="#fbfaf7" stroke="#1b2430" stroke-opacity="0.12"></rect>
+    <rect x="838" y="152" width="288" height="368" rx="10" fill="#fbfaf7"></rect>
+    <text x="868" y="196" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="10" fill="#9a8b72" letter-spacing="1.8">LEBENSLAUF</text>
+    <text x="868" y="228" font-family="&#39;Iowan Old Style&#39;, &#39;Palatino Linotype&#39;, Palatino, Georgia, serif" font-size="22" font-weight="600" fill="#1b2430">Amara Okafor</text>
+    <rect x="868" y="246" width="228" height="1" fill="#1b2430" opacity="0.12"></rect>
+    <rect x="868" y="268" width="180" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="286" width="212" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="304" width="164" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <text x="868" y="342" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="11" fill="#0a7d63">03/2021 – heute</text>
+    <rect x="868" y="356" width="212" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="374" width="188" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="392" width="204" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="428" width="140" height="7" rx="3.5" fill="#f0eee9"></rect>
+    <rect x="868" y="446" width="196" height="7" rx="3.5" fill="#f0eee9"></rect>
+    
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a7d63" stop-opacity="0"></stop>
+      <stop offset="0.5" stop-color="#0a7d63" stop-opacity="0.10"></stop>
+      <stop offset="1" stop-color="#0a7d63" stop-opacity="0"></stop>
+    </linearGradient>
+    <rect x="838" y="318" width="288" height="88" fill="url(#scan)"></rect>
+    <rect x="838" y="316" width="288" height="2.5" fill="#0a7d63" opacity="0.55"></rect>
+  </g>
+
+  
+  <rect x="72" y="566" width="1056" height="1" fill="#1b2430" opacity="0.14"></rect>
+  <text x="72" y="596" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="13" fill="#6f6960" letter-spacing="1.6">scanready.de</text>
+  <text x="1128" y="596" text-anchor="end" font-family="&#39;Geist Mono&#39;, &#39;SF Mono&#39;, Menlo, Consolas, monospace" font-size="13" fill="#6f6960" letter-spacing="1.6">ZERO-RETENTION · KOSTENLOS STARTEN</text>
+</svg>

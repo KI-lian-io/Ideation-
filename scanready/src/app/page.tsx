@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description:
       "Norm-correct German Lebenslauf and authentic Anschreiben. Zero-retention, grounded only in your real facts.",
     type: "website",
-    images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
+    images: [{ url: "/og-scanready.svg", width: 1200, height: 630, alt: "ScanReady" }],
   },
 };
 
