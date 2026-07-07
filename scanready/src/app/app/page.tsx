@@ -47,6 +47,7 @@ import {
   MonoBadge,
   KebabMenu,
   BottomSheet,
+  EmptyState,
   type KebabMenuItem,
 } from '@/components/ui'
 
@@ -952,7 +953,12 @@ function SavedApplications({
       </div>
 
       {packages.length === 0 ? (
-        <p className="text-sm text-muted">{t.libraryEmptyStatus}</p>
+        <EmptyState
+          status={t.libraryEmptyStatus}
+          body={t.libraryEmptyBody}
+          ctaLabel={t.libraryEmptyCta}
+          onCtaClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        />
       ) : (
         <>
           {anyReadOnly && <p className="text-xs text-muted">{t.libraryReadonlyBanner}</p>}
@@ -977,6 +983,16 @@ function SavedApplications({
           </div>
         </>
       )}
+
+      <div className="flex items-start gap-2 border-t border-hair pt-4 text-xs text-muted">
+        <LockGlyph />
+        <span>
+          {t.libraryFooterContents}{' '}
+          <a href="/datenschutz" className="underline" lang="de">
+            {t.humanizerPrivacyLink}
+          </a>
+        </span>
+      </div>
 
       {sheetFor && (
         <BottomSheet items={sheetItems} onClose={() => setSheetFor(null)} title={sheetFor.title} />
@@ -1252,6 +1268,30 @@ function PencilGlyph() {
     >
       <path d="M12 20h9" />
       <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// LockGlyph: storage-transparency footer icon for SavedApplications.
+// Local (not exported) - mirrors KontoClient.tsx's own local LockGlyph.
+// ---------------------------------------------------------------------------
+function LockGlyph() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="mt-0.5 shrink-0 text-accent"
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   )
 }
