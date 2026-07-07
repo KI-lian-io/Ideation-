@@ -29,10 +29,12 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { accountsEnabled } from '@/lib/supabase/config'
 import {
   saveApplicationPackage,
+  updatePackageTitle,
   listPackages,
   type ApplicationPackageRow,
   type SaveResult,
 } from '@/lib/account'
+import { SavedConfirmationPanel, InlineRenameField, SheetCard } from '@/components/ui'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
 const HumanizerModal = dynamic(() => import('@/components/HumanizerModal'), { ssr: false })
@@ -816,6 +818,7 @@ function ResultView({
   paketUnlocked,
   onRequestPaket,
   onSavePackage,
+  jobPosting,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -830,8 +833,13 @@ function ResultView({
   paketUnlocked: boolean
   onRequestPaket: () => void
   /** Stage 3 accounts: saves the current Lebenslauf (anschreiben: null at this
-   * step). Renders nothing via SaveApplicationButton when accounts are disabled. */
-  onSavePackage: () => Promise<SaveResult | 'signed_out'>
+   * step) under the given title. Renders nothing via SaveApplicationButton when
+   * accounts are disabled. */
+  onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
+  /** Feeds the save card's title suggestion (derivePackageTitle) - empty until
+   * the user has moved past this step at least once, same value the Anschreiben
+   * step already carries in reducer state. */
+  jobPosting: string
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
@@ -964,7 +972,7 @@ function ResultView({
         {/* Stage 3 accounts: save this Lebenslauf (anschreiben: null at this step).
             Renders nothing when accounts are disabled. */}
         <div className="mt-4">
-          <SaveApplicationButton onSave={onSavePackage} />
+          <SaveApplicationButton onSave={onSavePackage} jobPosting={jobPosting} />
         </div>
 
         {/* Ort/Datum for the printed signature block – editable so the user controls
@@ -1001,67 +1009,210 @@ function ResultView({
 }
 
 // ---------------------------------------------------------------------------
+// PencilGlyph: small edit-affordance icon for the saved-title rename control.
+// Local (not exported) - mirrors ui.tsx's own local CheckGlyph convention.
+// ---------------------------------------------------------------------------
+function PencilGlyph() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Save application (Stage 3 accounts) – shared between ResultView and
 // CoverLetterResultView. Renders nothing when accounts are disabled. Never
-// auto-saves: only fires on the explicit button click (zero-retention
-// guardrail for the anonymous flow, and honest about what accounts do).
+// auto-saves: onSave is invoked ONLY from handleClick below (the explicit
+// Speichern click) - no blur/navigation/effect-driven save path exists here
+// (zero-retention guardrail for the anonymous flow, and honest about what
+// accounts do, Datenschutz §7).
+//
+// Save-moment rebuild (design surface 05, 07-04): the former single button is
+// now a save card (title field pre-filled + pre-selected from
+// derivePackageTitle, a provenance line, a contents-reminder line) that
+// stays mounted for every state except 'saved', where it is replaced in
+// place by SavedConfirmationPanel (checkmark, timestamp, editable title via
+// InlineRenameField, library link). The extended state union is unchanged;
+// only the idle/saving render and the post-save render are new.
 // ---------------------------------------------------------------------------
 function SaveApplicationButton({
   onSave,
+  jobPosting,
 }: {
-  onSave: () => Promise<SaveResult | 'signed_out'>
+  onSave: (title: string) => Promise<SaveResult | 'signed_out'>
+  jobPosting: string
 }) {
   const { t } = useLang()
   const [state, setState] = useState<
     'idle' | 'saving' | 'saved' | 'signed_out' | 'limit' | 'error'
   >('idle')
+  // Suggestion is recomputed from jobPosting once per mount (this component's
+  // parent view remounts on every phase transition - see the `key={state.phase}`
+  // wrapper in AppShell - so a fresh posting always yields a fresh suggestion).
+  const [suggestedTitle] = useState(() => derivePackageTitle(jobPosting))
+  const [title, setTitle] = useState(suggestedTitle)
+  const [savedTitle, setSavedTitle] = useState(suggestedTitle)
+  const [savedAt, setSavedAt] = useState<string | null>(null)
+  const [savedPackageId, setSavedPackageId] = useState<string | null>(null)
+  const [renaming, setRenaming] = useState(false)
+  const [renameValue, setRenameValue] = useState('')
+  const [renameError, setRenameError] = useState(false)
 
   if (!accountsEnabled()) return null
 
   async function handleClick() {
     setState('saving')
-    const result = await onSave()
+    const result = await onSave(title)
     if (result === 'signed_out') {
       setState('signed_out')
       return
     }
     if (result.ok) {
+      setSavedTitle(title)
+      setSavedPackageId(result.packageId)
+      setSavedAt(new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }))
       setState('saved')
       return
     }
     setState(result.reason)
   }
 
+  // Renaming after save uses the already-existing updatePackageTitle helper
+  // (src/lib/account.ts) - a real write, gated behind the pencil affordance,
+  // never fired automatically. Optimistic update with revert-on-failure.
+  async function handleRenameCommit(value: string) {
+    setRenaming(false)
+    const trimmed = value.trim()
+    if (!trimmed || trimmed === savedTitle || !savedPackageId) return
+    const previous = savedTitle
+    setSavedTitle(trimmed)
+    setRenameError(false)
+    const client = getSupabaseBrowserClient()
+    const result = await updatePackageTitle(client, savedPackageId, trimmed)
+    if (!result.ok) {
+      setSavedTitle(previous)
+      setRenameError(true)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      <button
-        onClick={handleClick}
-        disabled={state === 'saving'}
-        className={btnClass('secondary')}
-      >
-        {state === 'saving' ? t.saveApplicationSaving : t.saveApplicationCta}
-      </button>
+      {state === 'saved' ? (
+        <SavedConfirmationPanel
+          timestamp={`${t.saveConfirmed} · ${savedAt ?? ''}`}
+          libraryHref="/konto"
+          libraryLabel={t.saveConfirmedLink}
+          titleSlot={
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                {renaming ? (
+                  <InlineRenameField
+                    value={renameValue}
+                    onChange={setRenameValue}
+                    onSave={handleRenameCommit}
+                    onCancel={() => setRenaming(false)}
+                    ariaLabel={t.saveRenameAria}
+                  />
+                ) : (
+                  <>
+                    <span className="font-serif text-base font-semibold text-ink">
+                      {savedTitle}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRenameValue(savedTitle)
+                        setRenaming(true)
+                      }}
+                      aria-label={t.saveRenameAria}
+                      className="text-stone hover:text-ink"
+                    >
+                      <PencilGlyph />
+                    </button>
+                  </>
+                )}
+              </div>
+              {renameError && (
+                <p className="text-xs text-red-600">{t.saveApplicationErrorHint}</p>
+              )}
+            </div>
+          }
+        />
+      ) : (
+        <div className={`${SheetCard} p-4`}>
+          <p className={`${EYEBROW} mb-2`}>{t.saveLabel}</p>
+          <input
+            type="text"
+            aria-label={t.saveTitleAriaLabel}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            disabled={state === 'saving'}
+            className="w-full rounded-md border border-accent bg-card px-3 py-2 font-serif text-base font-semibold text-ink shadow-[0_0_0_2px_rgba(10,125,99,0.18)] outline-none disabled:opacity-60"
+          />
+          <div className="mt-2 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone">
+            <PencilGlyph />
+            {t.saveSuggestionHint}
+          </div>
+          <p className="mt-3 border-t border-hair pt-2.5 text-xs text-muted">
+            {t.saveContents}
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={handleClick}
+              disabled={state === 'saving' || title.trim().length === 0}
+              className={btnClass('accent', 'sm')}
+            >
+              {state === 'saving' ? t.saveApplicationSaving : t.saveApplicationCta}
+            </button>
+            {/* Abbrechen discards the edited title back to the suggestion - there is
+                no separate "open" step to close out of, the card is always mounted
+                here, so "cancel" resets the field rather than hiding anything. */}
+            <button
+              type="button"
+              onClick={() => setTitle(suggestedTitle)}
+              disabled={state === 'saving'}
+              className={btnClass('secondary', 'sm')}
+            >
+              {t.saveCancelCta}
+            </button>
+          </div>
+          {state === 'signed_out' && (
+            <p className="mt-2 text-sm text-muted">
+              {t.saveApplicationSignedOutHint}{' '}
+              <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
+                {t.kontoLink}
+              </a>
+            </p>
+          )}
+          {state === 'limit' && (
+            <p className="mt-2 text-sm text-muted">
+              {t.saveApplicationLimitHint}{' '}
+              <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
+                {t.kontoLink}
+              </a>
+            </p>
+          )}
+          {state === 'error' && (
+            <p className="mt-2 text-sm text-red-600">{t.saveApplicationErrorHint}</p>
+          )}
+        </div>
+      )}
       <span className="sr-only" aria-live="polite">
         {state === 'saved' ? t.saveApplicationSaved : ''}
       </span>
-      {state === 'saved' && <p className="text-sm text-accent">{t.saveApplicationSaved}</p>}
-      {state === 'signed_out' && (
-        <p className="text-sm text-muted">
-          {t.saveApplicationSignedOutHint}{' '}
-          <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
-            {t.kontoLink}
-          </a>
-        </p>
-      )}
-      {state === 'limit' && (
-        <p className="text-sm text-muted">
-          {t.saveApplicationLimitHint}{' '}
-          <a href="/konto" target="_blank" rel="noopener noreferrer" className="underline">
-            {t.kontoLink}
-          </a>
-        </p>
-      )}
-      {state === 'error' && <p className="text-sm text-red-600">{t.saveApplicationErrorHint}</p>}
     </div>
   )
 }
@@ -1326,9 +1477,9 @@ function CoverLetterResultView({
   paketUnlocked: boolean
   paketPi: string | null
   onRequestPaket: () => void
-  /** Stage 3 accounts: saves the current Lebenslauf + letter. Renders nothing
-   * via SaveApplicationButton when accounts are disabled. */
-  onSavePackage: () => Promise<SaveResult | 'signed_out'>
+  /** Stage 3 accounts: saves the current Lebenslauf + letter under the given
+   * title. Renders nothing via SaveApplicationButton when accounts are disabled. */
+  onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1506,7 +1657,7 @@ function CoverLetterResultView({
 
       {/* Stage 3 accounts: save this Lebenslauf + letter. Renders nothing when
           accounts are disabled. */}
-      <SaveApplicationButton onSave={onSavePackage} />
+      <SaveApplicationButton onSave={onSavePackage} jobPosting={jobPosting} />
 
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
@@ -1754,7 +1905,10 @@ function AppShell() {
   // auth via the browser client at click time (not just AccountProvider's context
   // state), since the user may have signed in from another tab after this page
   // mounted. Returns a typed outcome the two result views render feedback for.
-  async function handleSavePackage(anschreiben: string | null): Promise<SaveResult | 'signed_out'> {
+  async function handleSavePackage(
+    anschreiben: string | null,
+    packageTitle: string
+  ): Promise<SaveResult | 'signed_out'> {
     if (!accountsEnabled()) return { ok: false, reason: 'error', message: 'accounts_disabled' }
     const client = getSupabaseBrowserClient()
     const {
@@ -1770,7 +1924,7 @@ function AppShell() {
       answers: answersToWire(state.answers, questions),
       lebenslauf: stripUids(state.lebenslauf),
       anschreiben,
-      packageTitle: derivePackageTitle(state.jobPosting),
+      packageTitle,
     })
   }
 
@@ -2031,7 +2185,8 @@ function AppShell() {
               onExportPdf={handleExportLebenslaufPdf}
               paketUnlocked={paketPi !== null}
               onRequestPaket={() => setPaketOpen(true)}
-              onSavePackage={() => handleSavePackage(null)}
+              onSavePackage={(title) => handleSavePackage(null, title)}
+              jobPosting={state.jobPosting}
             />
           </div>
         )}
@@ -2095,7 +2250,7 @@ function AppShell() {
                 dispatch({ type: 'SET_JOB_POSTING', payload: '' })
                 dispatch({ type: 'START_COVER_LETTER' })
               }}
-              onSavePackage={() => handleSavePackage(letterText)}
+              onSavePackage={(title) => handleSavePackage(letterText, title)}
             />
           </div>
         )}
