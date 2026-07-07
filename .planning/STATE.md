@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-07-07T09:53:58.047Z"
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-07-07T10:08:22.530Z"
 last_activity: 2026-07-07
-last_activity_desc: Phase 7 execution started
+last_activity_desc: Phase 7 plan 03 (A1 Pass API layer) executed
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 22
-  completed_plans: 16
-  percent: 71
-current_phase: 5
-current_phase_name: distribution-operationalization
+  completed_plans: 17
+  percent: 77
+current_phase: 7
+current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
 ---
 
 # Project State
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | Phase 04 P02 | 228 | 3 tasks | 2 files |
 | Phase 07 P01 | 26min | 3 tasks | 9 files |
 | Phase 07 P02 | 10min | 3 tasks | 5 files |
+| Phase 07 P03 | 32min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Recent decisions affecting current work:
 - [Phase 07-01]: ui.tsx now carries 'use client' since three of the seven new A0 primitives (KebabMenu, InlineRenameField, BottomSheet) own focus/keyboard state — Pure exports (Btn, CARD, EYEBROW, ...) remain safely importable from Server Components; verified via a clean build with preise/page.tsx unchanged
 - [Phase 07-01]: New A0 primitives (SheetCard, MonoBadge, EmptyState, SavedConfirmationPanel, InlineRenameField, KebabMenu, BottomSheet) use PascalCase, diverging from ui.tsx's existing UPPER_SNAKE style-const convention — Matches the plan's exact grep-checked export names and signals shell components with behavior/props vs one-line style consts
 - [Phase 07-02]: checkPassEntitlement kept as a standalone pure DB-row check in account.ts rather than folded into checkHumanizerEntitlement/PaymentIntentLike in humanizer.ts, since a Pass is a standing window entitlement, not a single-use Stripe PI token
+- [Phase 07-03]: paymentIntentId made optional on /api/humanize and /api/paket/verify so a signed-in Pass holder can omit it entirely; a real non-empty value still runs the original Stripe PI-check path unmodified
+- [Phase 07-03]: /api/pass/verify requires pi.metadata.user_id to match the caller's session before writing the pass_30d row, closing a cross-user credit forgery vector (T-07-03-02)
 
 ### Pending Todos
 
@@ -124,6 +127,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T09:53:21.948Z
-Last activity: 2026-07-06 - Completed quick task 260706-nbd: Record Stage 3 accounts E2E verification in CLAUDE.md and stage3-accounts.md
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-07-07T10:08:22.525Z
+Last activity: 2026-07-07 - Completed 07-03-PLAN.md: A1 Pass API layer (/api/pass/intent, /api/pass/verify, additive Pass fallback in /api/humanize + /api/paket/verify)
+Stopped at: Completed 07-03-PLAN.md
