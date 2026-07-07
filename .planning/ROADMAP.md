@@ -169,7 +169,30 @@ Decimal phases appear between their surrounding integers in numeric order.
   7. /preise shows the 4-card ladder (2,99 / 4,99 / 14,99 featured with per-application math / Plus 5,99 "Geplant" non-buyable), the free-tier manifesto pull quote, and the anti-Abofalle before/after comparison; prices match the code constants
   8. The six founder SVGs are in public/, favicon + openGraph.images wired in layout.tsx, src/app/not-found.tsx built from surface 06; npx tsc --noEmit, the full test suite, and next build all pass; no em-dash in any new copy; all new surfaces are inert when accounts/Stripe env vars are unset
 
-**Plans**: TBD
+**Plans**: 8 plans
+
+**Wave 1** *(parallel - no file overlap; the authorized A0 + A1 foundation)*
+
+- [ ] 07-01-PLAN.md — A0 foundation: shadow tokens + seven ui.tsx primitives + founder assets/favicon/OG metadata + surface-06 not-found (Wave 1)
+- [ ] 07-02-PLAN.md — A1 Pass data: migration 0002 (expires_at + three-tier limit) + [BLOCKING] live schema push + PASS_PRICE_CENTS/PASS_STORAGE_CAP + account helpers + tests (Wave 1)
+
+**Wave 2** *(parallel - Pass API, save moment, and preise touch disjoint files)*
+
+- [ ] 07-03-PLAN.md — A1 Pass API: auth-gated /api/pass/intent + /api/pass/verify (idempotent pass row) + additive pass entitlement in humanize/paket (Wave 2)
+- [ ] 07-04-PLAN.md — A2 save moment: SaveApplicationButton rebuilt as an editable-title save card + SavedConfirmationPanel on both result views (Wave 2)
+- [ ] 07-08-PLAN.md — A5 preise v2: four-card ladder (prices from constants) + free-tier manifesto + anti-Abofalle comparison (Wave 2)
+
+**Wave 3** *(blocked on 07-04 - shares app/page.tsx + i18n.tsx)*
+
+- [ ] 07-05-PLAN.md — A2 library gallery: card gallery on /konto + /app, kebab actions, inline rename, duplicate-and-tailor, read-only hides edit controls, empty state (Wave 3)
+
+**Wave 4** *(blocked on 07-05 - shares app/page.tsx + i18n.tsx)*
+
+- [ ] 07-06-PLAN.md — A3 storage gate: StorageGate inline chooser replaces the limit hint, Pass featured + Plus "Geplant", 2+-purchase anchor, sessionStorage dismissal (Wave 4)
+
+**Wave 5** *(blocked on 07-03 + 07-06 - shares app/page.tsx + KontoClient.tsx + i18n.tsx; final build gate)*
+
+- [ ] 07-07-PLAN.md — A4 Pass modal + lifecycle: PassModal (distinct §356(4)/§357a Widerruf) + active/expired chips + StorageGate Pass CTA wire (Wave 5)
 
 **UI hint**: yes
 
@@ -182,7 +205,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
-| 7. Account Library + Honest Pricing (design Phase A) | 0 | Planning | - |
+| 7. Account Library + Honest Pricing (design Phase A) | 0/8 | Planning | - |
 
 ## Backlog
 
