@@ -58,6 +58,8 @@ export function StorageGate({ onChoosePass }: { onChoosePass: () => void }) {
   // fail-open convention as the rest of this codebase's storage reads.
   useEffect(() => {
     try {
+      // Same hydration-safe post-mount read pattern as i18n.tsx's LangProvider.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (sessionStorage.getItem(DISMISS_KEY) === '1') setDismissed(true)
     } catch {
       // ignore
