@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Completed 07-06-PLAN.md
-last_updated: "2026-07-07T11:06:00.572Z"
+stopped_at: Completed 07-07-PLAN.md
+last_updated: "2026-07-07T13:26:02.000Z"
 last_activity: 2026-07-07
-last_activity_desc: Phase 7 execution in progress, 07-06 (A3 storage gate) complete
+last_activity_desc: "Phase 7 (Account Library + Honest Pricing, design Phase A) complete: 07-07 (A4 Pass modal + lifecycle) shipped, all 8/8 plans done"
 progress:
   total_phases: 7
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 21
-  percent: 95
+  completed_phases: 7
+  total_plans: 23
+  completed_plans: 23
+  percent: 100
 current_phase: 7
 current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
 ---
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 
 ## Current Position
 
-v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase.
-Last activity: 2026-07-07 — Phase 7 execution in progress, 07-06 (A3 storage gate) complete: 07-07 (Pass modal + lifecycle) remains
+v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is now complete: all 8/8 plans shipped.
+Last activity: 2026-07-07 — Phase 7 complete: 07-07 (A4 Pass modal + lifecycle) shipped PassModal + PassStatusChip, wired into /app's top bar, /konto, and StorageGate's Pass CTA.
 
-Progress: [██████████] 95%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [██████████] 95%
 | Phase 07 P08 | 25min | 2 tasks | 1 files |
 | Phase 07 P05 | 25min | 3 tasks | 3 files |
 | Phase 07-account-library-honest-pricing-design-reconciliation-phase-a P06 | 25min | 3 tasks | 3 files |
+| Phase 07 P07 | 19min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase 07-05]: Read-only rows hide the rename kebab item entirely; delete always stays available — RLS-silently-no-ops guardrail applied at the UI layer
 - [Phase 07-05]: Konto Oeffnen/Neue Bewerbung aus dieser hand off to /app via a plain window.location query-string bridge — /konto has no tool reducer to load a package into; avoids next/navigation useSearchParams Suspense requirement for a one-shot deep link
 - [Phase 07-06]: StorageGate fetches its own anchor data via useAccount()+listPaketPurchases; Pass/Plus cards stack in a plain flex-col (not a viewport-breakpoint grid) since the panel only ever renders inside the narrow save rail
+- [Phase 07-07]: PassStatusChip split into its own Stripe-free file (src/components/PassStatusChip.tsx) rather than living inside PassModal.tsx, so importing it never eagerly loads Stripe.js/cookies for every /app and /konto page view
+- [Phase 07-07]: Pass status resolution tries getActivePass first (server-side entitlement source) and falls back to the new getLatestPass only when null, so the expired chip can show a real date without contradicting the actual entitlement gate
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T11:06:00.379Z
-Last activity: 2026-07-07 - Completed 07-04-PLAN.md: A2 save moment (SaveApplicationButton rebuilt as a save card + SavedConfirmationPanel on both result views)
-Stopped at: Completed 07-06-PLAN.md
+Last session: 2026-07-07T13:26:02.000Z
+Last activity: 2026-07-07 - Completed 07-07-PLAN.md: A4 Pass modal + lifecycle (PassModal + PassStatusChip wired into /app top bar, /konto, and StorageGate's Pass CTA) - Phase 7 now fully complete, 8/8 plans
+Stopped at: Completed 07-07-PLAN.md

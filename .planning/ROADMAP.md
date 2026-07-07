@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Security Guards** - Input-length guards on both API routes + keep the flow stateless — safe to put real (and oversized/abusive) input in front of users (completed 2026-06-23)
 - [x] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned (completed 2026-06-23)
 - [x] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts (completed 2026-06-24)
-- [ ] **Phase 7: Account Library + Honest Pricing (design Phase A)** - Reconcile the six claude.ai/design Phase-A surfaces into the live app behind Stage 3 env gates: library card gallery, Bewerbungsphase-Pass SKU, storage gate, Pass modal, preise v2, foundation primitives + founder assets
+- [x] **Phase 7: Account Library + Honest Pricing (design Phase A)** - Reconcile the six claude.ai/design Phase-A surfaces into the live app behind Stage 3 env gates: library card gallery, Bewerbungsphase-Pass SKU, storage gate, Pass modal, preise v2, foundation primitives + founder assets (completed 2026-07-07)
 
 ## Phase Details
 
@@ -169,7 +169,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   7. /preise shows the 4-card ladder (2,99 / 4,99 / 14,99 featured with per-application math / Plus 5,99 "Geplant" non-buyable), the free-tier manifesto pull quote, and the anti-Abofalle before/after comparison; prices match the code constants
   8. The six founder SVGs are in public/, favicon + openGraph.images wired in layout.tsx, src/app/not-found.tsx built from surface 06; npx tsc --noEmit, the full test suite, and next build all pass; no em-dash in any new copy; all new surfaces are inert when accounts/Stripe env vars are unset
 
-**Plans**: 7/8 plans executed
+**Plans**: 8/8 plans complete
 
 **Wave 1** *(parallel - no file overlap; the authorized A0 + A1 foundation)*
 
@@ -192,7 +192,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 5** *(blocked on 07-03 + 07-06 - shares app/page.tsx + KontoClient.tsx + i18n.tsx; final build gate)*
 
-- [ ] 07-07-PLAN.md — A4 Pass modal + lifecycle: PassModal (distinct §356(4)/§357a Widerruf) + active/expired chips + StorageGate Pass CTA wire (Wave 5)
+- [x] 07-07-PLAN.md — A4 Pass modal + lifecycle: PassModal (distinct §356(4)/§357a Widerruf) + active/expired chips + StorageGate Pass CTA wire (Wave 5)
 
 **UI hint**: yes
 
@@ -205,7 +205,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 3. Security Guards | 2/2 | Complete    | 2026-06-23 |
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
-| 7. Account Library + Honest Pricing (design Phase A) | 7/8 | In Progress|  |
+| 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete   | 2026-07-07 |
 
 ## Backlog
 
