@@ -91,7 +91,7 @@ export function KontoClient() {
 
       <PassSection userId={user.id} />
       <SavedPackagesSection userId={user.id} />
-      <SubscriptionSection />
+      <SubscriptionSection userId={user.id} />
       <DangerZoneSection onSignOut={signOut} />
     </main>
   )
@@ -402,7 +402,7 @@ function LockGlyph() {
   )
 }
 
-function SubscriptionSection() {
+function SubscriptionSection({ userId }: { userId: string }) {
   const { t } = useLang()
   const [sub, setSub] = useState<SubscriptionRow | null | undefined>(undefined)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
@@ -413,10 +413,19 @@ function SubscriptionSection() {
     client
       .from('subscriptions')
       .select('stripe_subscription_id,status,current_period_end')
+      // Explicit user_id filter as defense-in-depth, matching every sibling
+      // Stage 3 read in this file (listPackages, getActivePass/getLatestPass,
+      // listPaketPurchases): RLS is expected to scope this already, but a
+      // client-side backstop means a loosened policy fails closed instead of
+      // silently returning another user's subscription row.
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
       .then(({ data }) => setSub((data as SubscriptionRow | null) ?? null))
+    // Deliberately runs once per mount: userId is stable for the lifetime of
+    // this page, same convention as the sibling sections' own refresh effects.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const isActive = sub?.status === 'active' || sub?.status === 'trialing'
