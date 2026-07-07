@@ -287,6 +287,40 @@ type Dict = {
   libraryEditableBadge: string
   libraryStorageFree: string
   libraryFooterContents: string
+  // Storage-gate chooser (design surface 02) - inline dismissible panel replacing
+  // the plain state==='limit' text hint in the save rail. Copy lifted verbatim
+  // from 02-storage-gate.dc.html's 1e copy deck; gatePassName/gatePlusName are
+  // product names, kept identical in both languages (same convention as
+  // paketEyebrow/humanizerEyebrow).
+  gateEyebrow: string
+  gateStorageStatus: string
+  gateTitle: string
+  gateSubtitle: string
+  gatePassName: string
+  gateRecommendedBadge: string
+  gatePassPriceUnit: string
+  gatePassFeature1: string
+  gatePassFeature2: string
+  gatePassCta: string
+  gatePassHonest: string
+  gatePlusName: string
+  gatePlannedBadge: string
+  gatePlusPrice: string
+  gatePlusPriceUnit: string
+  gatePlusFeature1: string
+  gatePlusFeature2: string
+  gatePlusCta: string
+  gatePlusHonest: string
+  gateAlternative: string
+  gateLaterCta: string
+  gateDismissAria: string
+  gateAnchorTitle: string
+  gateAnchorLineItem: (date: string) => string
+  gateAnchorSumLabel: (count: number) => string
+  gateAnchorPassLabel: string
+  gateAnchor: (count: number, sumFormatted: string, passFormatted: string) => string
+  gateAnchorPassCta: (priceFormatted: string) => string
+  gateAnchorEndsAutomatically: string
   kontoLink: string
   savedApplicationsHeading: string
   savedApplicationsUpdated: (date: string) => string
@@ -573,6 +607,37 @@ const en = {
   libraryStorageFree: '1 of 1 saved · Free',
   libraryFooterContents:
     'Your CV text, the Lebenslauf, the Anschreiben, the job posting and your answers. No photos.',
+  gateEyebrow: 'Storage',
+  gateStorageStatus: '1 of 1 application saved.',
+  gateTitle: 'Your free storage slot is taken.',
+  gateSubtitle:
+    'Your document stays complete and free; the only limit is how much we store for you.',
+  gatePassName: 'Bewerbungsphase-Pass',
+  gateRecommendedBadge: 'Recommended',
+  gatePassPriceUnit: 'one-time · 30 days',
+  gatePassFeature1: 'Unlimited application packages: PDF and refinement included',
+  gatePassFeature2: 'Storage for 25 applications',
+  gatePassCta: 'Buy Pass',
+  gatePassHonest: 'Expires on its own. Nothing to cancel.',
+  gatePlusName: 'ScanReady Plus',
+  gatePlannedBadge: 'Planned',
+  gatePlusPrice: '5,99 €',
+  gatePlusPriceUnit: 'per month',
+  gatePlusFeature1: 'Everything from the Pass, ongoing',
+  gatePlusFeature2: 'Unlimited storage',
+  gatePlusCta: 'Notify me',
+  gatePlusHonest: 'Cancel monthly, cancellation button included, a reminder before every renewal.',
+  gateAlternative: 'Or: delete the saved application and reuse the slot. Free, any time.',
+  gateLaterCta: 'Later',
+  gateDismissAria: 'Dismiss',
+  gateAnchorTitle: 'You are buying one at a time. Your whole application phase adds up differently.',
+  gateAnchorLineItem: (date) => `Bewerbungspaket · ${date}`,
+  gateAnchorSumLabel: (count) => (count === 2 ? 'Two packages bought' : `${count} packages bought`),
+  gateAnchorPassLabel: 'The Pass · all applications, 30 days',
+  gateAnchor: (count, sumFormatted, passFormatted) =>
+    `${count === 2 ? 'Two packages bought' : `${count} packages bought`} = ${sumFormatted}. The Pass is ${passFormatted} and covers your whole application phase.`,
+  gateAnchorPassCta: (priceFormatted) => `Buy Pass · ${priceFormatted}`,
+  gateAnchorEndsAutomatically: 'Ends automatically',
   kontoLink: 'Account',
   savedApplicationsHeading: 'Saved applications',
   savedApplicationsUpdated: (date) => `Updated ${date}`,
@@ -860,6 +925,37 @@ const de = {
   libraryStorageFree: '1 von 1 gespeichert · Kostenlos',
   libraryFooterContents:
     'Ihren CV-Text, den Lebenslauf, das Anschreiben, die Stellenanzeige und Ihre Antworten. Keine Fotos.',
+  gateEyebrow: 'Speicherplatz',
+  gateStorageStatus: '1 von 1 Bewerbung gespeichert.',
+  gateTitle: 'Ihr kostenloser Speicherplatz ist belegt.',
+  gateSubtitle:
+    'Ihr Dokument bleibt vollständig und kostenlos, begrenzt ist nur, wie viel wir für Sie speichern.',
+  gatePassName: 'Bewerbungsphase-Pass',
+  gateRecommendedBadge: 'Empfohlen',
+  gatePassPriceUnit: 'einmalig · 30 Tage',
+  gatePassFeature1: 'Unbegrenzte Bewerbungspakete: PDF und Feinschliff inklusive',
+  gatePassFeature2: 'Speicher für 25 Bewerbungen',
+  gatePassCta: 'Pass kaufen',
+  gatePassHonest: 'Läuft automatisch aus. Keine Kündigung nötig.',
+  gatePlusName: 'ScanReady Plus',
+  gatePlannedBadge: 'Geplant',
+  gatePlusPrice: '5,99 €',
+  gatePlusPriceUnit: 'pro Monat',
+  gatePlusFeature1: 'Alles aus dem Pass, fortlaufend',
+  gatePlusFeature2: 'Unbegrenzter Speicher',
+  gatePlusCta: 'Benachrichtigen lassen',
+  gatePlusHonest: 'Monatlich kündbar, Kündigungsbutton inklusive, Erinnerung vor jeder Verlängerung.',
+  gateAlternative: 'Oder: gespeicherte Bewerbung löschen und den Platz neu belegen. Kostenlos, jederzeit.',
+  gateLaterCta: 'Später',
+  gateDismissAria: 'Hinweis schließen',
+  gateAnchorTitle: 'Sie kaufen einzeln. Die Bewerbungsphase rechnet anders.',
+  gateAnchorLineItem: (date) => `Bewerbungspaket · ${date}`,
+  gateAnchorSumLabel: (count) => (count === 2 ? 'Zwei Pakete gekauft' : `${count} Pakete gekauft`),
+  gateAnchorPassLabel: 'Der Pass · alle Bewerbungen, 30 Tage',
+  gateAnchor: (count, sumFormatted, passFormatted) =>
+    `${count === 2 ? 'Zwei Pakete gekauft' : `${count} Pakete gekauft`} = ${sumFormatted}. Der Pass kostet ${passFormatted} und deckt Ihre ganze Bewerbungsphase.`,
+  gateAnchorPassCta: (priceFormatted) => `Pass kaufen · ${priceFormatted}`,
+  gateAnchorEndsAutomatically: 'Endet automatisch',
   kontoLink: 'Konto',
   savedApplicationsHeading: 'Gespeicherte Bewerbungen',
   savedApplicationsUpdated: (date) => `Aktualisiert ${date}`,
