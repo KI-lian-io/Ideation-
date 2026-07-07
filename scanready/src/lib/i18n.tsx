@@ -256,6 +256,16 @@ type Dict = {
   saveApplicationSignedOutHint: string
   saveApplicationLimitHint: string
   saveApplicationErrorHint: string
+  // Save moment (design surface 05) - save card + saved-confirmation panel copy,
+  // lifted verbatim from 05-save-moment.dc.html's 1c copy deck.
+  saveLabel: string
+  saveSuggestionHint: string
+  saveContents: string
+  saveConfirmed: string
+  saveConfirmedLink: string
+  saveCancelCta: string
+  saveTitleAriaLabel: string
+  saveRenameAria: string
   kontoLink: string
   savedApplicationsHeading: string
   savedApplicationsUpdated: (date: string) => string
@@ -508,12 +518,20 @@ const en = {
   accountSignIn: 'Sign in',
   accountLink: 'Account',
   accountSignOut: 'Sign out',
-  saveApplicationCta: 'Save application',
+  saveApplicationCta: 'Save',
   saveApplicationSaving: 'Saving …',
   saveApplicationSaved: 'Saved to your account ✓',
   saveApplicationSignedOutHint: 'Sign in first – open your account in a new tab, then try again.',
   saveApplicationLimitHint: 'Free accounts store one application. Manage or subscribe in your account.',
   saveApplicationErrorHint: 'Could not save. Please try again.',
+  saveLabel: 'Save as',
+  saveSuggestionHint: 'Suggested from the job posting',
+  saveContents: 'Saved: Lebenslauf, Anschreiben, job posting, your answers. No photos.',
+  saveConfirmed: 'Saved',
+  saveConfirmedLink: 'Open in My applications',
+  saveCancelCta: 'Cancel',
+  saveTitleAriaLabel: 'Application title',
+  saveRenameAria: 'Edit title',
   kontoLink: 'Account',
   savedApplicationsHeading: 'Saved applications',
   savedApplicationsUpdated: (date) => `Updated ${date}`,
@@ -767,12 +785,20 @@ const de = {
   accountSignIn: 'Anmelden',
   accountLink: 'Konto',
   accountSignOut: 'Abmelden',
-  saveApplicationCta: 'Bewerbung speichern',
+  saveApplicationCta: 'Speichern',
   saveApplicationSaving: 'Wird gespeichert …',
   saveApplicationSaved: 'Im Konto gespeichert ✓',
   saveApplicationSignedOutHint: 'Bitte zuerst anmelden – Konto in einem neuen Tab öffnen, dann erneut versuchen.',
   saveApplicationLimitHint: 'Kostenlose Konten speichern eine Bewerbung. Verwalten oder abonnieren Sie im Konto.',
   saveApplicationErrorHint: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+  saveLabel: 'Speichern als',
+  saveSuggestionHint: 'Vorschlag aus der Stellenanzeige',
+  saveContents: 'Gespeichert werden: Lebenslauf, Anschreiben, Stellenanzeige, Ihre Antworten. Keine Fotos.',
+  saveConfirmed: 'Gespeichert',
+  saveConfirmedLink: 'In Meine Bewerbungen öffnen',
+  saveCancelCta: 'Abbrechen',
+  saveTitleAriaLabel: 'Titel der Bewerbung',
+  saveRenameAria: 'Titel bearbeiten',
   kontoLink: 'Konto',
   savedApplicationsHeading: 'Gespeicherte Bewerbungen',
   savedApplicationsUpdated: (date) => `Aktualisiert ${date}`,
