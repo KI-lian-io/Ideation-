@@ -37,13 +37,11 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { btnClass, EYEBROW } from '@/components/ui'
 import { useLang } from '@/lib/i18n'
 import { track } from '@/lib/analytics'
-import { PASS_PRICE_CENTS } from '@/lib/humanizer'
+import { PASS_PRICE_CENTS, PASS_WINDOW_DAYS } from '@/lib/humanizer'
 
 export { PassStatusChip } from '@/components/PassStatusChip'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
-
-const PASS_WINDOW_DAYS = 30
 
 type Step = 'intro' | 'payment'
 

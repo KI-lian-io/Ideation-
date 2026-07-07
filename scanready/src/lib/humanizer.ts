@@ -30,6 +30,19 @@ export const PAKET_PRICE_CENTS = 499;
 export const PASS_PRICE_CENTS = 1499;
 
 /**
+ * Pass entitlement window in days: how long a purchased Pass stays live from
+ * the moment /api/pass/verify writes its expires_at column. Lives here
+ * (rather than duplicated in the server route and the pre-payment modal
+ * copy) for the same reason PASS_PRICE_CENTS/PASS_STORAGE_CAP do: the server
+ * route computes the authoritative expires_at from this constant, and
+ * PassModal.tsx renders the pre-payment "Endet automatisch am ..." date from
+ * the same value, so the two can never drift. The 30-day window is the
+ * founder's default per PRD section 9 and remains an open founder decision
+ * pending confirmation before go-live.
+ */
+export const PASS_WINDOW_DAYS = 30;
+
+/**
  * Storage cap while a Pass is live: up to 25 saved application packages
  * instead of the free tier's 1. This constant MUST match the `25` hardcoded
  * in the three-tier enforce_package_limit() trigger (migration

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { PASS_PRICE_CENTS } from "@/lib/humanizer";
+import { PASS_PRICE_CENTS, PASS_WINDOW_DAYS } from "@/lib/humanizer";
 import { enforceRateLimit, enforceSameOrigin, readJsonObject } from "@/lib/abuse-guards";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { accountsEnabled } from "@/lib/supabase/config";
 import { adminConfigured, getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
-
-const PASS_WINDOW_DAYS = 30;
 
 /**
  * POST /api/pass/verify

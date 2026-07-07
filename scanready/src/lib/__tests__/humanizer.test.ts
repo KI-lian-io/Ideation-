@@ -12,6 +12,7 @@ import {
   checkPaketPi,
   checkHumanizerEntitlement,
   PASS_PRICE_CENTS,
+  PASS_WINDOW_DAYS,
   type PaymentIntentLike,
 } from '../humanizer.ts'
 
@@ -139,4 +140,8 @@ test('entitlement: unknown feature → wrong_feature', () => {
 
 test('PASS_PRICE_CENTS is 14,99 EUR in cents', () => {
   assert.equal(PASS_PRICE_CENTS, 1499)
+})
+
+test('PASS_WINDOW_DAYS is the single source of truth for the 30-day window', () => {
+  assert.equal(PASS_WINDOW_DAYS, 30)
 })
