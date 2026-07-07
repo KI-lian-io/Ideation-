@@ -52,7 +52,7 @@ One cross-migration BLOCKER was found: the new `humanizer_purchases_pass_require
 
 ### CR-01: New check constraint breaks GDPR account deletion for any Pass purchaser
 
-**Status:** fixed (commit `8ca5982`) — 0002_pass.sql was left untouched (already applied live); a forward-fix migration `scanready/supabase/migrations/0003_pass_requires_user_fix.sql` drops the CHECK constraint and replaces it with an INSERT-only trigger (`enforce_pass_requires_user`) that enforces the same "pass rows always have a user_id" invariant without blocking the FK-driven UPDATE that account deletion relies on. This migration must still be applied to the live Supabase project.
+**Status:** fixed (commit `8ca5982`). 0002_pass.sql was left untouched (already applied live); a forward-fix migration `scanready/supabase/migrations/0003_pass_requires_user_fix.sql` drops the CHECK constraint and replaces it with an INSERT-only trigger (`enforce_pass_requires_user`) that enforces the same "pass rows always have a user_id" invariant without blocking the FK-driven UPDATE that account deletion relies on. This migration must still be applied to the live Supabase project.
 
 **File:** `scanready/supabase/migrations/0002_pass.sql:38-49`
 **Issue:**
@@ -91,7 +91,7 @@ or, if pass receipts must also survive deletion like the other kinds, drop the `
 
 ### WR-01: Pass expiry window (30 days) hardcoded in three places, one of them display-only
 
-**Status:** fixed (commit `ef4ee35`) — `PASS_WINDOW_DAYS` now lives in `scanready/src/lib/humanizer.ts` beside `PASS_PRICE_CENTS`/`PASS_STORAGE_CAP`; both `api/pass/verify/route.ts` and `PassModal.tsx` import it, and `humanizer.test.ts` asserts `PASS_WINDOW_DAYS === 30`.
+**Status:** fixed (commit `ef4ee35`). `PASS_WINDOW_DAYS` now lives in `scanready/src/lib/humanizer.ts` beside `PASS_PRICE_CENTS`/`PASS_STORAGE_CAP`; both `api/pass/verify/route.ts` and `PassModal.tsx` import it, and `humanizer.test.ts` asserts `PASS_WINDOW_DAYS === 30`.
 
 **File:** `scanready/src/app/api/pass/verify/route.ts:11`, `scanready/src/components/PassModal.tsx:46`
 **Issue:** `PASS_WINDOW_DAYS = 30` is independently declared in the server route that actually computes and persists `expires_at` (the authoritative value) and again in `PassModal.tsx`, which uses its own copy purely to render "Endet automatisch am TT.MM.JJJJ" in the purchase modal before payment. Unlike `PASS_PRICE_CENTS` and `PASS_STORAGE_CAP` — which live in `src/lib/humanizer.ts` specifically so the UI and the server can never drift, with a doc comment calling out the duplication risk — this constant has no single source of truth and no comment flagging the duplication. If the founder-open decision on the Pass window (PRD section 9) changes the 30-day figure and only one of the two locations is updated, the modal would advertise an incorrect expiry date to the buyer before they pay.
@@ -99,7 +99,7 @@ or, if pass receipts must also survive deletion like the other kinds, drop the `
 
 ### WR-02: SubscriptionSection query has no explicit user_id filter, unlike every sibling query
 
-**Status:** fixed (commit `7dfc970`) — `userId` is now threaded from `KontoClient` into `SubscriptionSection`, which adds `.eq('user_id', userId)` to the subscriptions query, matching the defense-in-depth convention used by every sibling read in this file.
+**Status:** fixed (commit `7dfc970`). `userId` is now threaded from `KontoClient` into `SubscriptionSection`, which adds `.eq('user_id', userId)` to the subscriptions query, matching the defense-in-depth convention used by every sibling read in this file.
 
 **File:** `scanready/src/app/konto/KontoClient.tsx:411-419`
 **Issue:** `SubscriptionSection` reads the signed-in user's subscription via:
@@ -112,7 +112,7 @@ with no `.eq('user_id', ...)` clause. Every other Stage 3 read in this same file
 
 ### WR-03: Purchase-history list keyed by `created_at`, which is not guaranteed unique
 
-**Status:** fixed (commit `c940ac7`) — `listPaketPurchases` now selects and returns the row's `id`; `StorageGate.tsx` keys the ledger rows by `p.id` instead of `p.created_at`.
+**Status:** fixed (commit `c940ac7`). `listPaketPurchases` now selects and returns the row's `id`; `StorageGate.tsx` keys the ledger rows by `p.id` instead of `p.created_at`.
 
 **File:** `scanready/src/components/StorageGate.tsx:226-231`
 **Issue:**
@@ -127,7 +127,7 @@ with no `.eq('user_id', ...)` clause. Every other Stage 3 read in this same file
 
 ### IN-01: Dead i18n dictionary keys
 
-**Status:** not fixed (deliberately left open) — these keys belong to design copy decks that later library/gallery surfaces may still use; removing them now would risk re-translating them later. Not addressed in this fix pass.
+**Status:** not fixed (deliberately left open). These keys belong to design copy decks that later library/gallery surfaces may still use; removing them now would risk re-translating them later. Not addressed in this fix pass.
 
 **File:** `scanready/src/lib/i18n.tsx`
 **Issue:** The following `Dict` keys are defined (with full EN + DE copy) but never referenced anywhere outside `i18n.tsx`: `uploadGenericError`, `savedApplicationsHeading`, `savedApplicationsUpdated`, `savedApplicationsReadOnlyBadge`, `savedApplicationsOpen`, `savedApplicationsEmpty`, `libraryStorageFree`, `kontoSavedHeading`, `kontoSavedHint`, `kontoDeleteCta`, `saveApplicationLimitHint`. These appear to be leftovers from an earlier iteration of the library/gallery UI (superseded by `libraryTitle`/`libraryEmptyStatus`/etc. and the `KontoClient.tsx` sections actually in use) and add translation-maintenance overhead (11 keys x 2 languages) for copy nobody sees.
