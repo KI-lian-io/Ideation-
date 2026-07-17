@@ -126,6 +126,7 @@ None yet.
 | 2026-07 session | Humanizer+ Stage 1 + abuse guards + CV upload + bug hunt (28 fixes) + nudges + Typesetting Theater P1 (superpowers SDD, not GSD-tracked — see .git/sdd/progress.md + CLAUDE.md) | 2026-07-05 | 6e33efb..7d794de | — |
 | 260706-n4r | Fix orphaned cvs row leak in saveApplicationPackage on package limit error | 2026-07-06 | 895e03d | [260706-n4r-fix-orphaned-cvs-row-leak-in-saveapplica](./quick/260706-n4r-fix-orphaned-cvs-row-leak-in-saveapplica/) |
 | 260706-nbd | Record Stage 3 accounts E2E verification (passed 2026-07-06) in CLAUDE.md and scanready/docs/stage3-accounts.md | 2026-07-06 | 677d42f | [260706-nbd-record-stage-3-accounts-e2e-verification](./quick/260706-nbd-record-stage-3-accounts-e2e-verification/) |
+| 260717-g8q | Soft-launch readiness: fill Impressum legal data (street/email flagged for founder confirmation) + paymentsEnabled() gate hiding dead-end paid CTAs and paid AGB/Datenschutz sections when Stripe is unset | 2026-07-17 | cdb5fb4 | [260717-g8q-soft-launch-readiness-fill-impressum-leg](./quick/260717-g8q-soft-launch-readiness-fill-impressum-leg/) |
 
 ## Deferred Items
 
@@ -142,5 +143,5 @@ None yet.
 **Resume file:** None
 
 Last session: 2026-07-07T13:26:02.000Z
-Last activity: 2026-07-07 - Completed 07-07-PLAN.md: A4 Pass modal + lifecycle (PassModal + PassStatusChip wired into /app top bar, /konto, and StorageGate's Pass CTA) - Phase 7 now fully complete, 8/8 plans
+Last activity: 2026-07-17 - Completed quick task 260717-g8q: soft-launch readiness (Impressum data filled, paymentsEnabled() gate for paid CTAs + paid legal sections)
 Stopped at: Completed 07-07-PLAN.md
