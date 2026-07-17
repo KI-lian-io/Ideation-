@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LEGAL } from "@/lib/legal-data";
 import { accountsEnabled } from "@/lib/supabase/config";
+import { paymentsEnabled } from "@/lib/payments-config";
 
 export const metadata: Metadata = { title: "Datenschutzerklärung: ScanReady" };
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = { title: "Datenschutzerklärung: ScanReady" };
  */
 export default function DatenschutzPage() {
   const accounts = accountsEnabled();
+  const payments = paymentsEnabled();
   return (
     <main lang="de" className="mx-auto w-full max-w-2xl px-6 py-16 flex flex-col gap-6 text-sm text-ink leading-relaxed">
       <h1 className="font-serif text-3xl font-semibold">Datenschutzerklärung</h1>
@@ -54,11 +56,10 @@ export default function DatenschutzPage() {
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">3. Cookies</h2>
         <p>
-          Bei normaler Nutzung setzt diese Website <strong>keine Cookies</strong>. Erst wenn Sie
-          eine kostenpflichtige Funktion (Humanizer+) nutzen, wird der Zahlungsdienstleister
-          Stripe geladen, der technisch notwendige Cookies zur Betrugsprävention setzt
-          (Art. 6 Abs. 1 lit. b und f DSGVO). Auch die in Abschnitt 4 beschriebene
-          Reichweitenmessung setzt keine Cookies.
+          Bei normaler Nutzung setzt diese Website <strong>keine Cookies</strong>.
+          {payments &&
+            " Erst wenn Sie eine kostenpflichtige Funktion (Humanizer+) nutzen, wird der Zahlungsdienstleister Stripe geladen, der technisch notwendige Cookies zur Betrugsprävention setzt (Art. 6 Abs. 1 lit. b und f DSGVO)."}{" "}
+          Auch die in Abschnitt 4 beschriebene Reichweitenmessung setzt keine Cookies.
           {accounts &&
             " Wenn Sie sich mit einem optionalen Konto anmelden, werden technisch notwendige Authentifizierungs-Cookies gesetzt, die Ihre Anmeldung aufrechterhalten (Art. 6 Abs. 1 lit. b DSGVO); sie entfallen mit der Abmeldung."}
         </p>
@@ -85,17 +86,19 @@ export default function DatenschutzPage() {
         </p>
       </section>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">5. Zahlungsabwicklung (Stripe)</h2>
-        <p>
-          Kostenpflichtige Funktionen werden über Stripe Payments Europe, Ltd. abgewickelt. Ihre
-          Zahlungsdaten werden direkt von Stripe verarbeitet; wir erhalten und speichern keine
-          Kartendaten. Details: Datenschutzerklärung von Stripe (stripe.com/de/privacy).
-        </p>
-      </section>
+      {(payments || accounts) && (
+        <section className="flex flex-col gap-2">
+          <h2 className="font-semibold">5. Zahlungsabwicklung (Stripe)</h2>
+          <p>
+            Kostenpflichtige Funktionen werden über Stripe Payments Europe, Ltd. abgewickelt. Ihre
+            Zahlungsdaten werden direkt von Stripe verarbeitet; wir erhalten und speichern keine
+            Kartendaten. Details: Datenschutzerklärung von Stripe (stripe.com/de/privacy).
+          </p>
+        </section>
+      )}
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">6. Ihre Rechte</h2>
+        <h2 className="font-semibold">{(payments || accounts) ? "6." : "5."} Ihre Rechte</h2>
         <p>
           Sie haben die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der
           Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht
