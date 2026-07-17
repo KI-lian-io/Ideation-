@@ -29,6 +29,7 @@ import { PassStatusChip } from '@/components/PassStatusChip'
 import { useAccount } from '@/components/AccountProvider'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { accountsEnabled } from '@/lib/supabase/config'
+import { paymentsEnabled } from '@/lib/payments-config'
 import {
   saveApplicationPackage,
   updatePackageTitle,
@@ -1198,13 +1199,15 @@ function ResultView({
               application): locked, the button opens the purchase modal; unlocked, it
               routes through the single onExportPdf seam (AppShell's
               handleExportLebenslaufPdf). Copy and .txt download stay free. */}
-          <button
-            onClick={() => (paketUnlocked ? onExportPdf(ortDatum) : onRequestPaket())}
-            aria-label={t.exportPdfAria}
-            className={btnClass('secondary')}
-          >
-            {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
-          </button>
+          {(paketUnlocked || paymentsEnabled()) && (
+            <button
+              onClick={() => (paketUnlocked ? onExportPdf(ortDatum) : onRequestPaket())}
+              aria-label={t.exportPdfAria}
+              className={btnClass('secondary')}
+            >
+              {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
+            </button>
+          )}
         </div>
         {paketUnlocked && (
           <p className="mt-2 text-xs font-semibold text-accent">{t.paketUnlockedBadge}</p>
@@ -1865,14 +1868,16 @@ function CoverLetterResultView({
       {/* Action row – flex, gap-3, wraps on mobile (CL-06 / D-07) */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Humanizer+ upsell – one-shot purchase, additive refinement (spec D1/D3) */}
-        <button
-          onClick={() => setHumanizerOpen(true)}
-          disabled={letterOverHumanizerLimit}
-          aria-label={t.humanizerCtaAria}
-          className={btnClass('accent')}
-        >
-          {t.humanizerCta}
-        </button>
+        {paymentsEnabled() && (
+          <button
+            onClick={() => setHumanizerOpen(true)}
+            disabled={letterOverHumanizerLimit}
+            aria-label={t.humanizerCtaAria}
+            className={btnClass('accent')}
+          >
+            {t.humanizerCta}
+          </button>
+        )}
 
         {/* Copy – primary button (CL-06) */}
         <button
@@ -1897,13 +1902,15 @@ function CoverLetterResultView({
             application): locked, the button opens the purchase modal; unlocked, it
             routes through the single onExportPdf seam (AppShell's
             handleExportLetterPdf). Copy and the .txt download stay free. */}
-        <button
-          onClick={() => (paketUnlocked ? onExportPdf() : onRequestPaket())}
-          aria-label={t.exportPdfAria}
-          className={`${btnClass('secondary')} shrink-0`}
-        >
-          {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
-        </button>
+        {(paketUnlocked || paymentsEnabled()) && (
+          <button
+            onClick={() => (paketUnlocked ? onExportPdf() : onRequestPaket())}
+            aria-label={t.exportPdfAria}
+            className={`${btnClass('secondary')} shrink-0`}
+          >
+            {paketUnlocked ? t.exportPdfCta : t.paketLockedExportCta}
+          </button>
+        )}
 
         {/* Regenerate – re-runs same jobPosting + answers from reducer state */}
         <button
