@@ -67,7 +67,15 @@ Status as of 2026-07-06 (live founder session):
 
 - [ ] Migration 0004_library_phase_b PENDING (phase 08 plan 08-01): file
       written per the 0001-0003 conventions, NOT yet applied to project
-      `thgmhbzimnjcaoqyyiyp`. Adds: `application_packages.status text`
+      `thgmhbzimnjcaoqyyiyp`. BLOCKED 2026-07-17: the Frankfurt project is
+      PAUSED (free-tier auto-pause after ~7 days idle; DNS for
+      thgmhbzimnjcaoqyyiyp.supabase.co no longer resolves, management API
+      still lists the project). FOUNDER ACTION: restore the project in the
+      Supabase dashboard (one click, supabase.com/dashboard -> project ->
+      Restore), then the apply + advisor + probe runbook below can run via
+      MCP. Until applied, the Phase B UI code is env-gated inert and its
+      local tests do not touch the live DB, but the phase MUST NOT be
+      marked verified/complete. Adds: `application_packages.status text`
       (nullable) + CHECK `status is null or status in ('entwurf',
       'beworben', 'interview', 'absage', 'zusage')`; SECURITY DEFINER RPC
       `set_package_status(package_id uuid, new_status text)` (ownership check
