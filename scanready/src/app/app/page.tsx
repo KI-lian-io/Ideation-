@@ -2851,7 +2851,7 @@ function AppShell() {
     ;(async () => {
       const client = getSupabaseBrowserClient()
       if (packageId) {
-        const pkg = await getPackage(client, packageId)
+        const pkg = await getPackage(client, packageId, user.id)
         if (!pkg) return
         if (action === 'duplicate') {
           await handleDuplicatePackage(pkg)

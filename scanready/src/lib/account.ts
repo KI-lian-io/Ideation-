@@ -219,10 +219,18 @@ export async function listPackages(
   return (data ?? []) as ApplicationPackageRow[];
 }
 
-/** Fetches a single saved application package by id (RLS scopes it to the owner). */
+/**
+ * Fetches a single saved application package by id. Used by the ?package=<id>
+ * cross-page bridge in page.tsx, where packageId comes straight from the URL,
+ * so this adds the explicit .eq("user_id", userId) backstop as
+ * defense-in-depth alongside RLS -- same convention as listPackages/listCvs
+ * (a loosened policy then fails closed instead of silently returning another
+ * user's row).
+ */
 export async function getPackage(
   client: SupabaseClient,
-  packageId: string
+  packageId: string,
+  userId: string
 ): Promise<ApplicationPackageRow | null> {
   if (!accountsEnabled()) return null;
 
@@ -230,6 +238,7 @@ export async function getPackage(
     .from("application_packages")
     .select("*")
     .eq("id", packageId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
