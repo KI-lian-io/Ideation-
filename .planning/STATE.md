@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Milestone complete
-stopped_at: Completed 07-07-PLAN.md
-last_updated: "2026-07-19T21:38:00.000Z"
+stopped_at: Completed 08-04-PLAN.md
+last_updated: "2026-07-19T21:55:47.000Z"
 last_activity: 2026-07-19
-last_activity_desc: Phase 8 Plan 3 complete (?cv= deep-link bridge, Meine Lebenslaeufe section on /konto with usage counts, rename, safe delete)
+last_activity_desc: Phase 8 Plan 4 complete (StatusChip status tracking on both galleries + auto-suggest 'beworben' on first export/copy of a saved package)
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 27
-  completed_plans: 24
-  percent: 89
+  completed_plans: 25
+  percent: 93
 current_phase: 8
 current_phase_name: account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
 ---
@@ -24,14 +24,14 @@ current_phase_name: account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** German output is native-quality and trustworthy — norm-correct, never fabricated — so a German recruiter takes the applicant seriously in the 8-second scan.
-**Current focus:** Phase 7 — Account Library + Honest Pricing (design Phase A)
+**Current focus:** Phase 8 — Account Library Phase B (CV reuse + status + Plus lifecycle)
 
 ## Current Position
 
-v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) is in progress: Plan 01 (migration 0004, apply blocked on a paused Supabase project), Plan 02 (CV-reuse attach-or-new radio), and Plan 03 (Meine Lebenslaeufe section on /konto + ?cv= deep-link bridge) are done; Plans 04-05 remain.
-Last activity: 2026-07-19 — Phase 8 Plan 3 complete (?cv= deep-link bridge in AppShell, Meine Lebenslaeufe section on /konto with usage counts/rename/safe delete, cvs.* i18n key group)
+v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) is in progress: Plan 01 (migration 0004, apply blocked on a paused Supabase project), Plan 02 (CV-reuse attach-or-new radio), Plan 03 (Meine Lebenslaeufe section on /konto + ?cv= deep-link bridge), and Plan 04 (per-package status chip + auto-suggest) are done; Plan 05 remains.
+Last activity: 2026-07-19 — Phase 8 Plan 4 complete (StatusChip status tracking on both galleries + auto-suggest 'beworben' on first export/copy of a saved package)
 
-Progress: [████████░░] 89%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [████████░░] 89%
 | Phase 07 P07 | 19min | 3 tasks | 7 files |
 | Phase 08 P02 | 10min | 3 tasks | 6 files |
 | Phase 08 P03 | 12min | 2 tasks | 3 files |
+| Phase 08 P04 | 25min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,7 @@ Recent decisions affecting current work:
 - [Phase 07-07]: Pass status resolution tries getActivePass first (server-side entitlement source) and falls back to the new getLatestPass only when null, so the expired chip can show a real date without contradicting the actual entitlement gate
 - [Phase 08-02]: cvOverlapRatio uses intersection-over-smaller-set (not Jaccard) so a shorter edit of the same CV still preselects attach; attach-path saveApplicationPackage failures never delete the reused cvs row (unlike save-as-new's 895e03d orphan-cleanup)
 - [Phase 08-03]: CV delete is a plain owner-scoped table delete with no RPC and no application_packages write; safety comes entirely from migration 0004's `on delete set null` FK. "Neue Bewerbung mit diesem CV" and "Ansehen" both resolve to the same `?cv=` bridge handler (view IS load into the tool)
+- [Phase ?]: [Phase 08-04]: hasSuggestedStatus/statusSuggestionVisible reset on a new save and on full reset
 
 ### Pending Todos
 
@@ -147,6 +149,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-19T21:38:00.000Z
-Last activity: 2026-07-19 - Completed 08-03-PLAN.md: Meine Lebenslaeufe section on /konto (?cv= deep-link bridge, CvSection/CvCard, cvs.* /konto-section i18n)
-Stopped at: Completed 08-03-PLAN.md
+Last session: 2026-07-19T21:55:47.000Z
+Last activity: 2026-07-19 - Completed 08-04-PLAN.md: StatusChip on both galleries (setPackageStatus RPC caller, status.* i18n, status-aware filters, auto-suggest 'beworben' on first export/copy with inline undo)
+Stopped at: Completed 08-04-PLAN.md

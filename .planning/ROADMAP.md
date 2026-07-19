@@ -212,7 +212,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. DE/EN copy is lifted VERBATIM from the three .dc.html surface decks into src/lib/i18n.tsx (documents/legal text stays German); no em-dash anywhere; new German copy flagged for native-speaker review
   6. npx tsc --noEmit, the full test suite, and next build all pass; all new surfaces are inert when accounts/Stripe env vars are unset; the anonymous zero-retention flow, explicit-save-only, no-photos, and grounded-only guardrails are untouched
 
-**Plans**: 2/5 plans executed
+**Plans**: 4/5 plans executed
 
 **Wave 1**
 
@@ -228,7 +228,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 4** *(blocked on 08-03 - shares KontoClient.tsx + i18n.tsx + app/page.tsx + account.ts)*
 
-- [ ] 08-04-PLAN.md — Surface 08 status chip: StatusChip primitive + set_package_status caller + chip in both galleries + auto-suggest beworben (Wave 4)
+- [x] 08-04-PLAN.md — Surface 08 status chip: StatusChip primitive + set_package_status caller + chip in both galleries + auto-suggest beworben (Wave 4)
 
 **Wave 5** *(blocked on 08-04 - shares KontoClient.tsx + i18n.tsx; final build gate)*
 
@@ -246,7 +246,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
 | 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete    | 2026-07-07 |
-| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 2/5 | In Progress|  |
+| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 4/5 | In Progress|  |
 
 ## Backlog
 
