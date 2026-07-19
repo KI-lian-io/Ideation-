@@ -33,6 +33,7 @@ import { paymentsEnabled } from '@/lib/payments-config'
 import {
   saveApplicationPackage,
   updatePackageTitle,
+  setPackageStatus,
   listPackages,
   listCvs,
   deletePackage,
@@ -52,7 +53,9 @@ import {
   KebabMenu,
   BottomSheet,
   EmptyState,
+  StatusChip,
   type KebabMenuItem,
+  type StatusChipOption,
 } from '@/components/ui'
 
 // Dynamic: keeps Stripe.js (and its cookies) out of the page until the modal opens.
@@ -744,6 +747,29 @@ function packageCompanyCity(pkg: ApplicationPackageRow): string | null {
   return latest.location ? `${latest.company} · ${latest.location}` : latest.company
 }
 
+/**
+ * The five status states in pipeline order, values are the domain keys the
+ * set_package_status RPC accepts (migration 0004), labels are the i18n
+ * status.* strings. Duplicated in KontoClient.tsx rather than shared, same
+ * "small pure derivation, no shared import between the two files" convention
+ * as packageCompanyCity above (07-05 key-decision).
+ */
+function statusOptions(t: ReturnType<typeof useLang>['t']): StatusChipOption[] {
+  return [
+    { value: 'entwurf', label: t.statusEntwurf },
+    { value: 'beworben', label: t.statusBeworben },
+    { value: 'interview', label: t.statusInterview },
+    { value: 'absage', label: t.statusAbsage },
+    { value: 'zusage', label: t.statusZusage },
+  ]
+}
+
+/** Maps a raw status key to its i18n label for the filter's substring match; a
+ * status key with no matching option (should not happen) falls back to itself. */
+function statusLabelFor(t: ReturnType<typeof useLang>['t'], status: string): string {
+  return statusOptions(t).find((o) => o.value === status)?.label ?? status
+}
+
 /** One saved-package card for the compact in-tool gallery: same anatomy and
  * kebab actions as the /konto gallery (mono date + kebab, serif title or
  * inline rename, company · city, hairline, mono document-type badge row).
@@ -762,6 +788,7 @@ function PackageCard({
   onDuplicate,
   onDelete,
   onOpenSheet,
+  onStatusChange,
 }: {
   pkg: ApplicationPackageRow
   anyReadOnly: boolean
@@ -775,6 +802,7 @@ function PackageCard({
   onDuplicate: (pkg: ApplicationPackageRow) => void
   onDelete: (pkg: ApplicationPackageRow) => void
   onOpenSheet: (pkg: ApplicationPackageRow) => void
+  onStatusChange: (pkg: ApplicationPackageRow, status: string) => void | Promise<void>
 }) {
   const { t } = useLang()
   const companyCity = packageCompanyCity(pkg)
@@ -849,6 +877,20 @@ function PackageCard({
         ) : anyReadOnly ? (
           <MonoBadge variant="editable">{t.libraryEditableBadge}</MonoBadge>
         ) : null}
+        {/* Deliberate CONTEXT.md exception to the read_only "hide, don't disable"
+            rule above: status is package METADATA, not document content, so it
+            stays editable even on read-only rows. The set_package_status RPC's
+            ownership-only check (migration 0004) is what keeps this safe, not
+            any gating here. */}
+        <span className="ml-auto">
+          <StatusChip
+            status={pkg.status}
+            options={statusOptions(t)}
+            setLabel={t.statusSetLabel}
+            ariaLabel={t.statusChangeAria(pkg.title)}
+            onSelect={(value) => onStatusChange(pkg, value)}
+          />
+        </span>
       </div>
     </div>
   )
@@ -920,13 +962,23 @@ function SavedApplications({
     await refresh()
   }
 
+  async function handleStatusChange(pkg: ApplicationPackageRow, status: string) {
+    await setPackageStatus(getSupabaseBrowserClient(), pkg.id, status)
+    await refresh()
+  }
+
   if (!accountsEnabled() || !user || packages === null) return null
 
   const needle = filter.trim().toLowerCase()
   const filtered = needle
     ? packages.filter((pkg) => {
         const companyCity = packageCompanyCity(pkg) ?? ''
-        return pkg.title.toLowerCase().includes(needle) || companyCity.toLowerCase().includes(needle)
+        const statusLabel = pkg.status ? statusLabelFor(t, pkg.status).toLowerCase() : ''
+        return (
+          pkg.title.toLowerCase().includes(needle) ||
+          companyCity.toLowerCase().includes(needle) ||
+          statusLabel.includes(needle)
+        )
       })
     : packages
   const anyReadOnly = packages.some((pkg) => pkg.read_only)
@@ -982,6 +1034,7 @@ function SavedApplications({
                 onDuplicate={onDuplicate}
                 onDelete={handleDelete}
                 onOpenSheet={setSheetFor}
+                onStatusChange={handleStatusChange}
               />
             ))}
           </div>
