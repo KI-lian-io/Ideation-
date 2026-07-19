@@ -1118,6 +1118,7 @@ function ResultView({
   currentCvText,
   onFirstExportOrCopy,
   statusSuggestionVisible,
+  statusActionError,
   onUndoStatusSuggestion,
 }: {
   lebenslauf: LebenslaufWithUids
@@ -1161,6 +1162,9 @@ function ResultView({
   /** Whether the inline "set to Beworben" undo notice is currently shown -
    * owned by AppShell so it survives the copy handler's own transient state. */
   statusSuggestionVisible: boolean
+  /** WR-02: true when the last suggest/undo status write failed - renders an
+   * inline error hint instead of silently trusting the optimistic UI. */
+  statusActionError: boolean
   onUndoStatusSuggestion: () => void
 }) {
   const { t } = useLang()
@@ -1315,6 +1319,9 @@ function ResultView({
                 {t.statusUndo}
               </button>
             </p>
+          )}
+          {statusActionError && (
+            <p className="text-xs text-red-600">{t.saveApplicationErrorHint}</p>
           )}
         </div>
 
@@ -1925,6 +1932,7 @@ function CoverLetterResultView({
   currentCvText,
   onFirstExportOrCopy,
   statusSuggestionVisible,
+  statusActionError,
   onUndoStatusSuggestion,
 }: {
   letterText: string
@@ -1958,6 +1966,8 @@ function CoverLetterResultView({
   onFirstExportOrCopy: () => void
   /** Whether the inline "set to Beworben" undo notice is currently shown. */
   statusSuggestionVisible: boolean
+  /** WR-02: true when the last suggest/undo status write failed. */
+  statusActionError: boolean
   onUndoStatusSuggestion: () => void
 }) {
   const { t } = useLang()
@@ -2162,6 +2172,7 @@ function CoverLetterResultView({
           </button>
         </p>
       )}
+      {statusActionError && <p className="text-xs text-red-600">{t.saveApplicationErrorHint}</p>}
 
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
@@ -2333,18 +2344,37 @@ function AppShell() {
   const [savedPackageId, setSavedPackageId] = useState<string | null>(null)
   const hasSuggestedStatus = useRef(false)
   const [statusSuggestionVisible, setStatusSuggestionVisible] = useState(false)
+  // WR-02: surfaces a failed setPackageStatus write (suggest or undo) using
+  // the same error-notice pattern SaveApplicationButton's renameError uses
+  // (a boolean + t.saveApplicationErrorHint), instead of silently assuming
+  // success.
+  const [statusActionError, setStatusActionError] = useState(false)
 
   async function suggestBeworben() {
     if (!savedPackageId || hasSuggestedStatus.current) return
     hasSuggestedStatus.current = true
-    await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'beworben')
-    setStatusSuggestionVisible(true)
+    const result = await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'beworben')
+    if (result.ok) {
+      setStatusActionError(false)
+      setStatusSuggestionVisible(true)
+    } else {
+      // Allow a retry on the next export/copy instead of latching a failed
+      // attempt as "already suggested".
+      hasSuggestedStatus.current = false
+      setStatusActionError(true)
+    }
   }
 
   async function handleUndoStatusSuggestion() {
     if (!savedPackageId) return
-    setStatusSuggestionVisible(false)
-    await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'entwurf')
+    const result = await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'entwurf')
+    if (result.ok) {
+      setStatusActionError(false)
+      setStatusSuggestionVisible(false)
+    } else {
+      // Keep the undo notice visible - the DB write did not actually happen.
+      setStatusActionError(true)
+    }
   }
 
   // Fetches the signed-in user's Pass status + saved-application count + saved
@@ -2901,6 +2931,7 @@ function AppShell() {
               currentCvText={state.resumeText}
               onFirstExportOrCopy={suggestBeworben}
               statusSuggestionVisible={statusSuggestionVisible}
+              statusActionError={statusActionError}
               onUndoStatusSuggestion={handleUndoStatusSuggestion}
             />
           </div>
@@ -2972,6 +3003,7 @@ function AppShell() {
               currentCvText={state.resumeText}
               onFirstExportOrCopy={suggestBeworben}
               statusSuggestionVisible={statusSuggestionVisible}
+              statusActionError={statusActionError}
               onUndoStatusSuggestion={handleUndoStatusSuggestion}
             />
           </div>
