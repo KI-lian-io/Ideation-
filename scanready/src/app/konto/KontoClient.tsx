@@ -27,6 +27,7 @@ import {
   type ApplicationPackageRow,
   type CvRow,
 } from '@/lib/account'
+import { isActiveStatus } from '@/lib/subscription'
 import { PassStatusChip } from '@/components/PassStatusChip'
 import {
   btnClass,
@@ -681,7 +682,7 @@ function SubscriptionSection({ userId }: { userId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const isActive = sub?.status === 'active' || sub?.status === 'trialing'
+  const isActive = sub ? isActiveStatus(sub.status) : false
   const isCancelling = isActive && Boolean(sub?.cancel_at_period_end)
   const isExpired = Boolean(sub) && !isActive
 
