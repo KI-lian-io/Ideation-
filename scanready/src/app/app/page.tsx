@@ -34,13 +34,16 @@ import {
   saveApplicationPackage,
   updatePackageTitle,
   listPackages,
+  listCvs,
   deletePackage,
   getPackage,
   getActivePass,
   getLatestPass,
   type ApplicationPackageRow,
+  type CvRow,
   type SaveResult,
 } from '@/lib/account'
+import { bestCvMatch } from '@/lib/cv-overlap'
 import {
   SavedConfirmationPanel,
   InlineRenameField,
@@ -1057,6 +1060,8 @@ function ResultView({
   onSavePackage,
   onRequestPass,
   jobPosting,
+  cvs,
+  currentCvText,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -1071,9 +1076,9 @@ function ResultView({
   paketUnlocked: boolean
   onRequestPaket: () => void
   /** Stage 3 accounts: saves the current Lebenslauf (anschreiben: null at this
-   * step) under the given title. Renders nothing via SaveApplicationButton when
-   * accounts are disabled. */
-  onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
+   * step) under the given title, optionally attaching to an existing cvs row.
+   * Renders nothing via SaveApplicationButton when accounts are disabled. */
+  onSavePackage: (title: string, existingCvId?: string) => Promise<SaveResult | 'signed_out'>
   /** Opens PassModal (07-07) - StorageGate's Pass CTA in the save rail's
    * state==='limit' branch routes through this seam instead of the 07-06
    * /preise fallback. */
@@ -1082,6 +1087,12 @@ function ResultView({
    * the user has moved past this step at least once, same value the Anschreiben
    * step already carries in reducer state. */
   jobPosting: string
+  /** Signed-in user's saved CVs, for the attach-or-new radio. Empty when signed
+   * out or accounts are disabled. */
+  cvs: CvRow[]
+  /** The CV text this Lebenslauf was generated from (state.resumeText) - fed
+   * into bestCvMatch to preselect the attach radio. */
+  currentCvText: string
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
@@ -1216,7 +1227,13 @@ function ResultView({
         {/* Stage 3 accounts: save this Lebenslauf (anschreiben: null at this step).
             Renders nothing when accounts are disabled. */}
         <div className="mt-4">
-          <SaveApplicationButton onSave={onSavePackage} onRequestPass={onRequestPass} jobPosting={jobPosting} />
+          <SaveApplicationButton
+            onSave={onSavePackage}
+            onRequestPass={onRequestPass}
+            jobPosting={jobPosting}
+            cvs={cvs}
+            currentCvText={currentCvText}
+          />
         </div>
 
         {/* Ort/Datum for the printed signature block – editable so the user controls
@@ -1319,12 +1336,20 @@ function SaveApplicationButton({
   onSave,
   onRequestPass,
   jobPosting,
+  cvs,
+  currentCvText,
 }: {
-  onSave: (title: string) => Promise<SaveResult | 'signed_out'>
+  onSave: (title: string, existingCvId?: string) => Promise<SaveResult | 'signed_out'>
   /** Opens PassModal (07-07) - passed straight through to StorageGate's
    * onChoosePass in the state==='limit' branch below. */
   onRequestPass: () => void
   jobPosting: string
+  /** Signed-in user's saved CVs. Empty (or accounts off) renders no radio -
+   * today's only historical behavior (always save-as-new). */
+  cvs: CvRow[]
+  /** The CV text this Lebenslauf/letter was generated from - fed into
+   * bestCvMatch to preselect the attach radio. */
+  currentCvText: string
 }) {
   const { t } = useLang()
   const [state, setState] = useState<
@@ -1342,11 +1367,22 @@ function SaveApplicationButton({
   const [renameValue, setRenameValue] = useState('')
   const [renameError, setRenameError] = useState(false)
 
+  // Attach-or-new radio (plan 08-02): computed once per mount, same "fresh
+  // suggestion per phase transition" rationale as suggestedTitle above.
+  // Preselects "attach" when an existing CV clearly matches (>=80% token
+  // overlap, cv-overlap.ts); otherwise "new" is the default (today's only
+  // historical behavior). attachCvId defaults to the matched CV, or the most
+  // recent CV (cvs is newest-first from listCvs) if the user switches to
+  // "attach" manually with no clear match.
+  const [preselect] = useState(() => bestCvMatch(currentCvText, cvs))
+  const [saveMode, setSaveMode] = useState<'attach' | 'new'>(preselect ? 'attach' : 'new')
+  const [attachCvId, setAttachCvId] = useState<string>(preselect?.id ?? cvs[0]?.id ?? '')
+
   if (!accountsEnabled()) return null
 
   async function handleClick() {
     setState('saving')
-    const result = await onSave(title)
+    const result = await onSave(title, saveMode === 'attach' ? attachCvId : undefined)
     if (result === 'signed_out') {
       setState('signed_out')
       return
@@ -1434,6 +1470,67 @@ function SaveApplicationButton({
             disabled={state === 'saving'}
             className="w-full rounded-md border border-accent bg-card px-3 py-2 font-serif text-base font-semibold text-ink shadow-[0_0_0_2px_rgba(10,125,99,0.18)] outline-none disabled:opacity-60"
           />
+          {/* Attach-or-new radio (plan 08-02, design surface 07 mockup 1b) - only
+              rendered once the user has 1+ saved CVs; explicit-save-only still
+              holds (this only changes what the Speichern click below sends). */}
+          {cvs.length > 0 && (
+            <div className="mt-4 flex flex-col gap-2">
+              <p className={`${EYEBROW}`}>{t.cvsAssignLabel}</p>
+              <label
+                className={`flex items-start gap-2.5 rounded-md border p-2.5 cursor-pointer ${
+                  saveMode === 'attach' ? 'border-accent' : 'border-hair'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="save-cv-mode"
+                  checked={saveMode === 'attach'}
+                  onChange={() => setSaveMode('attach')}
+                  disabled={state === 'saving'}
+                  className="mt-1"
+                />
+                <span className="flex-1">
+                  <span className="block text-sm font-semibold text-ink">
+                    {t.cvsAttachOption}
+                  </span>
+                  {saveMode === 'attach' && (
+                    <select
+                      value={attachCvId}
+                      onChange={(e) => setAttachCvId(e.target.value)}
+                      disabled={state === 'saving'}
+                      aria-label={t.cvsAttachOption}
+                      className="mt-1.5 w-full rounded-md border border-hair bg-card px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                    >
+                      {cvs.map((cv) => (
+                        <option key={cv.id} value={cv.id}>
+                          {cv.title} · {t.cvsAttachMeta(new Date(cv.updated_at).toLocaleDateString('de-DE'), 0)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </span>
+              </label>
+              <label
+                className={`flex items-start gap-2.5 rounded-md border p-2.5 cursor-pointer ${
+                  saveMode === 'new' ? 'border-accent' : 'border-hair'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="save-cv-mode"
+                  checked={saveMode === 'new'}
+                  onChange={() => setSaveMode('new')}
+                  disabled={state === 'saving'}
+                  className="mt-1"
+                />
+                <span className="flex-1">
+                  <span className="block text-sm font-semibold text-ink">{t.cvsNewOption}</span>
+                  <span className="block text-xs text-muted mt-0.5">{t.cvsNewOptionHint}</span>
+                </span>
+              </label>
+              <p className="text-xs text-muted">{t.cvsSnapshotNote}</p>
+            </div>
+          )}
           <div className="mt-2 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone">
             <PencilGlyph />
             {t.saveSuggestionHint}
@@ -1733,6 +1830,8 @@ function CoverLetterResultView({
   onRequestPaket,
   onSavePackage,
   onRequestPass,
+  cvs,
+  currentCvText,
 }: {
   letterText: string
   setLetterText: (text: string) => void
@@ -1748,10 +1847,15 @@ function CoverLetterResultView({
   paketPi: string | null
   onRequestPaket: () => void
   /** Stage 3 accounts: saves the current Lebenslauf + letter under the given
-   * title. Renders nothing via SaveApplicationButton when accounts are disabled. */
-  onSavePackage: (title: string) => Promise<SaveResult | 'signed_out'>
+   * title, optionally attaching to an existing cvs row. Renders nothing via
+   * SaveApplicationButton when accounts are disabled. */
+  onSavePackage: (title: string, existingCvId?: string) => Promise<SaveResult | 'signed_out'>
   /** Opens PassModal (07-07) - passed straight through to SaveApplicationButton. */
   onRequestPass: () => void
+  /** Signed-in user's saved CVs, for the attach-or-new radio. */
+  cvs: CvRow[]
+  /** The CV text this application was generated from (state.resumeText). */
+  currentCvText: string
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1933,7 +2037,13 @@ function CoverLetterResultView({
 
       {/* Stage 3 accounts: save this Lebenslauf + letter. Renders nothing when
           accounts are disabled. */}
-      <SaveApplicationButton onSave={onSavePackage} onRequestPass={onRequestPass} jobPosting={jobPosting} />
+      <SaveApplicationButton
+        onSave={onSavePackage}
+        onRequestPass={onRequestPass}
+        jobPosting={jobPosting}
+        cvs={cvs}
+        currentCvText={currentCvText}
+      />
 
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
@@ -2076,8 +2186,14 @@ function AppShell() {
   const [packageCount, setPackageCount] = useState(0)
   const [passOpen, setPassOpen] = useState(false)
 
-  // Fetches the signed-in user's Pass status + saved-application count.
-  // getActivePass is the same RLS-scoped entitlement source the fulfillment
+  // Signed-in user's saved CVs (`cvs` table rows), fetched alongside the Pass
+  // status below. Feeds the save flow's attach-or-new radio (SaveApplicationButton):
+  // bestCvMatch(currentCvText, cvs) preselects "attach" when an existing CV
+  // clearly matches, else "save as new" (today's only historical behavior).
+  const [cvs, setCvs] = useState<CvRow[]>([])
+
+  // Fetches the signed-in user's Pass status + saved-application count + saved
+  // CVs. getActivePass is the same RLS-scoped entitlement source the fulfillment
   // routes (/api/humanize, /api/paket/verify) use server-side; when it's null
   // the most recent Pass may simply have lapsed, so getLatestPass (no expiry
   // filter) sources the real date for the neutral expired chip. `cancelled`
@@ -2089,18 +2205,21 @@ function AppShell() {
       if (!cancelled?.()) {
         setPassRow(null)
         setPackageCount(0)
+        setCvs([])
       }
       return
     }
     const client = getSupabaseBrowserClient()
     const active = await getActivePass(client, user.id)
-    const [row, packages] = await Promise.all([
+    const [row, packages, userCvs] = await Promise.all([
       active ? Promise.resolve(active) : getLatestPass(client, user.id),
       listPackages(client, user.id),
+      listCvs(client, user.id),
     ])
     if (cancelled?.()) return
     setPassRow(row)
     setPackageCount(packages.length)
+    setCvs(userCvs)
   }
 
   useEffect(() => {
@@ -2240,7 +2359,8 @@ function AppShell() {
   // mounted. Returns a typed outcome the two result views render feedback for.
   async function handleSavePackage(
     anschreiben: string | null,
-    packageTitle: string
+    packageTitle: string,
+    existingCvId?: string
   ): Promise<SaveResult | 'signed_out'> {
     if (!accountsEnabled()) return { ok: false, reason: 'error', message: 'accounts_disabled' }
     const client = getSupabaseBrowserClient()
@@ -2253,6 +2373,7 @@ function AppShell() {
     const questions = questionsForPosting(state.jobPosting)
     return saveApplicationPackage(client, freshUser.id, {
       cvText: state.resumeText,
+      existingCvId,
       jobPosting: state.jobPosting || null,
       answers: answersToWire(state.answers, questions),
       lebenslauf: stripUids(state.lebenslauf),
@@ -2447,7 +2568,14 @@ function AppShell() {
   // accounts, so the read-only row itself can never be overwritten.
   async function handleLoadPackage(pkg: ApplicationPackageRow) {
     const client = getSupabaseBrowserClient()
-    const { data: cv } = await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()
+    // pkg.cv_id is null when the source CV was later deleted (migration 0004's
+    // `on delete set null` FK) -- the package still renders from its own
+    // snapshotted lebenslauf/anschreiben, so only run the cvs lookup when a
+    // live cv_id exists; otherwise fall back to an empty CV text rather than
+    // querying with a null id (T-08-09).
+    const cv = pkg.cv_id
+      ? (await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()).data
+      : null
     const jobPosting = pkg.job_posting ?? ''
     const questions = questionsForPosting(jobPosting)
     dispatch({
@@ -2473,7 +2601,10 @@ function AppShell() {
   // through the same DB limit trigger as any other save.
   async function handleDuplicatePackage(pkg: ApplicationPackageRow) {
     const client = getSupabaseBrowserClient()
-    const { data: cv } = await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()
+    // Same null-cv_id guard as handleLoadPackage above (T-08-09).
+    const cv = pkg.cv_id
+      ? (await client.from('cvs').select('cv_text').eq('id', pkg.cv_id).maybeSingle()).data
+      : null
     const questions = questionsForPosting('')
     dispatch({
       type: 'LOAD_PACKAGE',
@@ -2566,9 +2697,11 @@ function AppShell() {
               onExportPdf={handleExportLebenslaufPdf}
               paketUnlocked={paketPi !== null}
               onRequestPaket={() => setPaketOpen(true)}
-              onSavePackage={(title) => handleSavePackage(null, title)}
+              onSavePackage={(title, existingCvId) => handleSavePackage(null, title, existingCvId)}
               onRequestPass={() => setPassOpen(true)}
               jobPosting={state.jobPosting}
+              cvs={cvs}
+              currentCvText={state.resumeText}
             />
           </div>
         )}
@@ -2632,8 +2765,10 @@ function AppShell() {
                 dispatch({ type: 'SET_JOB_POSTING', payload: '' })
                 dispatch({ type: 'START_COVER_LETTER' })
               }}
-              onSavePackage={(title) => handleSavePackage(letterText, title)}
+              onSavePackage={(title, existingCvId) => handleSavePackage(letterText, title, existingCvId)}
               onRequestPass={() => setPassOpen(true)}
+              cvs={cvs}
+              currentCvText={state.resumeText}
             />
           </div>
         )}
