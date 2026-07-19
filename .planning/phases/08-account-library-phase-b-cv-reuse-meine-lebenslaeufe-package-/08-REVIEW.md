@@ -23,7 +23,9 @@ findings:
   warning: 5
   info: 2
   total: 7
-status: issues_found
+status: fixed
+fixed_at: 2026-07-19T00:00:00Z
+fix_report: 08-REVIEW-FIX.md
 ---
 
 # Phase 8: Code Review Report
@@ -31,7 +33,13 @@ status: issues_found
 **Reviewed:** 2026-07-19
 **Depth:** standard
 **Files Reviewed:** 14
-**Status:** issues_found
+**Status:** issues_found -> fixed (see `08-REVIEW-FIX.md`)
+
+**Fix pass (2026-07-19):** All 5 Warning findings (WR-01..WR-05) fixed and
+committed atomically on `claude/ecom-low-barrier-tools-zpyb10`. Both Info
+findings (IN-01, IN-02) deliberately left open by design -- see their
+per-finding notes below. `npx tsc --noEmit`, `npm test` (142/142), and
+`npm run build` all green after the fix pass.
 
 ## Summary
 
@@ -62,7 +70,7 @@ files reviewed.
 
 ## Warnings
 
-### WR-01: Attach-to-existing-CV dropdown always shows "0 applications"
+### WR-01: Attach-to-existing-CV dropdown always shows "0 applications" — **FIXED** (commit `3a3c273`)
 
 **File:** `scanready/src/app/app/page.tsx:1582`
 **Issue:** The `<select>` option label for each candidate CV in the
@@ -86,7 +94,7 @@ or create a new one.
 {cv.title} · {t.cvsAttachMeta(new Date(cv.updated_at).toLocaleDateString('de-DE'), usageCountFor(cv.id))}
 ```
 
-### WR-02: Status auto-suggest and its undo silently ignore RPC failure
+### WR-02: Status auto-suggest and its undo silently ignore RPC failure — **FIXED: requires human verification** (commit `f91f97c`)
 
 **File:** `scanready/src/app/app/page.tsx:2306-2317`
 **Issue:** `suggestBeworben()` sets `hasSuggestedStatus.current = true` and
@@ -122,7 +130,7 @@ async function handleUndoStatusSuggestion() {
 }
 ```
 
-### WR-03: "Undo" reverts to `'entwurf'`, not to the actual prior (unset) status
+### WR-03: "Undo" reverts to `'entwurf'`, not to the actual prior (unset) status — **FIXED** (commit `b1d1cdc`)
 
 **File:** `scanready/src/app/app/page.tsx:2313-2317`
 **Issue:** `suggestBeworben` only ever fires on a package that was just
@@ -142,7 +150,7 @@ signature already accept it):
 await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, null)
 ```
 
-### WR-04: `KontoClient.tsx` reimplements `isActiveStatus` instead of importing it
+### WR-04: `KontoClient.tsx` reimplements `isActiveStatus` instead of importing it — **FIXED** (commit `6d94fff`)
 
 **File:** `scanready/src/app/konto/KontoClient.tsx:684`
 **Issue:** `const isActive = sub?.status === 'active' || sub?.status === 'trialing'`
@@ -162,7 +170,7 @@ import { isActiveStatus } from '@/lib/subscription'
 const isActive = sub ? isActiveStatus(sub.status) : false
 ```
 
-### WR-05: `getPackage` skips the explicit `user_id` filter its sibling helpers use as defense-in-depth
+### WR-05: `getPackage` skips the explicit `user_id` filter its sibling helpers use as defense-in-depth — **FIXED** (commit `c3c0fdd`)
 
 **File:** `scanready/src/lib/account.ts:223-240` (compare `listPackages`, `223` vs `203-220`, and `KontoClient.tsx`'s `SubscriptionSection.refresh`, which explicitly notes *"a client-side backstop means a loosened policy fails closed instead of silently returning another user's row"*)
 **Issue:** `listPackages`, `listCvs`, and `KontoClient`'s subscription read all
@@ -193,7 +201,7 @@ export async function getPackage(
 
 ## Info
 
-### IN-01: `mapSaveError` treats an empty-string message as a real message, not "unknown"
+### IN-01: `mapSaveError` treats an empty-string message as a real message, not "unknown" — **deliberately left open** (info-tier, out of scope for this fix pass)
 
 **File:** `scanready/src/lib/account.ts:98-103`
 **Issue:** `error?.message ?? "unknown_error"` only falls back when `message`
@@ -206,7 +214,7 @@ and `undefined`, not the empty-string case.
 **Fix:** `message: error?.message || "unknown_error"` (or an explicit
 `.trim()` check) so a blank message also falls back.
 
-### IN-02: Duplicated `packageCompanyCity`/`statusOptions`/`statusLabelFor`/`LockGlyph`/`PackageCard` between `page.tsx` and `KontoClient.tsx`
+### IN-02: Duplicated `packageCompanyCity`/`statusOptions`/`statusLabelFor`/`LockGlyph`/`PackageCard` between `page.tsx` and `KontoClient.tsx` — **deliberately left open** (already flagged in REVIEW.md as "not a defect, no action required for this phase")
 
 **File:** `scanready/src/app/app/page.tsx:744-897` and `scanready/src/app/konto/KontoClient.tsx:166-193, 199-300, 631-649`
 **Issue:** Both files independently define near-identical helpers and a
