@@ -345,6 +345,39 @@ export async function updatePackageTitle(
 }
 
 /**
+ * Updates a saved application package's status (Entwurf / Beworben /
+ * Interview / Absage / Zusage). Calls the set_package_status(package_id,
+ * new_status) RPC defined in migration 0004_library_phase_b.sql rather than
+ * a plain UPDATE: that function is SECURITY DEFINER, checks `user_id =
+ * auth.uid()` itself (never a caller-supplied id), and validates new_status
+ * against the five keys server-side.
+ *
+ * Deliberate INVERTED exception to updatePackageTitle's read_only comment
+ * above: every other write helper in this file must ALSO be hidden
+ * client-side on a read_only row (RLS already blocks the underlying UPDATE,
+ * but the caller hides the control anyway, defense-in-depth). setPackageStatus
+ * is the ONE write that must NOT be hidden on read_only rows -- status is
+ * package METADATA, not document content, so it survives the write lock by
+ * design (the RPC's own migration comment states the same rationale). The
+ * RPC's ownership-only check is what keeps this safe, not any read_only
+ * gating here or in the UI.
+ */
+export async function setPackageStatus(
+  client: SupabaseClient,
+  packageId: string,
+  status: string | null
+): Promise<{ ok: boolean; message?: string }> {
+  if (!accountsEnabled()) return { ok: false, message: "accounts_disabled" };
+
+  const { error } = await client.rpc("set_package_status", {
+    package_id: packageId,
+    new_status: status,
+  });
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
+}
+
+/**
  * Fetches the signed-in user's currently-live Pass (kind pass_30d, not yet
  * expired), newest first, or null if they have none. RLS select-own already
  * scopes the read to the caller; accountsEnabled()-gated no-op like the

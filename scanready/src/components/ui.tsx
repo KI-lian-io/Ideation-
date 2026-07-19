@@ -30,6 +30,12 @@ import { useEffect, useRef, useState } from 'react'
  * client'`: importing it into a Server Component (e.g. src/app/preise/page.tsx) still
  * works, Next.js just treats the composed pieces as a client boundary.
  *
+ * StatusChip (design surface 08, phase 08-04) is the same doctrine applied to a
+ * per-package status badge + dropdown: a function component because it owns its
+ * own open/keyboard state, reusing KebabMenu's focusTrap and open/outside-click/
+ * Escape lifecycle rather than duplicating it. It never cycles on click -- the
+ * trigger only opens the menu, same as KebabMenu's own trigger.
+ *
  * None of these primitives hardcode copy: every label is a prop, sourced by the
  * caller from src/lib/i18n.tsx. That keeps this file free of i18n keys.
  */
@@ -404,6 +410,165 @@ export function KebabMenu({ items, ariaLabel }: { items: KebabMenuItem[]; ariaLa
                 {item.label}
               </button>
             </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// StatusChip: the five-state application-status chip + dropdown (design
+// surface 08). Reuses focusTrap and the exact open/outside-click/Escape
+// lifecycle from KebabMenu above -- the only new mechanics are the trigger's
+// two visual states (a set-status pill vs. the null "set status" ghost) and
+// the menu rendering a check on the current value instead of a plain action
+// list. Never cycles on click: the trigger only toggles `open`, exactly like
+// KebabMenu's own trigger opens a menu rather than doing anything itself.
+// Copy-free like every primitive in this file -- labels are props, sourced
+// by the caller from src/lib/i18n.tsx; only the five dot colors are
+// hardcoded here, keyed by the domain status value (not copy).
+// ---------------------------------------------------------------------------
+
+export type StatusChipOption = { value: string; label: string }
+
+const STATUS_DOT_CLASS: Record<string, string> = {
+  entwurf: 'bg-stone',
+  beworben: 'bg-ink',
+  interview: 'bg-brand-tag',
+  absage: 'bg-brand-error',
+  zusage: 'bg-accent',
+}
+
+function ChevronGlyph({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={open ? 'rotate-180' : ''}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  )
+}
+
+export function StatusChip({
+  status,
+  options,
+  setLabel,
+  ariaLabel,
+  onSelect,
+}: {
+  /** The current status value (a domain key, e.g. 'entwurf'), or null when unset. */
+  status: string | null
+  /** The five states in pipeline order; value is the domain key, label is the
+   * caller-supplied i18n string. */
+  options: StatusChipOption[]
+  /** The null-status affordance label ("Status setzen" / "Set status"). */
+  setLabel: string
+  ariaLabel: string
+  onSelect: (value: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  function close() {
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  // Outside-click closes the menu -- identical to KebabMenu's own effect.
+  useEffect(() => {
+    if (!open) return
+    function onPointerDown(e: MouseEvent) {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    return () => document.removeEventListener('mousedown', onPointerDown)
+  }, [open])
+
+  // Escape closes + Tab is trapped inside the open menu, reusing the same
+  // focusTrap helper KebabMenu already uses (no duplicated trap logic).
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = focusTrap(containerRef, close)
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  // Focus the current selection (or the first option) on open, mirroring
+  // KebabMenu's own focus-on-open effect.
+  useEffect(() => {
+    if (!open) return
+    const current = containerRef.current?.querySelector<HTMLElement>(
+      '[role="menuitemradio"][aria-checked="true"]'
+    )
+    const first = containerRef.current?.querySelector<HTMLElement>('[role="menuitemradio"]')
+    ;(current ?? first)?.focus()
+  }, [open])
+
+  const current = options.find((o) => o.value === status) ?? null
+
+  const triggerClass = current
+    ? current.value === 'zusage'
+      ? 'inline-flex items-center gap-1.5 rounded-full border border-hair bg-accent-tint px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-accent-deep'
+      : 'inline-flex items-center gap-1.5 rounded-full border border-hair bg-card px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted'
+    : 'inline-flex items-center gap-1.5 rounded-full border border-dashed border-hair px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted'
+
+  return (
+    <div ref={containerRef} className="relative inline-block">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-label={ariaLabel}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={triggerClass}
+      >
+        {current && (
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT_CLASS[current.value] ?? 'bg-stone'}`}
+            aria-hidden="true"
+          />
+        )}
+        {current ? current.label : setLabel}
+        {current && <ChevronGlyph open={open} />}
+      </button>
+      {open && (
+        <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border border-hair bg-card p-1.5 shadow-modal">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="menuitemradio"
+              aria-checked={option.value === status}
+              onClick={() => {
+                close()
+                onSelect(option.value)
+              }}
+              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink hover:bg-faint"
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT_CLASS[option.value] ?? 'bg-stone'}`}
+                aria-hidden="true"
+              />
+              {option.label}
+              {option.value === status && (
+                <span className="ml-auto text-accent-deep" aria-hidden="true">
+                  <CheckGlyph />
+                </span>
+              )}
+            </button>
           ))}
         </div>
       )}

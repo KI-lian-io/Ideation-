@@ -341,6 +341,20 @@ type Dict = {
   cvsEmptyStatus: string
   cvsEmptyBody: string
   cvsEmptyCta: string
+  // Status chip (design surface 08, phase 08-04) - per-package status on both
+  // galleries. The five state labels are lifted verbatim from 08-status.dc.html's
+  // 1c copy deck; the UI-affordance keys not in that deck (set/undo/auto-suggest
+  // note/aria) are newly authored in the same tone, flagged for native-speaker
+  // review alongside the rest of this phase's copy.
+  statusEntwurf: string
+  statusBeworben: string
+  statusInterview: string
+  statusAbsage: string
+  statusZusage: string
+  statusSetLabel: string
+  statusUndo: string
+  statusAutoSuggestNote: string
+  statusChangeAria: (title: string) => string
   // Storage-gate chooser (design surface 02) - inline dismissible panel replacing
   // the plain state==='limit' text hint in the save rail. Copy lifted verbatim
   // from 02-storage-gate.dc.html's 1e copy deck; gatePassName/gatePlusName are
@@ -705,6 +719,15 @@ const en = {
   cvsEmptyBody:
     'Once you save an application, its Lebenslauf appears here so you can reuse or rename it for your next one.',
   cvsEmptyCta: 'Create application',
+  statusEntwurf: 'Draft',
+  statusBeworben: 'Applied',
+  statusInterview: 'Interview',
+  statusAbsage: 'Rejected',
+  statusZusage: 'Offer',
+  statusSetLabel: 'Set status',
+  statusUndo: 'Undo',
+  statusAutoSuggestNote: 'Set to Applied',
+  statusChangeAria: (title) => `Change status for ${title}`,
   gateEyebrow: 'Storage',
   gateStorageStatus: '1 of 1 application saved.',
   gateTitle: 'Your free storage slot is taken.',
@@ -1067,6 +1090,15 @@ const de = {
   cvsEmptyBody:
     'Sobald Sie eine Bewerbung speichern, erscheint der zugehörige Lebenslauf hier zur Wiederverwendung oder zum Umbenennen.',
   cvsEmptyCta: 'Bewerbung erstellen',
+  statusEntwurf: 'Entwurf',
+  statusBeworben: 'Beworben',
+  statusInterview: 'Interview',
+  statusAbsage: 'Absage',
+  statusZusage: 'Zusage',
+  statusSetLabel: 'Status setzen',
+  statusUndo: 'Rückgängig',
+  statusAutoSuggestNote: "Auf 'Beworben' gesetzt",
+  statusChangeAria: (title) => `Status ändern für ${title}`,
   gateEyebrow: 'Speicherplatz',
   gateStorageStatus: '1 von 1 Bewerbung gespeichert.',
   gateTitle: 'Ihr kostenloser Speicherplatz ist belegt.',

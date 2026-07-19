@@ -15,6 +15,7 @@ import {
   updatePackageTitle,
   listCvs,
   updateCvTitle,
+  setPackageStatus,
 } from '../account.ts'
 
 test('mapSaveError: package_limit trigger message -> reason "limit"', () => {
@@ -270,6 +271,71 @@ test('updateCvTitle: accounts disabled -> safe no-op, never calls Supabase', asy
 
   assert.deepEqual(result, { ok: false, message: 'accounts_disabled' })
   assert.equal(called, false)
+})
+
+// ---------------------------------------------------------------------------
+// setPackageStatus: accountsEnabled()-gated RPC caller
+// ---------------------------------------------------------------------------
+
+test('setPackageStatus: accounts disabled -> safe no-op, never calls Supabase', async () => {
+  let called = false
+  const fakeClient = {
+    rpc() {
+      called = true
+      throw new Error('should not be called when accounts are disabled')
+    },
+  } as unknown as SupabaseClient
+
+  const result = await setPackageStatus(fakeClient, 'pkg-1', 'beworben')
+
+  assert.deepEqual(result, { ok: false, message: 'accounts_disabled' })
+  assert.equal(called, false)
+})
+
+test('setPackageStatus: accounts enabled -> calls rpc("set_package_status", ...) with the right shape', async () => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+  const rpcCalls: Array<{ fn: string; args: unknown }> = []
+  const fakeClient = {
+    rpc(fn: string, args: unknown) {
+      rpcCalls.push({ fn, args })
+      return Promise.resolve({ data: null, error: null })
+    },
+  } as unknown as SupabaseClient
+
+  try {
+    const result = await setPackageStatus(fakeClient, 'pkg-1', 'beworben')
+
+    assert.deepEqual(result, { ok: true })
+    assert.equal(rpcCalls.length, 1)
+    assert.deepEqual(rpcCalls[0], {
+      fn: 'set_package_status',
+      args: { package_id: 'pkg-1', new_status: 'beworben' },
+    })
+  } finally {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
+})
+
+test('setPackageStatus: rpc error -> { ok: false, message }', async () => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+  const fakeClient = {
+    rpc() {
+      return Promise.resolve({ data: null, error: { message: 'invalid_status' } })
+    },
+  } as unknown as SupabaseClient
+
+  try {
+    const result = await setPackageStatus(fakeClient, 'pkg-1', 'not-a-real-status')
+    assert.deepEqual(result, { ok: false, message: 'invalid_status' })
+  } finally {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
 })
 
 // ---------------------------------------------------------------------------
