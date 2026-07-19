@@ -21,7 +21,10 @@ import {
   deleteAccount,
   updatePackageTitle,
   getLatestPass,
+  listCvs,
+  updateCvTitle,
   type ApplicationPackageRow,
+  type CvRow,
 } from '@/lib/account'
 import { PassStatusChip } from '@/components/PassStatusChip'
 import {
@@ -91,6 +94,7 @@ export function KontoClient() {
 
       <PassSection userId={user.id} />
       <SavedPackagesSection userId={user.id} />
+      <CvSection userId={user.id} />
       <SubscriptionSection userId={user.id} />
       <DangerZoneSection onSignOut={signOut} />
     </main>
@@ -379,6 +383,194 @@ function SavedPackagesSection({ userId }: { userId: string }) {
         </>
       )}
     </section>
+  )
+}
+
+/**
+ * "Meine Lebenslaeufe" section (design surface 07, 1a): lists the signed-in
+ * user's saved CVs (`cvs` table rows) below SavedPackagesSection. Modeled
+ * directly on SavedPackagesSection -- run-once refresh effect, EmptyState
+ * when empty, SheetCard + MonoBadge + KebabMenu + InlineRenameField per card.
+ * The per-CV usage count is derived client-side from the already-fetched
+ * `listPackages()` rows grouped by cv_id (same "derive from rows already in
+ * scope" convention as packageCompanyCity above), not a new query.
+ *
+ * Deleting a CV never touches application_packages: migration 0004 re-created
+ * that FK as `on delete set null`, so every package that referenced this CV
+ * keeps its own already-saved lebenslauf/anschreiben snapshot and simply
+ * loses the live cv_id link (T-08-11 in 08-03's threat register).
+ */
+function CvSection({ userId }: { userId: string }) {
+  const { t } = useLang()
+  const [cvs, setCvs] = useState<CvRow[] | null>(null)
+  const [packages, setPackages] = useState<ApplicationPackageRow[]>([])
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+
+  async function refresh() {
+    const client = getSupabaseBrowserClient()
+    const [cvRows, packageRows] = await Promise.all([
+      listCvs(client, userId),
+      listPackages(client, userId),
+    ])
+    setCvs(cvRows)
+    setPackages(packageRows)
+  }
+
+  useEffect(() => {
+    // One-shot Supabase read on mount, same accepted pattern as the sibling
+    // sections' own refresh effects above.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh()
+    // Deliberately runs once per mount: userId is stable for the lifetime of
+    // this page, same convention as SavedPackagesSection's own refresh effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function usageCount(cvId: string): number {
+    return packages.filter((pkg) => pkg.cv_id === cvId).length
+  }
+
+  function handleRenameStart(cv: CvRow) {
+    setRenamingId(cv.id)
+    setRenameValue(cv.title)
+  }
+
+  function handleRenameCancel() {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  async function handleRenameCommit(cv: CvRow, value: string) {
+    const trimmed = value.trim()
+    setRenamingId(null)
+    if (!trimmed || trimmed === cv.title) return
+    await updateCvTitle(getSupabaseBrowserClient(), cv.id, trimmed)
+    await refresh()
+  }
+
+  async function handleDelete(cv: CvRow) {
+    if (!window.confirm(`${t.cvsMenuDelete}? ${t.cvsDeleteNote}`)) return
+    // Deletes only the cvs row itself (RLS cvs_delete_own scopes it to the
+    // owner). Never issues an application_packages write -- see the section
+    // doc-comment above for why that is safe by design.
+    await getSupabaseBrowserClient().from('cvs').delete().eq('id', cv.id)
+    await refresh()
+  }
+
+  // Same cross-page bridge convention as SavedPackagesSection's handleOpen/
+  // handleDuplicate: /konto has no tool reducer of its own, so reuse hands
+  // off to /app via the ?cv= query-string bridge AppShell reads once on
+  // mount (08-03 Task 1). "Neue Bewerbung mit diesem CV" and "Ansehen" both
+  // land on the same bridge -- viewing a CV IS loading it into the tool.
+  function handleReuse(cv: CvRow) {
+    window.location.assign(`/app?cv=${cv.id}`)
+  }
+
+  return (
+    <section className="flex flex-col gap-4">
+      <p className={EYEBROW}>{t.cvsHeading}</p>
+
+      {cvs === null ? (
+        <p className="text-muted">{t.kontoLoading}</p>
+      ) : cvs.length === 0 ? (
+        <EmptyState
+          status={t.cvsEmptyStatus}
+          body={t.cvsEmptyBody}
+          ctaLabel={t.cvsEmptyCta}
+          ctaHref="/app"
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {cvs.map((cv) => (
+            <CvCard
+              key={cv.id}
+              cv={cv}
+              usageCount={usageCount(cv.id)}
+              isRenaming={renamingId === cv.id}
+              renameValue={renameValue}
+              onRenameChange={setRenameValue}
+              onRenameStart={handleRenameStart}
+              onRenameCommit={handleRenameCommit}
+              onRenameCancel={handleRenameCancel}
+              onReuse={handleReuse}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+/** One CV card: mono Stand date + kebab, serif title (or inline rename), a
+ * hairline, and a usage-count line. Kebab lists the reuse action first (the
+ * 07 mockup's primary action), then Ansehen, Umbenennen, and a destructive
+ * Loeschen whose confirm dialog carries the "Bewerbungen behalten ihre
+ * Kopie" note. */
+function CvCard({
+  cv,
+  usageCount,
+  isRenaming,
+  renameValue,
+  onRenameChange,
+  onRenameStart,
+  onRenameCommit,
+  onRenameCancel,
+  onReuse,
+  onDelete,
+}: {
+  cv: CvRow
+  usageCount: number
+  isRenaming: boolean
+  renameValue: string
+  onRenameChange: (value: string) => void
+  onRenameStart: (cv: CvRow) => void
+  onRenameCommit: (cv: CvRow, value: string) => void
+  onRenameCancel: () => void
+  onReuse: (cv: CvRow) => void
+  onDelete: (cv: CvRow) => void
+}) {
+  const { t } = useLang()
+
+  const items: KebabMenuItem[] = [
+    { label: t.cvsMenuNewApplication, onSelect: () => onReuse(cv) },
+    { label: t.cvsMenuView, onSelect: () => onReuse(cv) },
+    { label: t.libraryMenuRename, onSelect: () => onRenameStart(cv) },
+    { label: t.cvsMenuDelete, onSelect: () => onDelete(cv), destructive: true },
+  ]
+
+  return (
+    <div className={`${SheetCard} flex flex-col gap-2.5 px-5 py-4`}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone">
+          {t.cvsStandLabel(new Date(cv.updated_at).toLocaleDateString('de-DE'))}
+        </span>
+        <KebabMenu items={items} ariaLabel={t.libraryMenuAriaLabel(cv.title)} />
+      </div>
+
+      {isRenaming ? (
+        <InlineRenameField
+          value={renameValue}
+          onChange={onRenameChange}
+          onSave={(value) => onRenameCommit(cv, value)}
+          onCancel={onRenameCancel}
+          ariaLabel={t.saveTitleAriaLabel}
+        />
+      ) : (
+        <span className="font-serif-text text-lg font-semibold leading-tight text-ink">{cv.title}</span>
+      )}
+      {isRenaming && (
+        <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-stone">{t.libraryRenameHelper}</p>
+      )}
+
+      <div className="h-px bg-hair" />
+
+      <div className="flex items-center justify-between gap-2">
+        <MonoBadge>LL</MonoBadge>
+        <span className="text-sm text-muted">{t.cvsUsage(usageCount)}</span>
+      </div>
+    </div>
   )
 }
 

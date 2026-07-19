@@ -326,6 +326,21 @@ type Dict = {
   cvsNewOptionHint: string
   cvsSnapshotNote: string
   cvsAttachMeta: (date: string, count: number) => string
+  // /konto "Meine Lebenslaeufe" section (design surface 07, 1a) - CV-entity
+  // reuse gallery rendered below SavedPackagesSection. Copy lifted verbatim
+  // from 07-lebenslaeufe.dc.html's 1a mockup + 1c copy deck. Rename reuses
+  // libraryMenuRename/libraryRenameHelper directly (identical wording to the
+  // packages gallery) rather than duplicating a key.
+  cvsHeading: string
+  cvsUsage: (count: number) => string
+  cvsStandLabel: (date: string) => string
+  cvsMenuNewApplication: string
+  cvsMenuView: string
+  cvsMenuDelete: string
+  cvsDeleteNote: string
+  cvsEmptyStatus: string
+  cvsEmptyBody: string
+  cvsEmptyCta: string
   // Storage-gate chooser (design surface 02) - inline dismissible panel replacing
   // the plain state==='limit' text hint in the save rail. Copy lifted verbatim
   // from 02-storage-gate.dc.html's 1e copy deck; gatePassName/gatePlusName are
@@ -679,6 +694,17 @@ const en = {
     'Applications stay snapshots: later changes to the Lebenslauf do not apply retroactively.',
   cvsAttachMeta: (date, count) =>
     count === 1 ? `As of ${date} · used in 1 application` : `As of ${date} · used in ${count} applications`,
+  cvsHeading: 'My CVs',
+  cvsUsage: (count) => (count === 1 ? 'Used in 1 application' : `Used in ${count} applications`),
+  cvsStandLabel: (date) => `As of ${date}`,
+  cvsMenuNewApplication: 'New application with this CV',
+  cvsMenuView: 'View',
+  cvsMenuDelete: 'Delete',
+  cvsDeleteNote: 'Applications keep their copy.',
+  cvsEmptyStatus: 'No saved CVs yet',
+  cvsEmptyBody:
+    'Once you save an application, its Lebenslauf appears here so you can reuse or rename it for your next one.',
+  cvsEmptyCta: 'Create application',
   gateEyebrow: 'Storage',
   gateStorageStatus: '1 of 1 application saved.',
   gateTitle: 'Your free storage slot is taken.',
@@ -1030,6 +1056,17 @@ const de = {
     'Bewerbungen bleiben Momentaufnahmen: spätere Änderungen am Lebenslauf wirken nicht rückwirkend.',
   cvsAttachMeta: (date, count) =>
     count === 1 ? `Stand ${date} · in 1 Bewerbung` : `Stand ${date} · in ${count} Bewerbungen`,
+  cvsHeading: 'Meine Lebensläufe',
+  cvsUsage: (count) => (count === 1 ? 'In 1 Bewerbung verwendet' : `In ${count} Bewerbungen verwendet`),
+  cvsStandLabel: (date) => `Stand ${date}`,
+  cvsMenuNewApplication: 'Neue Bewerbung mit diesem CV',
+  cvsMenuView: 'Ansehen',
+  cvsMenuDelete: 'Löschen',
+  cvsDeleteNote: 'Bewerbungen behalten ihre Kopie.',
+  cvsEmptyStatus: 'Noch keine gespeicherten Lebensläufe',
+  cvsEmptyBody:
+    'Sobald Sie eine Bewerbung speichern, erscheint der zugehörige Lebenslauf hier zur Wiederverwendung oder zum Umbenennen.',
+  cvsEmptyCta: 'Bewerbung erstellen',
   gateEyebrow: 'Speicherplatz',
   gateStorageStatus: '1 von 1 Bewerbung gespeichert.',
   gateTitle: 'Ihr kostenloser Speicherplatz ist belegt.',
