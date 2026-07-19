@@ -1115,6 +1115,9 @@ function ResultView({
   jobPosting,
   cvs,
   currentCvText,
+  onFirstExportOrCopy,
+  statusSuggestionVisible,
+  onUndoStatusSuggestion,
 }: {
   lebenslauf: LebenslaufWithUids
   sectionOrder: string[]
@@ -1146,6 +1149,14 @@ function ResultView({
   /** The CV text this Lebenslauf was generated from (state.resumeText) - fed
    * into bestCvMatch to preselect the attach radio. */
   currentCvText: string
+  /** Status auto-suggest (08-04): AppShell's suggestBeworben, called after a
+   * successful copy. No-ops when nothing is saved (savedPackageId is null),
+   * so anonymous/unsaved flows are unaffected. */
+  onFirstExportOrCopy: () => void
+  /** Whether the inline "set to Beworben" undo notice is currently shown -
+   * owned by AppShell so it survives the copy handler's own transient state. */
+  statusSuggestionVisible: boolean
+  onUndoStatusSuggestion: () => void
 }) {
   const { t } = useLang()
   // Copy button state – local, not in reducer (D-04 / UI-SPEC)
@@ -1161,6 +1172,7 @@ function ResultView({
     try {
       await navigator.clipboard.writeText(text)
       track('copy_download', { kind: 'lebenslauf_copy' })
+      onFirstExportOrCopy()
       setCopyState('copied')
       setTimeout(() => setCopyState('idle'), 1500)
     } catch {
@@ -1279,7 +1291,7 @@ function ResultView({
 
         {/* Stage 3 accounts: save this Lebenslauf (anschreiben: null at this step).
             Renders nothing when accounts are disabled. */}
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col gap-2">
           <SaveApplicationButton
             onSave={onSavePackage}
             onRequestPass={onRequestPass}
@@ -1287,6 +1299,17 @@ function ResultView({
             cvs={cvs}
             currentCvText={currentCvText}
           />
+          {/* Status auto-suggest (08-04): inline, undoable, never a modal - fires
+              only after a copy of a SAVED package (onFirstExportOrCopy no-ops
+              when nothing is saved). */}
+          {statusSuggestionVisible && (
+            <p className="flex items-center gap-2 text-sm text-muted" aria-live="polite">
+              {t.statusAutoSuggestNote}
+              <button type="button" onClick={onUndoStatusSuggestion} className="underline">
+                {t.statusUndo}
+              </button>
+            </p>
+          )}
         </div>
 
         {/* Ort/Datum for the printed signature block – editable so the user controls
@@ -1885,6 +1908,9 @@ function CoverLetterResultView({
   onRequestPass,
   cvs,
   currentCvText,
+  onFirstExportOrCopy,
+  statusSuggestionVisible,
+  onUndoStatusSuggestion,
 }: {
   letterText: string
   setLetterText: (text: string) => void
@@ -1909,6 +1935,12 @@ function CoverLetterResultView({
   cvs: CvRow[]
   /** The CV text this application was generated from (state.resumeText). */
   currentCvText: string
+  /** Status auto-suggest (08-04): AppShell's suggestBeworben, called after a
+   * successful copy or the .txt download. No-ops when nothing is saved. */
+  onFirstExportOrCopy: () => void
+  /** Whether the inline "set to Beworben" undo notice is currently shown. */
+  statusSuggestionVisible: boolean
+  onUndoStatusSuggestion: () => void
 }) {
   const { t } = useLang()
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
@@ -1931,6 +1963,7 @@ function CoverLetterResultView({
     try {
       await navigator.clipboard.writeText(letterText)
       track('copy_download', { kind: 'letter_copy' })
+      onFirstExportOrCopy()
       setCopyState('copied')
       setTimeout(() => setCopyState('idle'), 1500)
     } catch {
@@ -1948,6 +1981,7 @@ function CoverLetterResultView({
     a.click()
     URL.revokeObjectURL(url)
     track('copy_download', { kind: 'letter_download' })
+    onFirstExportOrCopy()
   }
 
   const HUMANIZER_LIMIT = 10_000
@@ -2098,6 +2132,18 @@ function CoverLetterResultView({
         currentCvText={currentCvText}
       />
 
+      {/* Status auto-suggest (08-04): inline, undoable, never a modal - fires only
+          after a copy/download of a SAVED package (onFirstExportOrCopy no-ops
+          when nothing is saved). */}
+      {statusSuggestionVisible && (
+        <p className="flex items-center gap-2 text-sm text-muted" aria-live="polite">
+          {t.statusAutoSuggestNote}
+          <button type="button" onClick={onUndoStatusSuggestion} className="underline">
+            {t.statusUndo}
+          </button>
+        </p>
+      )}
+
       {/* Honest price anchor – one line, muted, sits with the Humanizer+ CTA context */}
       <p className="text-sm text-muted">
         {t.priceAnchor}
@@ -2244,6 +2290,31 @@ function AppShell() {
   // bestCvMatch(currentCvText, cvs) preselects "attach" when an existing CV
   // clearly matches, else "save as new" (today's only historical behavior).
   const [cvs, setCvs] = useState<CvRow[]>([])
+
+  // Status auto-suggest (08-04): tracks the id of the package a Speichern click
+  // just saved, so a first export/copy can nudge its status to 'beworben'.
+  // Stays null for anonymous users and unsaved work -- suggestBeworben below
+  // no-ops whenever it is null, which is the whole guarantee that this never
+  // fires for anyone who hasn't explicitly saved. hasSuggestedStatus is a ref
+  // (not state) so the guard is read/written synchronously, closing the
+  // window where handleCopy and a near-simultaneous handleDownload could both
+  // pass the check before either write lands.
+  const [savedPackageId, setSavedPackageId] = useState<string | null>(null)
+  const hasSuggestedStatus = useRef(false)
+  const [statusSuggestionVisible, setStatusSuggestionVisible] = useState(false)
+
+  async function suggestBeworben() {
+    if (!savedPackageId || hasSuggestedStatus.current) return
+    hasSuggestedStatus.current = true
+    await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'beworben')
+    setStatusSuggestionVisible(true)
+  }
+
+  async function handleUndoStatusSuggestion() {
+    if (!savedPackageId) return
+    setStatusSuggestionVisible(false)
+    await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'entwurf')
+  }
 
   // Fetches the signed-in user's Pass status + saved-application count + saved
   // CVs. getActivePass is the same RLS-scoped entitlement source the fulfillment
@@ -2424,7 +2495,7 @@ function AppShell() {
     if (!state.lebenslauf) return { ok: false, reason: 'error', message: 'no_lebenslauf' }
 
     const questions = questionsForPosting(state.jobPosting)
-    return saveApplicationPackage(client, freshUser.id, {
+    const result = await saveApplicationPackage(client, freshUser.id, {
       cvText: state.resumeText,
       existingCvId,
       jobPosting: state.jobPosting || null,
@@ -2433,6 +2504,16 @@ function AppShell() {
       anschreiben,
       packageTitle,
     })
+    // Status auto-suggest (08-04): every successful save targets a freshly
+    // inserted row (saveApplicationPackage always INSERTs, never updates an
+    // existing one), so a new save gets its own first-export/copy suggestion
+    // rather than inheriting a previous package's already-suggested state.
+    if (result.ok) {
+      setSavedPackageId(result.packageId)
+      hasSuggestedStatus.current = false
+      setStatusSuggestionVisible(false)
+    }
+    return result
   }
 
   async function handleGenerateLetter() {
@@ -2582,6 +2663,11 @@ function AppShell() {
   // pattern the /preise page positions against.
   function handleReset() {
     clearPaket()
+    // Clears the status auto-suggest's tracked package too: a fresh start
+    // means no saved row is in scope until the user saves again.
+    setSavedPackageId(null)
+    hasSuggestedStatus.current = false
+    setStatusSuggestionVisible(false)
     dispatch({ type: 'RESET' })
   }
 
@@ -2596,6 +2682,7 @@ function AppShell() {
   function handleExportLebenslaufPdf(ortDatum: string) {
     if (!state.lebenslauf) return
     track('copy_download', { kind: 'lebenslauf_pdf' })
+    suggestBeworben()
     setPrintJob({
       kind: 'lebenslauf',
       lebenslauf: stripUids(state.lebenslauf),
@@ -2607,6 +2694,7 @@ function AppShell() {
 
   function handleExportLetterPdf() {
     track('copy_download', { kind: 'letter_pdf' })
+    suggestBeworben()
     setPrintJob({ kind: 'letter', letterText })
   }
 
@@ -2777,6 +2865,9 @@ function AppShell() {
               jobPosting={state.jobPosting}
               cvs={cvs}
               currentCvText={state.resumeText}
+              onFirstExportOrCopy={suggestBeworben}
+              statusSuggestionVisible={statusSuggestionVisible}
+              onUndoStatusSuggestion={handleUndoStatusSuggestion}
             />
           </div>
         )}
@@ -2844,6 +2935,9 @@ function AppShell() {
               onRequestPass={() => setPassOpen(true)}
               cvs={cvs}
               currentCvText={state.resumeText}
+              onFirstExportOrCopy={suggestBeworben}
+              statusSuggestionVisible={statusSuggestionVisible}
+              onUndoStatusSuggestion={handleUndoStatusSuggestion}
             />
           </div>
         )}
