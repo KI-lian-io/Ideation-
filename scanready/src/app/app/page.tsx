@@ -2367,7 +2367,11 @@ function AppShell() {
 
   async function handleUndoStatusSuggestion() {
     if (!savedPackageId) return
-    const result = await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, 'entwurf')
+    // WR-03: revert to the neutral, unset state the package actually had
+    // before suggestBeworben fired (application_packages inserts never set
+    // status - it starts null, migration 0004's "no status set yet" state),
+    // not the concrete 'entwurf' ("Draft") value.
+    const result = await setPackageStatus(getSupabaseBrowserClient(), savedPackageId, null)
     if (result.ok) {
       setStatusActionError(false)
       setStatusSuggestionVisible(false)
