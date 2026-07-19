@@ -212,7 +212,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. DE/EN copy is lifted VERBATIM from the three .dc.html surface decks into src/lib/i18n.tsx (documents/legal text stays German); no em-dash anywhere; new German copy flagged for native-speaker review
   6. npx tsc --noEmit, the full test suite, and next build all pass; all new surfaces are inert when accounts/Stripe env vars are unset; the anonymous zero-retention flow, explicit-save-only, no-photos, and grounded-only guardrails are untouched
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 
 **Wave 1**
 
@@ -220,7 +220,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on 08-01)*
 
-- [ ] 08-02-PLAN.md — Surface 07 data + save-flow: existingCvId attach path, listCvs/updateCvTitle, cv-overlap heuristic, attach-or-new radio (Wave 2)
+- [x] 08-02-PLAN.md — Surface 07 data + save-flow: existingCvId attach path, listCvs/updateCvTitle, cv-overlap heuristic, attach-or-new radio (Wave 2)
 
 **Wave 3** *(blocked on 08-02 - shares account.ts + i18n.tsx + app/page.tsx)*
 
@@ -246,7 +246,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
 | 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete    | 2026-07-07 |
-| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 0/5 | Planning | - |
+| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 1/5 | In Progress|  |
 
 ## Backlog
 

@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 status: Milestone complete
 stopped_at: Completed 07-07-PLAN.md
-last_updated: "2026-07-07T17:31:08.966Z"
-last_activity: 2026-07-07
-last_activity_desc: Phase 7 complete
+last_updated: "2026-07-19T19:29:54.016Z"
+last_activity: 2026-07-19
+last_activity_desc: Phase 8 Plan 2 complete (CV-reuse attach-or-new radio)
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 6
-  total_plans: 22
-  completed_plans: 22
-  percent: 86
-current_phase: 7
-current_phase_name: account-library-honest-pricing-design-reconciliation-phase-a
+  total_plans: 27
+  completed_plans: 23
+  percent: 85
+current_phase: 8
+current_phase_name: account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
 ---
 
 # Project State
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 
 ## Current Position
 
-v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is now complete: all 8/8 plans shipped.
-Last activity: 2026-07-07 — Phase 7 complete
+v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) is in progress: Plan 01 (migration 0004, apply blocked on a paused Supabase project) and Plan 02 (CV-reuse attach-or-new radio) are done; Plans 03-05 remain.
+Last activity: 2026-07-19 — Phase 8 Plan 2 complete (cv-overlap.ts heuristic, account.ts existingCvId attach path, attach-or-new radio in SaveApplicationButton)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [██████████] 100%
 | Phase 07 P05 | 25min | 3 tasks | 3 files |
 | Phase 07-account-library-honest-pricing-design-reconciliation-phase-a P06 | 25min | 3 tasks | 3 files |
 | Phase 07 P07 | 19min | 3 tasks | 7 files |
+| Phase 08 P02 | 10min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,7 @@ Recent decisions affecting current work:
 - [Phase 07-06]: StorageGate fetches its own anchor data via useAccount()+listPaketPurchases; Pass/Plus cards stack in a plain flex-col (not a viewport-breakpoint grid) since the panel only ever renders inside the narrow save rail
 - [Phase 07-07]: PassStatusChip split into its own Stripe-free file (src/components/PassStatusChip.tsx) rather than living inside PassModal.tsx, so importing it never eagerly loads Stripe.js/cookies for every /app and /konto page view
 - [Phase 07-07]: Pass status resolution tries getActivePass first (server-side entitlement source) and falls back to the new getLatestPass only when null, so the expired chip can show a real date without contradicting the actual entitlement gate
+- [Phase 08-02]: cvOverlapRatio uses intersection-over-smaller-set (not Jaccard) so a shorter edit of the same CV still preselects attach; attach-path saveApplicationPackage failures never delete the reused cvs row (unlike save-as-new's 895e03d orphan-cleanup)
 
 ### Pending Todos
 
@@ -143,6 +145,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-07T13:26:02.000Z
-Last activity: 2026-07-17 - Completed quick task 260717-g8q: soft-launch readiness (Impressum data filled, paymentsEnabled() gate for paid CTAs + paid legal sections)
-Stopped at: Completed 07-07-PLAN.md
+Last session: 2026-07-19T19:27:44.363Z
+Last activity: 2026-07-19 - Completed 08-02-PLAN.md: CV-reuse attach-or-new radio (cv-overlap.ts, account.ts existingCvId path, cvs.* i18n, SaveApplicationButton radio)
+Stopped at: Completed 08-02-PLAN.md
