@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned (completed 2026-06-23)
 - [x] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts (completed 2026-06-24)
 - [x] **Phase 7: Account Library + Honest Pricing (design Phase A)** - Reconcile the six claude.ai/design Phase-A surfaces into the live app behind Stage 3 env gates: library card gallery, Bewerbungsphase-Pass SKU, storage gate, Pass modal, preise v2, foundation primitives + founder assets (completed 2026-07-07)
+- [ ] **Phase 8: Account Library Phase B (CV reuse + status + Plus lifecycle)** - Reconcile the three Phase-B design surfaces into the live app behind the same env gates: "Meine Lebenslaeufe" CV reuse with attach-or-new save flow, per-package status chip, and the Plus subscription lifecycle surfaces (cancelled-but-running/expired states + un-cancel route); Plus stays "Geplant" non-buyable
 
 ## Phase Details
 
@@ -196,6 +197,25 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
+### Phase 8: Account Library Phase B (CV reuse + status + Plus lifecycle)
+
+**Goal**: The three Phase-B design surfaces (07-lebenslaeufe, 08-status, 09-plus) are reconciled into the live app behind the existing Stage 3 env gates: the save flow offers attach-to-existing-CV vs save-as-new (fixing the one-cvs-row-per-save duplication), /konto gains a "Meine Lebenslaeufe" section with usage counts and rename/delete that never touches packages, every package card carries an editable status chip (Entwurf/Beworben/Interview/Absage/Zusage), and /konto shows the full Plus subscription lifecycle (cancelled-but-running and expired states plus a Kuendigung-zuruecknehmen route). Plus stays "Geplant" and non-buyable; the renewal-reminder email stays a flagged founder gate (provider decision open, PRD 6.4). Everything stays inert until founder keys exist.
+**Mode:** mvp
+**Depends on**: Phase 7
+**Requirements**: TBD (spec lives in scanready/docs/design-impl-plan-library-pricing.md Phase B section + scanready/docs/prd-account-library-pricing.md 6.4)
+**Success Criteria** (what must be TRUE):
+
+  1. Save flow CV reuse: when a signed-in user with at least one stored CV saves, the save card offers "an bestehenden Lebenslauf anhaengen" vs "als neuen speichern"; a text-overlap heuristic (>80%) preselects attach; attaching reuses the existing cvs row id (no new cvs insert), save-as-new inserts one; packages keep snapshotting their own Lebenslauf JSON (point-in-time, never live-linked)
+  2. "Meine Lebenslaeufe" on /konto: CV cards from a new listCvs() helper with per-CV usage count (packages grouped by cv_id), inline rename, and delete with "Bewerbungen behalten ihre Kopie" semantics: deleting a CV never deletes or mutates any application package
+  3. Package status: a nullable status column (Entwurf/Beworben/Interview/Absage/Zusage) ships via a new migration applied to the live Frankfurt project with the same MCP + advisor runbook; the chip renders in the card badge row on BOTH galleries, click opens a dropdown (never cycles), first PDF-export/copy of a saved package auto-suggests Beworben with an inline undo, and status stays editable even on read_only packages via a safe server-verified path (plain row UPDATE is RLS-blocked on read_only rows; the mechanism must not weaken the read-only contract for document content)
+  4. Plus lifecycle on /konto: cancelled-but-running state (shows the paid-until date + "Kuendigung zuruecknehmen" action) and expired state render from real subscription rows; a new un-cancel route flips Stripe cancel_at_period_end back to false and syncs the row; /kuendigen and the existing cancel flow keep working; Plus remains "Geplant"/non-buyable on every surface; the renewal-reminder email is NOT built (flagged founder gate: transactional email provider decision, PRD 6.4)
+  5. DE/EN copy is lifted VERBATIM from the three .dc.html surface decks into src/lib/i18n.tsx (documents/legal text stays German); no em-dash anywhere; new German copy flagged for native-speaker review
+  6. npx tsc --noEmit, the full test suite, and next build all pass; all new surfaces are inert when accounts/Stripe env vars are unset; the anonymous zero-retention flow, explicit-save-only, no-photos, and grounded-only guardrails are untouched
+
+**Plans**: TBD
+
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -206,6 +226,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
 | 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete    | 2026-07-07 |
+| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 0 | Planning | - |
 
 ## Backlog
 
