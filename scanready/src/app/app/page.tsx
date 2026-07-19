@@ -1,5 +1,5 @@
 'use client'
-import React, { useReducer, useState, useRef, useEffect } from 'react'
+import React, { useReducer, useState, useRef, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import type { Lebenslauf } from '@/lib/schema'
 import {
@@ -1114,6 +1114,7 @@ function ResultView({
   onRequestPass,
   jobPosting,
   cvs,
+  cvUsageCounts,
   currentCvText,
   onFirstExportOrCopy,
   statusSuggestionVisible,
@@ -1146,6 +1147,10 @@ function ResultView({
   /** Signed-in user's saved CVs, for the attach-or-new radio. Empty when signed
    * out or accounts are disabled. */
   cvs: CvRow[]
+  /** cv_id -> saved-package count (WR-01), for the attach radio's "used in N
+   * applications" line. Derived in AppShell from the same packages list
+   * refreshPassStatus already fetches. */
+  cvUsageCounts: Record<string, number>
   /** The CV text this Lebenslauf was generated from (state.resumeText) - fed
    * into bestCvMatch to preselect the attach radio. */
   currentCvText: string
@@ -1297,6 +1302,7 @@ function ResultView({
             onRequestPass={onRequestPass}
             jobPosting={jobPosting}
             cvs={cvs}
+            cvUsageCounts={cvUsageCounts}
             currentCvText={currentCvText}
           />
           {/* Status auto-suggest (08-04): inline, undoable, never a modal - fires
@@ -1413,6 +1419,7 @@ function SaveApplicationButton({
   onRequestPass,
   jobPosting,
   cvs,
+  cvUsageCounts,
   currentCvText,
 }: {
   onSave: (title: string, existingCvId?: string) => Promise<SaveResult | 'signed_out'>
@@ -1423,6 +1430,9 @@ function SaveApplicationButton({
   /** Signed-in user's saved CVs. Empty (or accounts off) renders no radio -
    * today's only historical behavior (always save-as-new). */
   cvs: CvRow[]
+  /** cv_id -> saved-package count (WR-01), for the attach radio's "used in N
+   * applications" line - same derivation KontoClient's CvSection uses. */
+  cvUsageCounts: Record<string, number>
   /** The CV text this Lebenslauf/letter was generated from - fed into
    * bestCvMatch to preselect the attach radio. */
   currentCvText: string
@@ -1579,7 +1589,11 @@ function SaveApplicationButton({
                     >
                       {cvs.map((cv) => (
                         <option key={cv.id} value={cv.id}>
-                          {cv.title} · {t.cvsAttachMeta(new Date(cv.updated_at).toLocaleDateString('de-DE'), 0)}
+                          {cv.title} ·{' '}
+                          {t.cvsAttachMeta(
+                            new Date(cv.updated_at).toLocaleDateString('de-DE'),
+                            cvUsageCounts[cv.id] ?? 0
+                          )}
                         </option>
                       ))}
                     </select>
@@ -1907,6 +1921,7 @@ function CoverLetterResultView({
   onSavePackage,
   onRequestPass,
   cvs,
+  cvUsageCounts,
   currentCvText,
   onFirstExportOrCopy,
   statusSuggestionVisible,
@@ -1933,6 +1948,9 @@ function CoverLetterResultView({
   onRequestPass: () => void
   /** Signed-in user's saved CVs, for the attach-or-new radio. */
   cvs: CvRow[]
+  /** cv_id -> saved-package count (WR-01), for the attach radio's "used in N
+   * applications" line. */
+  cvUsageCounts: Record<string, number>
   /** The CV text this application was generated from (state.resumeText). */
   currentCvText: string
   /** Status auto-suggest (08-04): AppShell's suggestBeworben, called after a
@@ -2129,6 +2147,7 @@ function CoverLetterResultView({
         onRequestPass={onRequestPass}
         jobPosting={jobPosting}
         cvs={cvs}
+        cvUsageCounts={cvUsageCounts}
         currentCvText={currentCvText}
       />
 
@@ -2290,6 +2309,18 @@ function AppShell() {
   // bestCvMatch(currentCvText, cvs) preselects "attach" when an existing CV
   // clearly matches, else "save as new" (today's only historical behavior).
   const [cvs, setCvs] = useState<CvRow[]>([])
+  // Signed-in user's saved application packages, fetched alongside cvs/passRow
+  // below. Only consumer today is cvUsageCounts (WR-01): the attach-or-new
+  // radio's per-CV "used in N applications" line, derived the same way
+  // KontoClient's CvSection derives its usageCount (group by cv_id).
+  const [packages, setPackages] = useState<ApplicationPackageRow[]>([])
+  const cvUsageCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const pkg of packages) {
+      if (pkg.cv_id) counts[pkg.cv_id] = (counts[pkg.cv_id] ?? 0) + 1
+    }
+    return counts
+  }, [packages])
 
   // Status auto-suggest (08-04): tracks the id of the package a Speichern click
   // just saved, so a first export/copy can nudge its status to 'beworben'.
@@ -2330,20 +2361,22 @@ function AppShell() {
         setPassRow(null)
         setPackageCount(0)
         setCvs([])
+        setPackages([])
       }
       return
     }
     const client = getSupabaseBrowserClient()
     const active = await getActivePass(client, user.id)
-    const [row, packages, userCvs] = await Promise.all([
+    const [row, packageRows, userCvs] = await Promise.all([
       active ? Promise.resolve(active) : getLatestPass(client, user.id),
       listPackages(client, user.id),
       listCvs(client, user.id),
     ])
     if (cancelled?.()) return
     setPassRow(row)
-    setPackageCount(packages.length)
+    setPackageCount(packageRows.length)
     setCvs(userCvs)
+    setPackages(packageRows)
   }
 
   useEffect(() => {
@@ -2864,6 +2897,7 @@ function AppShell() {
               onRequestPass={() => setPassOpen(true)}
               jobPosting={state.jobPosting}
               cvs={cvs}
+              cvUsageCounts={cvUsageCounts}
               currentCvText={state.resumeText}
               onFirstExportOrCopy={suggestBeworben}
               statusSuggestionVisible={statusSuggestionVisible}
@@ -2934,6 +2968,7 @@ function AppShell() {
               onSavePackage={(title, existingCvId) => handleSavePackage(letterText, title, existingCvId)}
               onRequestPass={() => setPassOpen(true)}
               cvs={cvs}
+              cvUsageCounts={cvUsageCounts}
               currentCvText={state.resumeText}
               onFirstExportOrCopy={suggestBeworben}
               statusSuggestionVisible={statusSuggestionVisible}
