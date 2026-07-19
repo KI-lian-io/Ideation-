@@ -2623,21 +2623,43 @@ function AppShell() {
   // doesn't repeat it. Plain window.location parsing (not next/navigation's
   // useSearchParams) so this client component doesn't need a Suspense
   // boundary just for a one-shot deep link.
+  //
+  // ?cv=<id> is the CV-reuse variant (08-03's "Neue Bewerbung mit diesem CV" /
+  // "Ansehen" kebab actions on /konto's Meine Lebenslaeufe section): it fetches
+  // that single cvs row directly (RLS cvs_select_own scopes the read to the
+  // owner, so a foreign id resolves to null and changes nothing) and dispatches
+  // SET_RESUME_TEXT with its cv_text. It deliberately leaves state.phase at
+  // 'input' rather than auto-submitting -- the user still has to click Convert,
+  // matching the explicit-action guardrail already documented on
+  // handleSavePackage (no silent auto-parse from a mere navigation).
   useEffect(() => {
     if (accountLoading || !accountsEnabled() || !user) return
     const params = new URLSearchParams(window.location.search)
     const packageId = params.get('package')
-    if (!packageId) return
+    const cvId = params.get('cv')
+    if (!packageId && !cvId) return
     const action = params.get('action')
     window.history.replaceState(null, '', window.location.pathname)
     ;(async () => {
       const client = getSupabaseBrowserClient()
-      const pkg = await getPackage(client, packageId)
-      if (!pkg) return
-      if (action === 'duplicate') {
-        await handleDuplicatePackage(pkg)
-      } else {
-        await handleLoadPackage(pkg)
+      if (packageId) {
+        const pkg = await getPackage(client, packageId)
+        if (!pkg) return
+        if (action === 'duplicate') {
+          await handleDuplicatePackage(pkg)
+        } else {
+          await handleLoadPackage(pkg)
+        }
+        return
+      }
+      const { data } = await client
+        .from('cvs')
+        .select('cv_text')
+        .eq('id', cvId as string)
+        .maybeSingle()
+      const cvText = (data as { cv_text?: string } | null)?.cv_text
+      if (typeof cvText === 'string') {
+        dispatch({ type: 'SET_RESUME_TEXT', payload: cvText })
       }
     })()
   }, [accountLoading, user])
