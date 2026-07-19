@@ -34,13 +34,32 @@ const PACKAGE_LIMIT_MESSAGE = "package_limit";
 export type ApplicationPackageRow = {
   id: string;
   user_id: string;
-  cv_id: string;
+  // Nullable since migration 0004_library_phase_b.sql re-created the FK as
+  // `on delete set null`: a package survives its CV being deleted, it just
+  // loses the live link (its own lebenslauf/anschreiben JSONB is unaffected,
+  // those are point-in-time snapshots, never a live reference).
+  cv_id: string | null;
   title: string;
   job_posting: string | null;
   answers: AnswerEntry[];
   lebenslauf: Lebenslauf;
   anschreiben: string | null;
   read_only: boolean;
+  // Nullable status enum ('entwurf' | 'beworben' | 'interview' | 'absage' |
+  // 'zusage' | null) added by migration 0004; typed here so the row shape is
+  // complete for the status feature (08-04). Not read or written by this
+  // plan's helpers.
+  status: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** A saved Lebenslauf ("cvs" table row) the signed-in user can reuse across packages. */
+export type CvRow = {
+  id: string;
+  user_id: string;
+  title: string;
+  cv_text: string;
   created_at: string;
   updated_at: string;
 };
@@ -48,6 +67,11 @@ export type ApplicationPackageRow = {
 export type SaveApplicationPackageInput = {
   cvTitle?: string;
   cvText: string;
+  // Attach path: when set, saveApplicationPackage skips the cvs insert
+  // entirely and uses this id directly as cv_id on the application_packages
+  // insert. Reuses an existing Lebenslauf instead of duplicating the CV text
+  // into a fresh cvs row (see plan 08-02).
+  existingCvId?: string;
   packageTitle?: string;
   jobPosting: string | null;
   answers: AnswerEntry[];
@@ -79,11 +103,29 @@ export function mapSaveError(error: { message?: string | null } | null | undefin
 }
 
 /**
- * Saves one application package for the signed-in user: upserts the CV text
- * as a `cvs` row, then inserts an `application_packages` row pointing at it.
- * The free/paid boundary (D4: 1 free package, 2+ needs an active
- * subscription) is enforced by the database trigger, not here -- this
- * function only translates the resulting success/limit/error into a typed
+ * Saves one application package for the signed-in user.
+ *
+ * Two branches on `input.existingCvId`:
+ * - ATTACH (existingCvId set): skips the `cvs` insert entirely and reuses the
+ *   caller-supplied id directly as `cv_id` on the application_packages
+ *   insert. This is the "attach to existing Lebenslauf" path (plan 08-02) --
+ *   it must never insert a new cvs row, and on a package-insert failure it
+ *   must NOT delete the reused cvs row (that row pre-existed the call and
+ *   may belong to other packages; deleting it here would destroy a CV the
+ *   user still needs). The only IDOR-relevant check is that `existingCvId`
+ *   can only ever be an id `listCvs` already returned to this same user (RLS
+ *   `cvs_select_own`), so the UI can never present or submit another user's
+ *   CV id (T-08-06 in this plan's threat register).
+ * - SAVE-AS-NEW (existingCvId absent, today's only historical behavior):
+ *   inserts a `cvs` row, then the `application_packages` row pointing at it.
+ *   The free/paid boundary (D4: 1 free package, 2+ needs an active
+ *   subscription) is enforced by the database trigger, not here. On a
+ *   package-insert failure, best-effort deletes the just-inserted cvs row
+ *   (the 895e03d orphan-cleanup fix) so a blocked save never leaks CV text
+ *   into an orphaned row nobody can reach. This ordering and the delete-on-
+ *   failure behavior are preserved EXACTLY as before -- do not reorder.
+ *
+ * Either branch translates the resulting success/limit/error into a typed
  * result the UI can branch on without parsing Postgres error text itself.
  */
 export async function saveApplicationPackage(
@@ -93,6 +135,29 @@ export async function saveApplicationPackage(
 ): Promise<SaveResult> {
   if (!accountsEnabled()) return { ok: false, reason: "error", message: "accounts_disabled" };
 
+  if (input.existingCvId) {
+    // ATTACH: no cvs insert, no orphan risk, no best-effort delete on failure.
+    const { data: pkg, error: pkgError } = await client
+      .from("application_packages")
+      .insert({
+        user_id: userId,
+        cv_id: input.existingCvId,
+        title: input.packageTitle ?? "Bewerbung",
+        job_posting: input.jobPosting,
+        answers: input.answers,
+        lebenslauf: input.lebenslauf,
+        anschreiben: input.anschreiben,
+      })
+      .select("id")
+      .single();
+
+    if (pkgError || !pkg) {
+      return mapSaveError(pkgError);
+    }
+    return { ok: true, packageId: pkg.id };
+  }
+
+  // SAVE-AS-NEW: unchanged from before existingCvId existed.
   const { data: cv, error: cvError } = await client
     .from("cvs")
     .insert({
@@ -172,6 +237,46 @@ export async function getPackage(
     return null;
   }
   return (data as ApplicationPackageRow | null) ?? null;
+}
+
+/**
+ * Lists the signed-in user's saved CVs (`cvs` table rows), newest first.
+ * Same shape/gate/error-handling pattern as listPackages. Consumed by the
+ * attach-or-new radio (bestCvMatch candidates) and the /konto "Meine
+ * Lebenslaeufe" section (08-03).
+ */
+export async function listCvs(client: SupabaseClient, userId: string): Promise<CvRow[]> {
+  if (!accountsEnabled()) return [];
+
+  const { data, error } = await client
+    .from("cvs")
+    .select("*")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.error("listCvs error", error.message);
+    return [];
+  }
+  return (data ?? []) as CvRow[];
+}
+
+/**
+ * Renames a saved CV. accountsEnabled()-gated no-op, same convention as
+ * updatePackageTitle. RLS's cvs_update_own policy already scopes the write
+ * to the owner; unlike application_packages there is no read_only concept
+ * on cvs rows, so this helper needs no additional client-side gating.
+ */
+export async function updateCvTitle(
+  client: SupabaseClient,
+  cvId: string,
+  title: string
+): Promise<{ ok: boolean; message?: string }> {
+  if (!accountsEnabled()) return { ok: false, message: "accounts_disabled" };
+
+  const { error } = await client.from("cvs").update({ title }).eq("id", cvId);
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
 }
 
 /** Deletes a saved application package (RLS scopes it to the owner; no-op on other users' rows). */

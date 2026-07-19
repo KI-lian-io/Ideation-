@@ -8,7 +8,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { mapSaveError, saveApplicationPackage, checkPassEntitlement, updatePackageTitle } from '../account.ts'
+import {
+  mapSaveError,
+  saveApplicationPackage,
+  checkPassEntitlement,
+  updatePackageTitle,
+  listCvs,
+  updateCvTitle,
+} from '../account.ts'
 
 test('mapSaveError: package_limit trigger message -> reason "limit"', () => {
   const result = mapSaveError({ message: 'package_limit' })
@@ -111,6 +118,158 @@ test('saveApplicationPackage: blocked (limit) save cleans up the orphaned cvs ro
     delete process.env.NEXT_PUBLIC_SUPABASE_URL
     delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   }
+})
+
+// ---------------------------------------------------------------------------
+// saveApplicationPackage: attach path (existingCvId set)
+// ---------------------------------------------------------------------------
+
+test('saveApplicationPackage: existingCvId set -> never calls cvs.insert, uses it as cv_id', async () => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+  let cvsInsertCalled = false
+  let insertedPackage: Record<string, unknown> | null = null
+
+  const fakeClient = {
+    from(table: string) {
+      if (table === 'cvs') {
+        return {
+          insert() {
+            cvsInsertCalled = true
+            return this
+          },
+          delete() {
+            return this
+          },
+          eq() {
+            return Promise.resolve({ data: null, error: null })
+          },
+        }
+      }
+      if (table === 'application_packages') {
+        return {
+          insert(payload: Record<string, unknown>) {
+            insertedPackage = payload
+            return this
+          },
+          select() {
+            return this
+          },
+          single() {
+            return Promise.resolve({ data: { id: 'pkg-attach-1' }, error: null })
+          },
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    },
+  } as unknown as SupabaseClient
+
+  try {
+    const result = await saveApplicationPackage(fakeClient, 'user-1', {
+      cvText: 'ignored on the attach path',
+      existingCvId: 'cv-existing-1',
+      jobPosting: null,
+      answers: [],
+      lebenslauf: {} as never,
+      anschreiben: null,
+    })
+
+    assert.deepEqual(result, { ok: true, packageId: 'pkg-attach-1' })
+    assert.equal(cvsInsertCalled, false)
+    assert.equal((insertedPackage as { cv_id?: string } | null)?.cv_id, 'cv-existing-1')
+  } finally {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
+})
+
+test('saveApplicationPackage: attach path limit error does NOT delete the existing cvs row', async () => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+  let cvsDeleteCalled = false
+
+  const fakeClient = {
+    from(table: string) {
+      if (table === 'cvs') {
+        return {
+          delete() {
+            cvsDeleteCalled = true
+            return this
+          },
+          eq() {
+            return Promise.resolve({ data: null, error: null })
+          },
+        }
+      }
+      if (table === 'application_packages') {
+        return {
+          insert() {
+            return this
+          },
+          select() {
+            return this
+          },
+          single() {
+            return Promise.resolve({ data: null, error: { message: 'package_limit' } })
+          },
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    },
+  } as unknown as SupabaseClient
+
+  try {
+    const result = await saveApplicationPackage(fakeClient, 'user-1', {
+      cvText: 'ignored on the attach path',
+      existingCvId: 'cv-existing-1',
+      jobPosting: null,
+      answers: [],
+      lebenslauf: {} as never,
+      anschreiben: null,
+    })
+
+    assert.deepEqual(result, { ok: false, reason: 'limit' })
+    assert.equal(cvsDeleteCalled, false)
+  } finally {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
+})
+
+// ---------------------------------------------------------------------------
+// listCvs / updateCvTitle: accountsEnabled()-gated no-ops
+// ---------------------------------------------------------------------------
+
+test('listCvs: accounts disabled -> [], never calls Supabase', async () => {
+  let called = false
+  const fakeClient = {
+    from() {
+      called = true
+      throw new Error('should not be called when accounts are disabled')
+    },
+  } as unknown as SupabaseClient
+
+  const result = await listCvs(fakeClient, 'user-1')
+
+  assert.deepEqual(result, [])
+  assert.equal(called, false)
+})
+
+test('updateCvTitle: accounts disabled -> safe no-op, never calls Supabase', async () => {
+  let called = false
+  const fakeClient = {
+    from() {
+      called = true
+      throw new Error('should not be called when accounts are disabled')
+    },
+  } as unknown as SupabaseClient
+
+  const result = await updateCvTitle(fakeClient, 'cv-1', 'New Title')
+
+  assert.deepEqual(result, { ok: false, message: 'accounts_disabled' })
+  assert.equal(called, false)
 })
 
 // ---------------------------------------------------------------------------

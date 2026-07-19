@@ -317,6 +317,15 @@ type Dict = {
   libraryEditableBadge: string
   libraryStorageFree: string
   libraryFooterContents: string
+  // CV-reuse save-flow radio (design surface 07, 1b/1c) - attach-to-existing
+  // vs save-as-new inside the save card. Copy lifted verbatim from
+  // 07-lebenslaeufe.dc.html's 1b mockup + 1c copy deck.
+  cvsAssignLabel: string
+  cvsAttachOption: string
+  cvsNewOption: string
+  cvsNewOptionHint: string
+  cvsSnapshotNote: string
+  cvsAttachMeta: (date: string, count: number) => string
   // Storage-gate chooser (design surface 02) - inline dismissible panel replacing
   // the plain state==='limit' text hint in the save rail. Copy lifted verbatim
   // from 02-storage-gate.dc.html's 1e copy deck; gatePassName/gatePlusName are
@@ -662,6 +671,14 @@ const en = {
   libraryStorageFree: '1 of 1 saved · Free',
   libraryFooterContents:
     'Your CV text, the Lebenslauf, the Anschreiben, the job posting and your answers. No photos.',
+  cvsAssignLabel: 'Assign Lebenslauf',
+  cvsAttachOption: 'Attach to an existing Lebenslauf',
+  cvsNewOption: 'Save as a new Lebenslauf',
+  cvsNewOptionHint: 'For example for a second language or specialization.',
+  cvsSnapshotNote:
+    'Applications stay snapshots: later changes to the Lebenslauf do not apply retroactively.',
+  cvsAttachMeta: (date, count) =>
+    count === 1 ? `As of ${date} · used in 1 application` : `As of ${date} · used in ${count} applications`,
   gateEyebrow: 'Storage',
   gateStorageStatus: '1 of 1 application saved.',
   gateTitle: 'Your free storage slot is taken.',
@@ -1005,6 +1022,14 @@ const de = {
   libraryStorageFree: '1 von 1 gespeichert · Kostenlos',
   libraryFooterContents:
     'Ihren CV-Text, den Lebenslauf, das Anschreiben, die Stellenanzeige und Ihre Antworten. Keine Fotos.',
+  cvsAssignLabel: 'Lebenslauf zuordnen',
+  cvsAttachOption: 'An bestehenden Lebenslauf anhängen',
+  cvsNewOption: 'Als neuen Lebenslauf speichern',
+  cvsNewOptionHint: 'Zum Beispiel für eine zweite Sprache oder Fachrichtung.',
+  cvsSnapshotNote:
+    'Bewerbungen bleiben Momentaufnahmen: spätere Änderungen am Lebenslauf wirken nicht rückwirkend.',
+  cvsAttachMeta: (date, count) =>
+    count === 1 ? `Stand ${date} · in 1 Bewerbung` : `Stand ${date} · in ${count} Bewerbungen`,
   gateEyebrow: 'Speicherplatz',
   gateStorageStatus: '1 von 1 Bewerbung gespeichert.',
   gateTitle: 'Ihr kostenloser Speicherplatz ist belegt.',
