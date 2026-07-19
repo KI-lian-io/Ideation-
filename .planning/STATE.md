@@ -127,6 +127,7 @@ None yet.
 | 260706-n4r | Fix orphaned cvs row leak in saveApplicationPackage on package limit error | 2026-07-06 | 895e03d | [260706-n4r-fix-orphaned-cvs-row-leak-in-saveapplica](./quick/260706-n4r-fix-orphaned-cvs-row-leak-in-saveapplica/) |
 | 260706-nbd | Record Stage 3 accounts E2E verification (passed 2026-07-06) in CLAUDE.md and scanready/docs/stage3-accounts.md | 2026-07-06 | 677d42f | [260706-nbd-record-stage-3-accounts-e2e-verification](./quick/260706-nbd-record-stage-3-accounts-e2e-verification/) |
 | 260717-g8q | Soft-launch readiness: fill Impressum legal data (street/email flagged for founder confirmation) + paymentsEnabled() gate hiding dead-end paid CTAs and paid AGB/Datenschutz sections when Stripe is unset | 2026-07-17 | cdb5fb4 | [260717-g8q-soft-launch-readiness-fill-impressum-leg](./quick/260717-g8q-soft-launch-readiness-fill-impressum-leg/) |
+| fast-260717 | Set founder-confirmed Impressum contact email kilian.hartmann93@gmail.com (street confirmation still open) | 2026-07-17 | 1e467b8 | (inline /gsd-fast, no directory) |
 
 ## Deferred Items
 
