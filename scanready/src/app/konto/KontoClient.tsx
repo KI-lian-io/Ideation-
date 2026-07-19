@@ -50,6 +50,7 @@ type SubscriptionRow = {
   stripe_subscription_id: string
   status: string
   current_period_end: string | null
+  cancel_at_period_end: boolean
 }
 
 export function KontoClient() {
@@ -652,12 +653,14 @@ function SubscriptionSection({ userId }: { userId: string }) {
   const [sub, setSub] = useState<SubscriptionRow | null | undefined>(undefined)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [subscribing, setSubscribing] = useState(false)
+  const [reactivating, setReactivating] = useState(false)
+  const [reactivateError, setReactivateError] = useState<string | null>(null)
 
-  useEffect(() => {
+  async function refresh() {
     const client = getSupabaseBrowserClient()
-    client
+    const { data } = await client
       .from('subscriptions')
-      .select('stripe_subscription_id,status,current_period_end')
+      .select('stripe_subscription_id,status,current_period_end,cancel_at_period_end')
       // Explicit user_id filter as defense-in-depth, matching every sibling
       // Stage 3 read in this file (listPackages, getActivePass/getLatestPass,
       // listPaketPurchases): RLS is expected to scope this already, but a
@@ -667,13 +670,20 @@ function SubscriptionSection({ userId }: { userId: string }) {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => setSub((data as SubscriptionRow | null) ?? null))
+    setSub((data as SubscriptionRow | null) ?? null)
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh()
     // Deliberately runs once per mount: userId is stable for the lifetime of
     // this page, same convention as the sibling sections' own refresh effects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const isActive = sub?.status === 'active' || sub?.status === 'trialing'
+  const isCancelling = isActive && Boolean(sub?.cancel_at_period_end)
+  const isExpired = Boolean(sub) && !isActive
 
   async function handleSubscribe() {
     setSubscribing(true)
@@ -693,11 +703,61 @@ function SubscriptionSection({ userId }: { userId: string }) {
     }
   }
 
+  // Un-cancel: mirrors handleSubscribe's fetch-then-branch shape. The
+  // subscriptions row itself is synced by the webhook on Stripe's resulting
+  // customer.subscription.updated event, so refresh() re-reads after a short
+  // beat is unnecessary here; the row-level cancel_at_period_end flip is
+  // eventually consistent, but the route only returns { ok: true } once
+  // Stripe has accepted the update, so a re-fetch on success is a fine
+  // best-effort refresh (the same accepted latency as cancel/route.ts's
+  // endsAt vs. the webhook-synced row).
+  async function handleReactivate() {
+    setReactivating(true)
+    setReactivateError(null)
+    try {
+      const res = await fetch('/api/subscription/reactivate', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        await refresh()
+        return
+      }
+      setReactivateError((data as { error?: string }).error ?? t.plusUncancelError)
+    } catch {
+      setReactivateError(t.plusUncancelError)
+    } finally {
+      setReactivating(false)
+    }
+  }
+
   return (
     <section className="flex flex-col gap-3">
       <p className={EYEBROW}>{t.kontoSubscriptionHeading}</p>
       {sub === undefined ? (
         <p className="text-muted">{t.kontoLoading}</p>
+      ) : isCancelling ? (
+        <>
+          <div className="flex items-center gap-2">
+            <p>
+              {t.plusCancelledBody(
+                sub?.current_period_end
+                  ? new Date(sub.current_period_end).toLocaleDateString('de-DE')
+                  : '–'
+              )}
+            </p>
+            <span className="shrink-0 rounded-full border border-hair px-2.5 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-slate">
+              {t.plusCancelledBadge}
+            </span>
+          </div>
+          <p className="text-sm text-muted">{t.plusCancelledDowngrade}</p>
+          <button
+            onClick={handleReactivate}
+            disabled={reactivating}
+            className={`${btnClass('secondary')} self-start`}
+          >
+            {t.plusUncancelCta}
+          </button>
+          {reactivateError && <p className="text-red-600">{reactivateError}</p>}
+        </>
       ) : isActive ? (
         <>
           <p>
@@ -709,6 +769,25 @@ function SubscriptionSection({ userId }: { userId: string }) {
           </p>
           <a href="/kuendigen" className="underline text-sm w-fit" lang="de">
             {t.kontoCancelLink}
+          </a>
+        </>
+      ) : isExpired ? (
+        // Neutral (never red/error-styled) state: an ended subscription is a
+        // normal outcome, not a failure. Plus stays non-buyable ("Geplant")
+        // here -- the only next step offered is the buyable Pass (surface 03).
+        <>
+          <div className="flex items-center gap-2">
+            <p className="text-muted">{t.plusExpiredBody}</p>
+            <span className="shrink-0 rounded-full border border-hair px-2.5 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-slate">
+              {t.plusExpiredBadge(
+                sub?.current_period_end
+                  ? new Date(sub.current_period_end).toLocaleDateString('de-DE')
+                  : '–'
+              )}
+            </span>
+          </div>
+          <a href="/preise" className="text-sm underline w-fit" lang="de">
+            {t.plusPassAlternative}
           </a>
         </>
       ) : (

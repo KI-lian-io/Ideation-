@@ -407,6 +407,14 @@ type Dict = {
   kontoSubscribeCta: string
   kontoSubscribeError: string
   kontoCancelLink: string
+  plusCancelledBadge: string
+  plusCancelledBody: (date: string) => string
+  plusCancelledDowngrade: string
+  plusUncancelCta: string
+  plusUncancelError: string
+  plusExpiredBadge: (date: string) => string
+  plusExpiredBody: string
+  plusPassAlternative: string
   kontoDangerHeading: string
   kontoDeleteAccountCta: string
   kontoDeleteAccountConfirm: string
@@ -777,6 +785,15 @@ const en = {
   kontoSubscribeCta: 'Subscribe',
   kontoSubscribeError: 'Das Abonnement ist derzeit nicht verfügbar.',
   kontoCancelLink: 'Cancel subscription',
+  plusCancelledBadge: 'Cancelled',
+  plusCancelledBody: (date) => `Runs until ${date}, no further charges after that. Nothing gets deleted.`,
+  plusCancelledDowngrade:
+    'Everything stays usable until then. After that: your most recent application stays editable, older ones stay readable, nothing gets deleted.',
+  plusUncancelCta: 'Undo cancellation',
+  plusUncancelError: 'Could not undo the cancellation. Please try again later.',
+  plusExpiredBadge: (date) => `Ended on ${date}`,
+  plusExpiredBody: 'Your applications stay saved and readable. The most recent one stays editable.',
+  plusPassAlternative: 'Or one-time: Pass, 14,99 € for 30 days',
   kontoDangerHeading: 'Danger zone',
   kontoDeleteAccountCta: 'Delete account',
   kontoDeleteAccountConfirm:
@@ -1148,6 +1165,15 @@ const de = {
   kontoSubscribeCta: 'Abonnieren',
   kontoSubscribeError: 'Das Abonnement ist derzeit nicht verfügbar.',
   kontoCancelLink: 'Abonnement kündigen',
+  plusCancelledBadge: 'Gekündigt',
+  plusCancelledBody: (date) => `Läuft bis ${date}, danach keine Abbuchung mehr. Nichts wird gelöscht.`,
+  plusCancelledDowngrade:
+    'Bis dahin bleibt alles nutzbar. Danach: neueste Bewerbung bearbeitbar, ältere lesbar, nichts wird gelöscht.',
+  plusUncancelCta: 'Kündigung zurücknehmen',
+  plusUncancelError: 'Die Kündigung konnte nicht zurückgenommen werden. Bitte später erneut versuchen.',
+  plusExpiredBadge: (date) => `Beendet am ${date}`,
+  plusExpiredBody: 'Ihre Bewerbungen bleiben gespeichert und lesbar. Die neueste bleibt bearbeitbar.',
+  plusPassAlternative: 'Oder einmalig: Pass, 14,99 € für 30 Tage',
   kontoDangerHeading: 'Gefahrenzone',
   kontoDeleteAccountCta: 'Konto löschen',
   kontoDeleteAccountConfirm:

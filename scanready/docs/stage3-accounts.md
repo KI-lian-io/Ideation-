@@ -260,3 +260,29 @@ have it reviewed together with the AGB before the subscription goes live.
 The AGB (`/agb`) and Datenschutz (`/datenschutz`) render their
 subscription/account sections only while `accountsEnabled()` is true, so
 the live legal texts always match the deployed configuration.
+
+## 9. Plus subscription lifecycle (08-05) - un-cancel shipped, reminder email NOT built
+
+`/konto` now renders three subscription card states: active, cancelled-but-
+running (paid-until date, "Kuendigung zuruecknehmen" un-cancel action via
+`POST /api/subscription/reactivate`), and a neutral (never red) expired
+state with a Pass cross-sell. `cancel_at_period_end` flows Stripe -> the
+`mapStripeSubscription` mapper -> the webhook upsert, same dual-write model
+as the existing cancel route. Plus stays non-buyable ("Geplant") on every
+surface this phase.
+
+**Deliberately NOT built (FOUNDER gate, PRD 6.4):** the 09-plus design
+deck's renewal-reminder email (item 1b: "5 days before every charge,"
+one-click cancel link, subject-line honesty about date/amount). The open
+decision is the transactional email provider (Resend, Postmark, SES, etc)
+and its env/DNS setup, which is out of scope for this phase's TypeScript-
+only changes. Shipping it later is what completes the honest-renewal story
+this lifecycle work sets up; until then, the only renewal signal a
+subscriber gets is the paid-until date already shown on the active card.
+
+**Flagged for native-speaker + legal review** alongside the rest of this
+phase's German copy (`plusCancelledBadge`, `plusCancelledBody`,
+`plusCancelledDowngrade`, `plusUncancelCta`, `plusUncancelError`,
+`plusExpiredBadge`, `plusExpiredBody`, `plusPassAlternative`) and the new
+`/api/subscription/reactivate` route's German error strings, per the
+standing founder gate this doc and `humanizer-golive.md` already track.
