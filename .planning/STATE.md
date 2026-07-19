@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Milestone complete
-stopped_at: Completed 08-04-PLAN.md
-last_updated: "2026-07-19T21:55:47.000Z"
+stopped_at: Completed 08-05-PLAN.md
+last_updated: "2026-07-19T20:07:34.000Z"
 last_activity: 2026-07-19
-last_activity_desc: Phase 8 Plan 4 complete (StatusChip status tracking on both galleries + auto-suggest 'beworben' on first export/copy of a saved package)
+last_activity_desc: Phase 8 Plan 5 complete (Plus subscription lifecycle: cancel_at_period_end + /api/subscription/reactivate un-cancel route + cancelled-but-running/expired /konto states) - phase 8 is now 5/5 plans executed, blocked only on 08-01's live schema push
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 27
-  completed_plans: 25
-  percent: 93
+  completed_plans: 26
+  percent: 96
 current_phase: 8
 current_phase_name: account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
 ---
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 
 ## Current Position
 
-v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) is in progress: Plan 01 (migration 0004, apply blocked on a paused Supabase project), Plan 02 (CV-reuse attach-or-new radio), Plan 03 (Meine Lebenslaeufe section on /konto + ?cv= deep-link bridge), and Plan 04 (per-package status chip + auto-suggest) are done; Plan 05 remains.
-Last activity: 2026-07-19 — Phase 8 Plan 4 complete (StatusChip status tracking on both galleries + auto-suggest 'beworben' on first export/copy of a saved package)
+v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) has all 5/5 plans executed: Plan 01 (migration 0004, TypeScript targets it but the live schema push is still blocked on a paused Supabase project), Plan 02 (CV-reuse attach-or-new radio), Plan 03 (Meine Lebenslaeufe section on /konto + ?cv= deep-link bridge), Plan 04 (per-package status chip + auto-suggest), and Plan 05 (Plus subscription lifecycle: cancel_at_period_end + un-cancel route + cancelled/expired /konto states) are all done. Phase 8 is otherwise complete pending only 08-01's live schema push (founder gate).
+Last activity: 2026-07-19 — Phase 8 Plan 5 complete (Plus subscription lifecycle: cancel_at_period_end + /api/subscription/reactivate un-cancel route + cancelled-but-running/expired /konto states, plus.* i18n copy)
 
-Progress: [█████████░] 93%
+Progress: [█████████░] 96%
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: [█████████░] 93%
 | Phase 08 P02 | 10min | 3 tasks | 6 files |
 | Phase 08 P03 | 12min | 2 tasks | 3 files |
 | Phase 08 P04 | 25min | 3 tasks | 6 files |
+| Phase 08 P05 | 20min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,7 @@ Recent decisions affecting current work:
 - [Phase 08-02]: cvOverlapRatio uses intersection-over-smaller-set (not Jaccard) so a shorter edit of the same CV still preselects attach; attach-path saveApplicationPackage failures never delete the reused cvs row (unlike save-as-new's 895e03d orphan-cleanup)
 - [Phase 08-03]: CV delete is a plain owner-scoped table delete with no RPC and no application_packages write; safety comes entirely from migration 0004's `on delete set null` FK. "Neue Bewerbung mit diesem CV" and "Ansehen" both resolve to the same `?cv=` bridge handler (view IS load into the tool)
 - [Phase ?]: [Phase 08-04]: hasSuggestedStatus/statusSuggestionVisible reset on a new save and on full reset
+- [Phase 08-05]: SubscriptionSection's Supabase read refactored into a refresh() function so handleReactivate can re-fetch the row after a successful un-cancel, same shape as the sibling sections' refresh() functions
 
 ### Pending Todos
 
@@ -149,6 +151,6 @@ None yet.
 
 **Resume file:** None
 
-Last session: 2026-07-19T21:55:47.000Z
-Last activity: 2026-07-19 - Completed 08-04-PLAN.md: StatusChip on both galleries (setPackageStatus RPC caller, status.* i18n, status-aware filters, auto-suggest 'beworben' on first export/copy with inline undo)
-Stopped at: Completed 08-04-PLAN.md
+Last session: 2026-07-19T20:07:34.000Z
+Last activity: 2026-07-19 - Completed 08-05-PLAN.md: Plus subscription lifecycle (cancel_at_period_end mapped through subscription.ts + webhook, /api/subscription/reactivate un-cancel route, cancelled-but-running/expired /konto states, plus.* i18n copy, renewal-reminder email flagged as an unbuilt founder gate)
+Stopped at: Completed 08-05-PLAN.md
