@@ -46,6 +46,9 @@ export type StripeSubscriptionLike = {
   current_period_end?: number | null;
   items?: { data?: Array<{ current_period_end?: number | null }> };
   metadata?: Partial<Record<string, string>>;
+  /** Stripe's own un-cancel flag: true while a cancellation is scheduled for
+   * period end but the subscription is still active. */
+  cancel_at_period_end?: boolean;
 };
 
 export type SubscriptionRow = {
@@ -57,6 +60,10 @@ export type SubscriptionRow = {
    * when absent (webhook then falls back to a profiles lookup by customer). */
   user_id: string | null;
   customer_id: string | null;
+  /** Mirrors migration 0004's subscriptions.cancel_at_period_end column
+   * (not null, default false). Undefined on the Stripe payload maps to
+   * false, same default as the DB column. */
+  cancel_at_period_end: boolean;
 };
 
 export function mapStripeSubscription(sub: StripeSubscriptionLike): SubscriptionRow {
@@ -69,5 +76,6 @@ export function mapStripeSubscription(sub: StripeSubscriptionLike): Subscription
       typeof periodEndEpoch === "number" ? new Date(periodEndEpoch * 1000).toISOString() : null,
     user_id: sub.metadata?.supabase_user_id ?? null,
     customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+    cancel_at_period_end: sub.cancel_at_period_end ?? false,
   };
 }

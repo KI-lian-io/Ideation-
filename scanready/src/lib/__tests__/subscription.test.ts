@@ -69,3 +69,18 @@ test('expanded customer object -> its id; missing metadata -> null user_id', () 
   assert.equal(row.customer_id, 'cus_expanded')
   assert.equal(row.user_id, null)
 })
+
+test('cancel_at_period_end true on the Stripe payload maps through', () => {
+  const row = mapStripeSubscription(sub({ cancel_at_period_end: true }))
+  assert.equal(row.cancel_at_period_end, true)
+})
+
+test('cancel_at_period_end false on the Stripe payload maps through', () => {
+  const row = mapStripeSubscription(sub({ cancel_at_period_end: false }))
+  assert.equal(row.cancel_at_period_end, false)
+})
+
+test('cancel_at_period_end absent on the Stripe payload defaults to false, mirroring the DB default', () => {
+  const row = mapStripeSubscription(sub())
+  assert.equal(row.cancel_at_period_end, false)
+})

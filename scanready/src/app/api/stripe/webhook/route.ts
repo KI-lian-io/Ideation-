@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
             stripe_subscription_id: row.stripe_subscription_id,
             status: row.status,
             current_period_end: row.current_period_end,
+            cancel_at_period_end: row.cancel_at_period_end,
             updated_at: new Date().toISOString(),
           },
           { onConflict: "stripe_subscription_id" }
