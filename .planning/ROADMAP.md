@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Design Pass + Vercel Deploy** - Conversion-oriented landing and tool UI, then deploy to production with all env vars and runtime pinned (completed 2026-06-23)
 - [x] **Phase 5: Distribution Operationalization** - Produce the build-in-public content plan, SEO keyword list, and paid-test spec as deliverable artifacts (completed 2026-06-24)
 - [x] **Phase 7: Account Library + Honest Pricing (design Phase A)** - Reconcile the six claude.ai/design Phase-A surfaces into the live app behind Stage 3 env gates: library card gallery, Bewerbungsphase-Pass SKU, storage gate, Pass modal, preise v2, foundation primitives + founder assets (completed 2026-07-07)
-- [ ] **Phase 8: Account Library Phase B (CV reuse + status + Plus lifecycle)** - Reconcile the three Phase-B design surfaces into the live app behind the same env gates: "Meine Lebenslaeufe" CV reuse with attach-or-new save flow, per-package status chip, and the Plus subscription lifecycle surfaces (cancelled-but-running/expired states + un-cancel route); Plus stays "Geplant" non-buyable
+- [x] **Phase 8: Account Library Phase B (CV reuse + status + Plus lifecycle)** - Reconcile the three Phase-B design surfaces into the live app behind the same env gates: "Meine Lebenslaeufe" CV reuse with attach-or-new save flow, per-package status chip, and the Plus subscription lifecycle surfaces (cancelled-but-running/expired states + un-cancel route); Plus stays "Geplant" non-buyable (completed 2026-07-21)
 
 ## Phase Details
 
@@ -212,11 +212,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. DE/EN copy is lifted VERBATIM from the three .dc.html surface decks into src/lib/i18n.tsx (documents/legal text stays German); no em-dash anywhere; new German copy flagged for native-speaker review
   6. npx tsc --noEmit, the full test suite, and next build all pass; all new surfaces are inert when accounts/Stripe env vars are unset; the anonymous zero-retention flow, explicit-save-only, no-photos, and grounded-only guardrails are untouched
 
-**Plans**: 5/5 plans executed (08-01's live schema push remains blocked on the paused Supabase project - the migration file itself is committed and this phase's later plans target that schema)
+**Plans**: 5/5 plans complete
 
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — Migration 0004 (status column + set_package_status RPC + cv_id ON DELETE SET NULL + subscriptions.cancel_at_period_end) + [BLOCKING] live schema push (Wave 1)
+- [x] 08-01-PLAN.md — Migration 0004 (status column + set_package_status RPC + cv_id ON DELETE SET NULL + subscriptions.cancel_at_period_end) + [BLOCKING] live schema push (Wave 1)
 
 **Wave 2** *(blocked on 08-01)*
 
@@ -246,7 +246,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
 | 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete    | 2026-07-07 |
-| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 5/5 | Blocked (08-01 live schema push) |  |
+| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 5/5 | Complete   | 2026-07-21 |
 
 ## Backlog
 
