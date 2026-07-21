@@ -105,3 +105,12 @@ None - no new external service configuration required. The Supabase project itse
 ---
 *Phase: 08-account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-*
 *Completed: 2026-07-20*
+
+## Self-Check: PASSED
+
+- FOUND: `.planning/phases/08-account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-/08-01-SUMMARY.md`
+- FOUND: commit `407b0fe` (Task 1: migration 0004 written)
+- FOUND: commit `b5611b3` (checkpoint: paused-project block recorded)
+- FOUND: commit `b444ab3` (Task 2 resolved: migration applied live, advisor-clean, probes recorded)
+- FOUND: commit `0b359ea` (this SUMMARY committed)
+- FOUND: commit `e499208` (STATE.md + ROADMAP.md tracking updates committed)
