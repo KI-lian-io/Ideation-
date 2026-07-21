@@ -246,7 +246,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 4. Design Pass + Vercel Deploy | 3/3 | Complete    | 2026-06-23 |
 | 5. Distribution Operationalization | 3/3 | Complete    | 2026-06-24 |
 | 7. Account Library + Honest Pricing (design Phase A) | 8/8 | Complete    | 2026-07-07 |
-| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 5/5 | Complete   | 2026-07-21 |
+| 8. Account Library Phase B (CV reuse + status + Plus lifecycle) | 5/5 | Complete    | 2026-07-21 |
 
 ## Backlog
 

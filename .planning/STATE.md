@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Milestone complete
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-07-21T00:00:00.000Z"
+stopped_at: Completed 08-01-PLAN.md (phase 8 complete)
+last_updated: "2026-07-21T08:35:14.463Z"
 last_activity: 2026-07-21
-last_activity_desc: Phase 8 Plan 1 closed out (migration 0004 live-applied to the Frankfurt project after the paused-project blocker was resolved by a founder restore; security advisor clean apart from one accepted set_package_status exception) - phase 8 is now 5/5 plans complete, no blockers remain
+last_activity_desc: Phase 8 complete
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 27
   completed_plans: 27
-  percent: 100
+  percent: 88
 current_phase: 8
 current_phase_name: account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
 ---
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 ## Current Position
 
 v1.0 milestone is feature-complete — phases 1-5 done, all 14 plans complete. The analytics funnel (Phase 6) is backlogged, not the current phase. Phase 7 (Account Library + Honest Pricing, design Phase A) is complete: all 8/8 plans shipped. Phase 8 (Account Library Phase B - CV reuse + status + Plus lifecycle) is now fully complete: all 5/5 plans executed AND verified. Plan 01 (migration 0004) closed out on 2026-07-21 after the paused-project blocker resolved: the founder restored the Frankfurt Supabase project, the async backup landed a few minutes after compute came up, and the migration applied live with a clean security advisor (one accepted, documented set_package_status exception, same pattern as delete_own_account). Plan 02 (CV-reuse attach-or-new radio), Plan 03 (Meine Lebenslaeufe section on /konto + ?cv= deep-link bridge), Plan 04 (per-package status chip + auto-suggest), and Plan 05 (Plus subscription lifecycle: cancel_at_period_end + un-cancel route + cancelled/expired /konto states) were already done. No blockers remain in Phase 8.
-Last activity: 2026-07-21 - Phase 8 Plan 1 closed out (migration 0004 live-applied + advisor-clean); phase 8 is 5/5 plans complete
+Last activity: 2026-07-21 — Phase 8 complete
 
 Progress: [██████████] 100%
 
@@ -37,7 +37,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 27
+- Total plans completed: 32
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -50,6 +50,7 @@ Progress: [██████████] 100%
 | 04 | 3 | - | - |
 | 05 | 3 | - | - |
 | 7 | 8 | - | - |
+| 8 | 5 | - | - |
 
 **Recent Trend:**
 

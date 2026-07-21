@@ -1,37 +1,26 @@
 ---
 phase: 08-account-library-phase-b-cv-reuse-meine-lebenslaeufe-package-
-verified: 2026-07-19T00:00:00Z
-status: gaps_found
-score: 5/6 must-haves verified
+verified: 2026-07-21T00:00:00Z
+status: passed
+score: 6/6 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
-gaps:
-  - truth: "Package status ships via a new migration applied to the live Frankfurt project with the same MCP + advisor runbook (SC-03, second clause)"
-    status: failed
-    reason: "Migration 0004_library_phase_b.sql is written, committed, and code-reviewed (0 blockers), and all dependent TypeScript/UI code targets its schema, but the migration has NOT been applied to the live Frankfurt Supabase project (ref thgmhbzimnjcaoqyyiyp). The project is PAUSED (free-tier auto-pause), which blocks the mcp__supabase__apply_migration + get_advisors runbook step that 08-01-PLAN.md marks as [BLOCKING]. This is an infrastructure/founder-action gap, not a code defect: the migration file itself follows the 0001-0003 idempotent + grant-hardening conventions correctly (verified by direct read), and 08-01 has no SUMMARY.md because the plan's live-apply task never completed."
-    artifacts:
-      - path: "scanready/supabase/migrations/0004_library_phase_b.sql"
-        issue: "File is correct and complete but not applied to the live project. Locally-run tests and tsc cannot detect this because they don't touch the live DB."
-      - path: "scanready/docs/stage3-accounts.md"
-        issue: "Runbook entry (line 68) documents this exact block: 'Migration 0004_library_phase_b PENDING ... BLOCKED 2026-07-17: the Frankfurt project is PAUSED ... FOUNDER ACTION: restore the project in the Supabase dashboard, then the apply + advisor + probe runbook below can run via MCP.'"
-    missing:
-      - "Founder must restore the paused Supabase project (dashboard > project > Restore)"
-      - "Then run mcp__supabase__apply_migration with the 0004 file contents against thgmhbzimnjcaoqyyiyp"
-      - "Then run mcp__supabase__get_advisors (type security) confirming zero NEW findings"
-      - "Then run the live-verification probes listed in stage3-accounts.md (status column + CHECK exist; set_package_status exists and is granted only to authenticated; cv_id FK has confdeltype = 'n' and cv_id is nullable; subscriptions.cancel_at_period_end exists)"
-human_verification:
-  - test: "After migration 0004 is applied live, do the full accounts E2E pass again (attach-vs-new save, /konto Meine Lebenslaeufe rename/delete, status chip write/read, Plus reactivate) against the real Frankfurt project, the way the 2026-07-06 Stage 3 E2E was done for 0001-0003."
-    expected: "All writes succeed against the live schema; RLS/grant behavior matches the advisor-clean expectation stated in the runbook."
-    why_human: "Requires a live, restored Supabase project and either Google OAuth or a disposable test user; cannot be exercised by static code inspection or the local test suite."
+re_verification:
+  previous_status: gaps_found
+  previous_score: 5/6
+  gaps_closed:
+    - "Package status ships via a new migration applied to the live Frankfurt project with the same MCP + advisor runbook (SC-03, second clause)"
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 8: Account Library Phase B Verification Report
 
 **Phase Goal:** The three Phase-B design surfaces (07-lebenslaeufe, 08-status, 09-plus) are reconciled into the live app behind the existing Stage 3 env gates: the save flow offers attach-to-existing-CV vs save-as-new, /konto gains a "Meine Lebenslaeufe" section with usage counts and rename/delete that never touches packages, every package card carries an editable status chip, and /konto shows the full Plus subscription lifecycle (cancelled-but-running and expired states plus a Kuendigung-zuruecknehmen route). Plus stays "Geplant" non-buyable; the renewal-reminder email stays a flagged founder gate. Everything inert until founder keys exist.
 
-**Verified:** 2026-07-19
-**Status:** gaps_found
-**Re-verification:** No, initial verification
+**Verified:** 2026-07-21
+**Status:** passed
+**Re-verification:** Yes, after gap closure (previous run 2026-07-19, status gaps_found, score 5/6)
 
 ## Goal Achievement
 
@@ -39,48 +28,46 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | SC-01: Save flow CV reuse (attach-or-new radio, >80% overlap preselect, attach reuses cvs row id with no new insert, save-as-new inserts one, packages keep snapshotting) | VERIFIED | `scanready/src/lib/account.ts:131-200` `saveApplicationPackage` has two branches on `input.existingCvId`: ATTACH skips the `cvs` insert entirely (line 138-157, no `.from("cvs").insert` call in that branch) and inserts the package with `cv_id: input.existingCvId`; SAVE-AS-NEW (line 160-199) is unchanged, inserts a `cvs` row then the package, with the 895e03d orphan-cleanup delete-on-failure preserved (line 195). `scanready/src/lib/cv-overlap.ts` provides `cvOverlapRatio`/`bestCvMatch`/`CV_ATTACH_THRESHOLD` (0.8), 10 passing tests. Radio UI wired in `page.tsx`'s `SaveApplicationButton` (08-02-SUMMARY.md task 3, commit f76eb2d) |
-| 2 | SC-02: "Meine Lebenslaeufe" on /konto with usage count, inline rename, delete that never touches packages | VERIFIED | `scanready/src/app/konto/KontoClient.tsx:458-` `CvSection` fetches `listCvs`+`listPackages` and derives `usageCount(cvId)` via `packages.filter(pkg => pkg.cv_id === cvId).length` (client-side, no live join); rename via `updateCvTitle`; delete (line 512) is `getSupabaseBrowserClient().from('cvs').delete().eq('id', cv.id)` -- only touches the `cvs` table, never `application_packages`. Safety comes from migration 0004's `ON DELETE SET NULL` FK, not from application code (matches the plan's stated design). `EmptyState` renders when the user has no CVs (line 532); whole `KontoClient` (including `CvSection`) is gated behind `accountsEnabled()` at line 61 |
-| 3 | SC-03 (code half): Nullable status column, chip on both galleries, dropdown never cycles, auto-suggest beworben with undo, editable on read_only rows via safe RPC path | VERIFIED (code only, see gap below for the migration-apply half) | `set_package_status` RPC in `0004_library_phase_b.sql`: revokes public/anon, grants only authenticated, checks `user_id = auth.uid()` server-side, updates only `status`. `scanready/src/lib/account.ts:374-387` `setPackageStatus` calls it via `.rpc(...)`; grep confirms no plain `.update({ status` write anywhere in `src/`. `StatusChip` in `ui.tsx` reused in both `page.tsx:886` and `KontoClient.tsx:290`; `statusOptions`/`statusLabelFor` present in both galleries and both galleries' filters match status label text (`page.tsx:976`, `KontoClient.tsx:367`). Auto-suggest `suggestBeworben()`/`handleUndoStatusSuggestion()` at `page.tsx:2353-2382` check the RPC result before flipping UI state (WR-02 fix confirmed in code) and undo reverts to `null`, not `'entwurf'` (WR-03 fix confirmed in code) |
-| 3b | SC-03 (infra half): "ships via a new migration applied to the live Frankfurt project with the same MCP + advisor runbook" | FAILED | See Gaps section. Migration file exists and is correct; live apply is blocked on a paused Supabase project, a founder-action item, not a code gap |
-| 4 | SC-04: Plus lifecycle (cancelled-but-running + expired states, un-cancel route, /kuendigen and cancel flow untouched, Plus stays Geplant, reminder email not built) | VERIFIED | `scanready/src/app/api/subscription/reactivate/route.ts` guard order matches `cancel/route.ts`: `enforceSameOrigin` -> `enforceRateLimit` -> `accountsEnabled()/isStripeConfigured()` 503 -> auth 401 -> RLS-scoped select -> filter `isActiveStatus(r.status) && r.cancel_at_period_end` (line 57-58) -> 404 if none -> Stripe update only, no client-side subscriptions row write. `KontoClient.tsx:686-687` derives `isCancelling`/`isExpired` from `isActive && cancel_at_period_end` and `!isActive`; expired state styled identically to active/cancelled (no red, per plan requirement). `preise/page.tsx:285-290` and `KontoClient.tsx` both keep Plus as a non-buyable "Geplant" card. `stage3-accounts.md` section 9 documents the renewal-reminder email as a deliberate, flagged founder gate (transactional provider decision, PRD 6.4) -- it is not built anywhere in the touched files |
-| 5 | SC-05: DE/EN copy lifted verbatim from the three design decks, no em-dash anywhere, new German copy flagged for native-speaker review | VERIFIED | Grep for em-dash ("—") across all 10 files this phase touched (cv-overlap.ts, account.ts, subscription.ts, i18n.tsx, reactivate/route.ts, stripe/webhook/route.ts, app/page.tsx, KontoClient.tsx, ui.tsx, migration 0004, stage3-accounts.md) returns zero matches. Each SUMMARY.md explicitly documents which German strings are lifted verbatim vs. newly authored, and each flags native-speaker review per the standing `humanizer-golive.md` gate |
-| 6 | SC-06: tsc/tests/build pass; new surfaces inert when env vars unset; anonymous/explicit-save-only/no-photos/grounded-only guardrails untouched | VERIFIED | `npx tsc --noEmit` exit 0 (re-run at verification time). `npm test` 142/142 passing (re-run at verification time). `accountsEnabled()` gates `saveApplicationPackage`, `listCvs`, `updateCvTitle`, `setPackageStatus`, the reactivate route, and the entire `KontoClient` render tree (early-return "not available yet" notice at line 61-66 when disabled). No changes found to the anonymous `/app` stateless flow's core parse/generate paths outside the opt-in save/status/CV-reuse additions |
+| 1 | SC-01: Save flow CV reuse (attach-or-new radio, >80% overlap preselect, attach reuses cvs row id with no new insert, save-as-new inserts one, packages keep snapshotting) | VERIFIED | Regression check only (no code change since last run). `scanready/src/lib/account.ts` `saveApplicationPackage` ATTACH branch skips the `cvs` insert and uses `input.existingCvId`; SAVE-AS-NEW branch inserts a `cvs` row then the package. `scanready/src/lib/cv-overlap.ts` provides `cvOverlapRatio`/`bestCvMatch`/`CV_ATTACH_THRESHOLD` (0.8). Radio UI wired in `page.tsx`'s `SaveApplicationButton`. Confirmed unchanged: `git log 49a8785..HEAD` touches only `.planning/` and `scanready/docs/stage3-accounts.md`, no `src/` files |
+| 2 | SC-02: "Meine Lebenslaeufe" on /konto with usage count, inline rename, delete that never touches packages | VERIFIED | Regression check only (no code change since last run). `KontoClient.tsx` `CvSection` derives `usageCount(cvId)` client-side from `listPackages`; delete only issues `.from('cvs').delete()`, never touches `application_packages`; package-safety now additionally guaranteed at the DB layer by migration 0004's `ON DELETE SET NULL` FK (closed this round, see truth 3) |
+| 3 | SC-03: Nullable status column ships via a new migration applied to the live Frankfurt project with the same MCP + advisor runbook; chip renders on both galleries; dropdown never cycles; auto-suggest beworben with undo; editable on read_only rows via safe RPC path | VERIFIED (code half regression + infra half newly closed) | Code half unchanged since last run (`set_package_status` RPC caller in `account.ts`, `StatusChip` in both galleries, auto-suggest/undo in `page.tsx`, all previously verified and no `src/` diff since). Infra half: `scanready/docs/stage3-accounts.md` line 68 entry (commit `b444ab3`) records `mcp__supabase__apply_migration` against project `thgmhbzimnjcaoqyyiyp` returned `success: true` on 2026-07-20, and live verification confirmed the `status` column + `application_packages_status_check` CHECK exist, `set_package_status` exists with EXECUTE granted only to `authenticated` (zero anon/PUBLIC grants), the `cv_id` FK has `confdeltype = 'n'` (SET NULL) and `cv_id` is nullable, and `subscriptions.cancel_at_period_end` exists with default `false`. Rolled-back behavioral probes (zero residue) confirmed the status CHECK accepts `'beworben'` and rejects an invalid key, and a package row survives deletion of its `cvs` row with `cv_id` set to null. Security advisors show the two pre-existing WARNs plus one new EXPECTED, documented exception (`set_package_status` flagged by the same authenticated-security-definer lint as `delete_own_account`, safe by construction: authenticated-only grant + in-body `auth.uid()` ownership check + single-column update + input validation). 08-01-SUMMARY.md corroborates with matching commit hashes (`407b0fe`, `b5611b3`, `b444ab3`) and a self-check block confirming all four commits exist |
+| 4 | SC-04: Plus lifecycle (cancelled-but-running + expired states, un-cancel route, /kuendigen and cancel flow untouched, Plus stays Geplant, reminder email not built) | VERIFIED | Regression check only (no code change since last run). `reactivate/route.ts` guard order matches `cancel/route.ts`; `KontoClient.tsx` derives `isCancelling`/`isExpired`; `preise/page.tsx` and `KontoClient.tsx` keep Plus non-buyable "Geplant"; reminder email still not built anywhere, flagged founder gate per `stage3-accounts.md` |
+| 5 | SC-05: DE/EN copy lifted verbatim, no em-dash anywhere, new German copy flagged for native-speaker review | VERIFIED | Regression check: em-dash grep across all phase-touched files (unchanged set since last run) still returns zero matches; the new stage3-accounts.md 0004-applied entry was also grepped and contains no em-dash |
+| 6 | SC-06: tsc/tests/build pass; new surfaces inert when env vars unset; anonymous/explicit-save-only/no-photos/grounded-only guardrails untouched | VERIFIED | Re-run at this verification: `npx tsc --noEmit` exit 0. `npm test` 142/142 passing. `accountsEnabled()` gating unchanged (no `src/` diff since last run) |
 
-**Score:** 5/6 truths verified (SC-01, SC-02, SC-03-code-half, SC-04, SC-05, SC-06 -- counted as 5 of the 6 numbered roadmap criteria; SC-03's live-migration clause is the one FAILED item)
+**Score:** 6/6 truths verified. The single prior gap (SC-03's live-migration clause) is closed with direct evidence from the project's canonical runbook (`stage3-accounts.md`) plus the plan's own SUMMARY and self-check block.
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `scanready/src/lib/cv-overlap.ts` | `cvOverlapRatio`, `bestCvMatch`, `CV_ATTACH_THRESHOLD` | VERIFIED | Present, exported, 10 passing tests, pure/no-I/O |
-| `scanready/src/lib/account.ts` | `existingCvId` attach path, `listCvs`, `updateCvTitle`, `setPackageStatus`, `getPackage` with userId filter | VERIFIED | All present and wired; `getPackage` confirmed to include `.eq("user_id", userId)` (WR-05 fix) |
-| `scanready/src/app/app/page.tsx` | attach-or-new radio, `?cv=` bridge, StatusChip + auto-suggest | VERIFIED | All present; `cvsAttachMeta` called with real usage-derived count (WR-01 fix confirmed at line 1600), not the hardcoded `0` the review originally flagged |
-| `scanready/src/app/konto/KontoClient.tsx` | CvSection, StatusChip wiring, cancelled/expired Plus states | VERIFIED | All present; `isActiveStatus` imported from `subscription.ts` (WR-04 fix confirmed) rather than reimplemented |
-| `scanready/src/components/ui.tsx` | `StatusChip` primitive | VERIFIED | Exported, reused in both galleries |
-| `scanready/src/app/api/subscription/reactivate/route.ts` | un-cancel POST route | VERIFIED | Exists, guard order and scoping match `cancel/route.ts` |
-| `scanready/supabase/migrations/0004_library_phase_b.sql` | status column+CHECK, `set_package_status` RPC+grant-hardening, `cv_id` nullable+ON DELETE SET NULL, `subscriptions.cancel_at_period_end` | VERIFIED (file) / FAILED (live apply) | File content correct per direct read; NOT yet applied to the live Frankfurt project |
-| `scanready/docs/stage3-accounts.md` | 0004 apply + advisor runbook entry | VERIFIED | Entry present (line 68), documents the exact PAUSED-project block and founder action needed |
+| `scanready/src/lib/cv-overlap.ts` | `cvOverlapRatio`, `bestCvMatch`, `CV_ATTACH_THRESHOLD` | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/src/lib/account.ts` | attach path, `listCvs`, `updateCvTitle`, `setPackageStatus`, `getPackage` with userId filter | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/src/app/app/page.tsx` | attach-or-new radio, `?cv=` bridge, StatusChip + auto-suggest | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/src/app/konto/KontoClient.tsx` | CvSection, StatusChip wiring, cancelled/expired Plus states | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/src/components/ui.tsx` | `StatusChip` primitive | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/src/app/api/subscription/reactivate/route.ts` | un-cancel POST route | VERIFIED | Unchanged since last run, regression-checked |
+| `scanready/supabase/migrations/0004_library_phase_b.sql` | status column+CHECK, `set_package_status` RPC+grant-hardening, `cv_id` nullable+ON DELETE SET NULL, `subscriptions.cancel_at_period_end` | VERIFIED (file + live apply) | File content correct (unchanged); live apply now confirmed via `stage3-accounts.md` line 68 entry (`success: true`, all four objects live-verified) |
+| `scanready/docs/stage3-accounts.md` | 0004 apply + advisor runbook entry | VERIFIED | Entry updated (commit `b444ab3`) from PENDING/blocked to applied, advisor-clean, with full probe results |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| SaveApplicationButton radio | `saveApplicationPackage` | `existingCvId` param | WIRED | Confirmed threaded `onSave -> handleSavePackage -> saveApplicationPackage` per 08-02-SUMMARY.md and direct read of `account.ts` |
-| StatusChip (both galleries) | `set_package_status` RPC | `setPackageStatus()` | WIRED | `account.ts:381` calls `.rpc("set_package_status", ...)`; grep confirms this is the only status-write path in `src/` |
-| CV delete (KontoClient) | migration 0004 FK | `ON DELETE SET NULL` | WIRED (file-level) | UI code only deletes from `cvs`; correctness depends on the FK actually being live, which is the open gap |
-| KontoClient un-cancel button | `/api/subscription/reactivate` | `fetch POST` + `refresh()` | WIRED | `handleReactivate` confirmed in `KontoClient.tsx`, mirrors `handleSubscribe`'s fetch-then-branch pattern |
-| webhook upsert | `subscriptions.cancel_at_period_end` | `mapStripeSubscription(...).cancel_at_period_end` | WIRED (code) / PENDING (live column) | Code writes the field; the live DB column only exists once 0004 is applied |
+| SaveApplicationButton radio | `saveApplicationPackage` | `existingCvId` param | WIRED | Regression-checked, no `src/` diff since last run |
+| StatusChip (both galleries) | `set_package_status` RPC | `setPackageStatus()` | WIRED | Regression-checked, no `src/` diff since last run |
+| CV delete (KontoClient) | migration 0004 FK | `ON DELETE SET NULL` | WIRED (now live) | UI code only deletes from `cvs`; the FK's live behavior is now confirmed by the stage3-accounts.md probe ("a package row survives deletion of its cvs row with cv_id set to null") -- this is the exact item the prior run flagged as file-level only |
+| KontoClient un-cancel button | `/api/subscription/reactivate` | `fetch POST` + `refresh()` | WIRED | Regression-checked, no `src/` diff since last run |
+| webhook upsert | `subscriptions.cancel_at_period_end` | `mapStripeSubscription(...).cancel_at_period_end` | WIRED (live) | Code writes the field; the live DB column is now confirmed present with default `false` per the stage3-accounts.md 0004 entry |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| Full test suite passes | `npm test` (run once) | 142/142 pass | PASS |
-| Typecheck passes | `npx tsc --noEmit` | exit 0 | PASS |
-| No plain status UPDATE bypassing the RPC | `grep -rn "\.update({ status" src/` | no matches | PASS |
-| No em-dash in touched files | `grep -n "—" <each touched file>` | no matches in any of 10 files | PASS |
-| Live migration apply | N/A (requires restored Supabase project) | not run | SKIP -- infra blocked, see gap |
+| Full test suite passes | `npm test` (run once, this verification) | 142/142 pass | PASS |
+| Typecheck passes | `npx tsc --noEmit` (run once, this verification) | exit 0 | PASS |
+| No `src/` file changed since last verification | `git log 49a8785..HEAD --name-only` | only `.planning/*` and `scanready/docs/stage3-accounts.md` touched | PASS |
+| Migration 0004 live apply | N/A (Supabase MCP not available to this verifier; treating `stage3-accounts.md` as the canonical runbook record per task constraints) | `mcp__supabase__apply_migration` returned `success: true`; column/RPC/FK/grant/probe results recorded in full | PASS (evidence-based, not independently re-run) |
 
 ### Requirements Coverage
 
@@ -88,7 +75,7 @@ human_verification:
 |--------------|----------------|--------------|--------|----------|
 | SC-01 | 08-02 | Save flow CV reuse | SATISFIED | See truth #1 |
 | SC-02 | 08-03 | Meine Lebenslaeufe section | SATISFIED | See truth #2 |
-| SC-03 | 08-01, 08-04 | Package status column + RPC + chip | PARTIALLY SATISFIED | Code-half SATISFIED; live-migration-apply half BLOCKED (founder action) |
+| SC-03 | 08-01, 08-04 | Package status column + RPC + chip, live migration apply | SATISFIED | See truth #3 -- both code half and live-migration half now closed |
 | SC-04 | 08-05 | Plus lifecycle | SATISFIED | See truth #4 |
 | SC-05 | all plans | i18n copy, no em-dash | SATISFIED | See truth #5 |
 | SC-06 | all plans | tsc/tests/build, env-gating, guardrails | SATISFIED | See truth #6 |
@@ -97,32 +84,34 @@ No orphaned requirements found -- all Phase 8 SCs map to at least one plan's `re
 
 ### Anti-Patterns Found
 
-None. No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any of the 10 files this phase touched (grep returned zero matches, excluding the legitimate "founder gate"/"PENDING" runbook language, which references formal follow-up work by name and is not a debt marker).
+None. No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any of the phase-touched files (regression-checked; no new files added since last run other than doc updates, which were also checked and contain none).
 
-### Code Review Cross-Check (08-REVIEW.md)
+### Gap Closure Detail (this re-verification)
 
-08-REVIEW.md reported 0 blockers, 5 warnings, 2 info findings. All 5 warnings (WR-01 through WR-05) were independently re-verified against the current source in this pass (not merely trusted from the review or SUMMARY claims):
-- WR-01 (hardcoded 0 usage count in attach dropdown) -- fix confirmed at `page.tsx:1600` (`t.cvsAttachMeta(...)` now called with a derived count, not a literal `0`)
-- WR-02 (auto-suggest/undo ignore RPC failure) -- fix confirmed at `page.tsx:2353-2382` (`result.ok` checked before flipping UI state)
-- WR-03 (undo reverts to `'entwurf'` instead of `null`) -- fix confirmed at `page.tsx:2374` (`setPackageStatus(..., null)`)
-- WR-04 (KontoClient reimplements `isActiveStatus`) -- fix confirmed at `KontoClient.tsx:30,685` (imported and used, not reimplemented)
-- WR-05 (`getPackage` missing `user_id` backstop) -- fix confirmed at `account.ts:230-242` (`.eq("user_id", userId)` present)
+The prior run's single gap was: "migration 0004's live apply to the Frankfurt Supabase project has not happened" (project was paused on the free tier). This is now closed:
 
-The 2 info-tier findings (IN-01 empty-string error message, IN-02 duplicated helpers between galleries) were left open by design per the review and are correctly non-blocking.
+1. **Founder action**: the paused Frankfurt project (`thgmhbzimnjcaoqyyiyp`) was restored via the Supabase dashboard (2026-07-20/21).
+2. **Async backup landing**: immediately after restore the database came up with platform schemas only (zero public tables, zero auth users); the orchestrator correctly waited rather than rebuilding, and the full pre-pause state (0001-0003 objects, founder auth user) returned on its own. This is recorded in both `stage3-accounts.md` and `08-01-SUMMARY.md`'s Checkpoint Resolution section, consistently.
+3. **Migration applied**: `mcp__supabase__apply_migration` against 0004's contents returned `success: true`.
+4. **Live verification**: status column + CHECK, `set_package_status` (authenticated-only grant), `cv_id` FK (`confdeltype='n'`, nullable), and `subscriptions.cancel_at_period_end` (default false) all confirmed present.
+5. **Behavioral probes** (rolled back, zero residue): CHECK constraint accepts a valid status key and rejects an invalid one; a package survives its parent CV's deletion with `cv_id` nulled.
+6. **Security advisors**: two known pre-existing WARNs plus one new EXPECTED WARN (`set_package_status`, same lint class as the already-accepted `delete_own_account` exception), documented as an accepted exception with the same justification pattern used in Phase 7.
+
+This verifier has no direct Supabase MCP access and, per task constraints, treats `scanready/docs/stage3-accounts.md` as the project's canonical runbook record for the DB layer -- the same standing this file has held for every prior migration (0001-0003, 0002_pass, 0003_pass_requires_user_fix) in this project's verification history. The record is internally consistent with `08-01-SUMMARY.md` (matching commit hashes `407b0fe`, `b5611b3`, `b444ab3`, plus a self-check block that confirms each commit exists) and with `.planning/ROADMAP.md`'s Phase 8 completion line ("completed 2026-07-21").
+
+No regressions: `git log 49a8785..HEAD` (the range since the prior verification's own commit) touches only `.planning/ROADMAP.md`, `.planning/STATE.md`, `.planning/phases/08-.../08-01-SUMMARY.md`, and `scanready/docs/stage3-accounts.md` -- zero `scanready/src/` changes, so all five previously-VERIFIED truths carry forward on regression check alone, and the full test suite (142/142) and `tsc --noEmit` (exit 0) both re-confirm clean at this verification.
 
 ### Human Verification Required
 
-1. **Live E2E after migration 0004 is applied.** Test: once the founder restores the paused Frankfurt Supabase project and the migration is applied + advisor-clean, re-run the attach-vs-new save flow, /konto CV rename/delete, status chip writes, and the Plus reactivate route against the live project (same method as the 2026-07-06 Stage 3 E2E). Expected: all writes succeed against the live schema, matching the code paths verified here. Why human: requires a live, restored Supabase project and either Google OAuth or a disposable test user session; cannot be exercised by static code inspection or the local test suite that runs against no DB at all.
+None blocking. One optional founder follow-up remains, carried forward from the prior run as a nice-to-have, not a gap:
+
+1. **Live E2E walkthrough of the new surfaces against the restored project.** Test: with the founder's own account (or a disposable test user), walk the attach-vs-new save flow, /konto CV rename/delete, status chip writes across both galleries, and the Plus reactivate route once end-to-end in the real UI against the now-live Frankfurt project, the way the 2026-07-06 Stage 3 E2E was done for 0001-0003. Expected: all writes succeed and match the code paths and DB-level probe results already confirmed here. Why human: this is a UI/UX confidence pass (does it *feel* right end-to-end through real browser interaction), not a correctness question -- the schema, RLS, grants, and constraint behavior have already been directly probed and verified at the DB layer in `stage3-accounts.md`. Optional founder follow-up before public launch, not a blocker to marking this phase passed.
 
 ### Gaps Summary
 
-One gap, and it is infrastructure/founder-gated rather than a code defect: **migration 0004's live apply to the Frankfurt Supabase project (`thgmhbzimnjcaoqyyiyp`) has not happened.** The project auto-paused on the free tier; DNS no longer resolves for the project and the runbook's `mcp__supabase__apply_migration` + `get_advisors` steps cannot run until the founder restores it in the Supabase dashboard (one click). This is exactly and only the item flagged in `scanready/docs/stage3-accounts.md` line 68 and in ROADMAP.md's own Phase 8 progress note ("08-01's live schema push remains blocked on the paused Supabase project"). All four dependent plans (08-02 through 08-05) correctly built their TypeScript/UI code against the migration's intended schema shape and their SUMMARY.md files each explicitly acknowledge this same standing block rather than claiming it resolved. No plan overstated completion; 08-01 itself has no SUMMARY.md, which is the honest signal that its live-apply task did not finish.
-
-Per the roadmap's Success Criteria, SC-03 explicitly requires the status column to ship "via a new migration applied to the live Frankfurt project" -- so this phase cannot be marked fully passed while that clause is open. Everything else (5 of 6 SCs, all code-level wiring, all guardrails, all anti-pattern/em-dash checks, the full local test suite, and the review's 5 warnings) checks out clean.
-
-**Recommended next action:** founder restores the Supabase project, then either re-run this verification (which will re-check the live-apply artifacts) or have a human execute the runbook in `stage3-accounts.md` directly and update the entry from PENDING to applied + advisor-clean.
+None. All 6 roadmap Success Criteria are verified. The prior run's one gap (SC-03's live-migration clause) is closed with direct, itemized evidence from the project's canonical Supabase runbook (`stage3-accounts.md`), cross-checked against `08-01-SUMMARY.md`'s matching commit hashes and self-check block, and against a regression check confirming zero `src/` changes since the prior verification (so nothing else could have silently broken in between). `npm test` (142/142) and `npx tsc --noEmit` (exit 0) were both re-run fresh at this verification and pass clean.
 
 ---
 
-_Verified: 2026-07-19_
+_Verified: 2026-07-21_
 _Verifier: Claude (gsd-verifier)_
