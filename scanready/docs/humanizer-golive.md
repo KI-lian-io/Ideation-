@@ -4,7 +4,12 @@ Code-complete is NOT launch-ready. Every box below must be checked before the
 Humanizer+ button ships to production traffic.
 
 ## Legal (blocking)
-- [ ] Fill real data in `src/lib/legal-data.ts` (name, address, email) — no FOUNDER_TODO left
+- [x] Fill real data in `src/lib/legal-data.ts` — no FOUNDER_TODO left (done
+      2026-07-17/20: name, city, and email kilian.hartmann93@gmail.com are
+      real and founder-confirmed). ONE residual sub-item:
+  - [ ] Confirm the street value ("Teststraße 1") is the real ladungsfähige
+        Anschrift (§5 DDG) before paid go-live; swap in the real street if it
+        is a stand-in
 - [ ] Decide VAT: Kleinunternehmerregelung (§19 UStG) → keep the vatLine; otherwise
       remove it, register for VAT/OSS, and enable Stripe Tax
 - [ ] Have Datenschutzerklärung + AGB reviewed (template text ≠ legal advice)

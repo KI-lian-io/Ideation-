@@ -70,7 +70,7 @@ Progress: [██████████] 100%
 | Phase 07 P04 | 20min | 2 tasks | 2 files |
 | Phase 07 P08 | 25min | 2 tasks | 1 files |
 | Phase 07 P05 | 25min | 3 tasks | 3 files |
-| Phase 07-account-library-honest-pricing-design-reconciliation-phase-a P06 | 25min | 3 tasks | 3 files |
+| Phase 07 P06 | 25min | 3 tasks | 3 files |
 | Phase 07 P07 | 19min | 3 tasks | 7 files |
 | Phase 08 P02 | 10min | 3 tasks | 6 files |
 | Phase 08 P03 | 12min | 2 tasks | 3 files |

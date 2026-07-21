@@ -7,3 +7,6 @@
 
 # Design-session round-trip zips (redundant with the extracted folder we commit)
 scanready/claude design files/*.zip
+
+# vercel CLI link (root deploys with Root Directory=scanready)
+.vercel
