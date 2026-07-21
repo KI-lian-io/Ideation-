@@ -1,0 +1,229 @@
+/**
+ * Behavior tests for lebenslauf-utils.ts
+ * Uses Node.js built-in test runner (node:test), no extra dependencies.
+ * Run: node --experimental-strip-types src/lib/__tests__/lebenslauf-utils.test.ts
+ */
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+
+import {
+  isLebenslaufBasicallyEmpty,
+  softFormatDate,
+  toPlainText,
+  derivePackageTitle,
+  answersToWire,
+  wireAnswersToIds,
+} from '../lebenslauf-utils.ts'
+
+// Minimal shape matching the Lebenslauf type for testing purposes
+function makeLebenslauf(overrides: {
+  fullName?: string
+  experience?: { role: string; company: string; location: null; start: null; end: null; bullets: string[] }[]
+  education?: { qualification: string; institution: string; location: null; start: null; end: null }[]
+}) {
+  return {
+    personal: {
+      fullName: overrides.fullName ?? '',
+      address: null,
+      phone: null,
+      email: null,
+      nationality: null,
+      dateOfBirth: null,
+    },
+    experience: overrides.experience ?? [],
+    education: overrides.education ?? [],
+    skills: [],
+    languages: [],
+    normGapNotes: [],
+    profil: null,
+    photoAdvice: { en: '', de: '' },
+  }
+}
+
+// Test 1: empty name → true (regardless of experience/education)
+test('returns true when fullName is empty', () => {
+  const l = makeLebenslauf({
+    fullName: '',
+    experience: [{ role: 'Engineer', company: 'Acme', location: null, start: null, end: null, bullets: [] }],
+  })
+  assert.strictEqual(isLebenslaufBasicallyEmpty(l), true)
+})
+
+// Test 2: name present but no experience and no education → true
+test('returns true when name present but no experience and no education', () => {
+  const l = makeLebenslauf({ fullName: 'Jane Doe', experience: [], education: [] })
+  assert.strictEqual(isLebenslaufBasicallyEmpty(l), true)
+})
+
+// Test 3: name + at least one experience → false
+test('returns false when name and at least one experience entry', () => {
+  const l = makeLebenslauf({
+    fullName: 'Jane Doe',
+    experience: [{ role: 'Engineer', company: 'Acme', location: null, start: null, end: null, bullets: [] }],
+  })
+  assert.strictEqual(isLebenslaufBasicallyEmpty(l), false)
+})
+
+// Test 4: name + at least one education → false
+test('returns false when name and at least one education entry', () => {
+  const l = makeLebenslauf({
+    fullName: 'Jane Doe',
+    education: [{ qualification: 'B.Sc.', institution: 'TU Berlin', location: null, start: null, end: null }],
+  })
+  assert.strictEqual(isLebenslaufBasicallyEmpty(l), false)
+})
+
+// ---------------------------------------------------------------------------
+// softFormatDate (D-11): Behavior Tests
+// ---------------------------------------------------------------------------
+
+// Test 1: ISO YYYY-MM-DD → DD.MM.YYYY
+test('softFormatDate: converts ISO date to DIN format', () => {
+  assert.strictEqual(softFormatDate('2020-09-15'), '15.09.2020')
+})
+
+// Test 2: US slash M/D/YYYY → zero-padded DD.MM.YYYY
+test('softFormatDate: converts US slash date to DIN format with zero-padding', () => {
+  assert.strictEqual(softFormatDate('9/15/2020'), '15.09.2020')
+})
+
+// Test 3: Already DD.MM.YYYY → unchanged
+test('softFormatDate: leaves already-DIN date unchanged', () => {
+  assert.strictEqual(softFormatDate('15.09.2020'), '15.09.2020')
+})
+
+// Test 4a: Natural partial date passes through unchanged
+test('softFormatDate: passes through natural partial date like "September 2020"', () => {
+  assert.strictEqual(softFormatDate('September 2020'), 'September 2020')
+})
+
+// Test 4b: Year-only passes through unchanged
+test('softFormatDate: passes through year-only partial date like "2020"', () => {
+  assert.strictEqual(softFormatDate('2020'), '2020')
+})
+
+// ---------------------------------------------------------------------------
+// toPlainText (D-04): Behavior Tests
+// ---------------------------------------------------------------------------
+
+// Test 5: toPlainText includes the full name and an experience entry's role + company,
+//         sections emitted in the given sectionOrder (personal before experience)
+test('toPlainText: includes full name and experience role and company in sectionOrder', () => {
+  const l = {
+    personal: {
+      fullName: 'Max Mustermann',
+      address: null,
+      phone: null,
+      email: null,
+      nationality: null,
+      dateOfBirth: null,
+    },
+    experience: [
+      {
+        role: 'Software Engineer',
+        company: 'Tech GmbH',
+        location: null,
+        start: null,
+        end: null,
+        bullets: [],
+      },
+    ],
+    education: [],
+    skills: [],
+    languages: [],
+    normGapNotes: [],
+    profil: null,
+    photoAdvice: { en: '', de: '' },
+  }
+  const sectionOrder = ['personal', 'experience', 'education', 'skills', 'languages']
+  const text = toPlainText(l, sectionOrder)
+  assert.ok(text.includes('Max Mustermann'), 'should include full name')
+  assert.ok(text.includes('Software Engineer'), 'should include experience role')
+  assert.ok(text.includes('Tech GmbH'), 'should include experience company')
+  // personal section should appear before experience section in output
+  assert.ok(text.indexOf('Max Mustermann') < text.indexOf('Software Engineer'), 'personal before experience')
+})
+
+// toPlainText: Kurzprofil serialization
+test('toPlainText: emits Kurzprofil between personal and experience, skips it when null', () => {
+  const base = makeLebenslauf({
+    fullName: 'Jane Doe',
+    experience: [{ role: 'Engineer', company: 'Acme', location: null, start: null, end: null, bullets: [] }],
+  })
+  const order = ['personal', 'profil', 'experience', 'education', 'skills', 'languages']
+
+  const withProfil = { ...base, profil: 'Operations-Managerin mit 8 Jahren Erfahrung.' }
+  const text = toPlainText(withProfil, order)
+  assert.ok(text.includes('Kurzprofil\nOperations-Managerin mit 8 Jahren Erfahrung.'), 'profil section emitted with heading')
+  assert.ok(text.indexOf('Jane Doe') < text.indexOf('Kurzprofil'), 'profil after personal')
+  assert.ok(text.indexOf('Kurzprofil') < text.indexOf('Engineer'), 'profil before experience')
+
+  const withoutProfil = toPlainText(base, order)
+  assert.ok(!withoutProfil.includes('Kurzprofil'), 'no empty Kurzprofil heading when profil is null')
+})
+
+// ---------------------------------------------------------------------------
+// Stage 3 accounts: derivePackageTitle / answersToWire / wireAnswersToIds
+// ---------------------------------------------------------------------------
+
+test('derivePackageTitle: falls back to Bewerbung when there is no posting', () => {
+  assert.equal(derivePackageTitle(null), 'Bewerbung')
+  assert.equal(derivePackageTitle(undefined), 'Bewerbung')
+  assert.equal(derivePackageTitle(''), 'Bewerbung')
+  assert.equal(derivePackageTitle('   \n  '), 'Bewerbung')
+})
+
+test('derivePackageTitle: uses the first non-empty line', () => {
+  assert.equal(derivePackageTitle('\n\nSoftware Engineer (m/w/d)\nAcme GmbH'), 'Software Engineer (m/w/d)')
+})
+
+test('derivePackageTitle: truncates long first lines to ~60 chars with an ellipsis', () => {
+  const long = 'A'.repeat(80)
+  const title = derivePackageTitle(long)
+  assert.ok(title.length <= 61, 'truncated title stays near 60 chars')
+  assert.ok(title.endsWith('…'), 'truncated title ends with an ellipsis')
+})
+
+const QUESTIONS = [
+  { id: 'achievement', en: 'Describe an achievement.' },
+  { id: 'why-company', en: 'Why this company?' },
+]
+
+test('answersToWire: maps id-answers to {question, answer} and drops empty answers', () => {
+  const wire = answersToWire(
+    [
+      { id: 'achievement', answer: 'Shipped X' },
+      { id: 'why-company', answer: '   ' },
+    ],
+    QUESTIONS
+  )
+  assert.deepEqual(wire, [{ question: 'Describe an achievement.', answer: 'Shipped X' }])
+})
+
+test('wireAnswersToIds: maps stored wire answers back to ids by English question text', () => {
+  const ids = wireAnswersToIds([{ question: 'Why this company?', answer: 'Great culture' }], QUESTIONS)
+  assert.deepEqual(ids, [
+    { id: 'achievement', answer: '' },
+    { id: 'why-company', answer: 'Great culture' },
+  ])
+})
+
+test('wireAnswersToIds: drops unmatched stored answers (question no longer applies)', () => {
+  const ids = wireAnswersToIds(
+    [{ question: 'A question that no longer exists', answer: 'orphaned' }],
+    QUESTIONS
+  )
+  assert.deepEqual(ids, [
+    { id: 'achievement', answer: '' },
+    { id: 'why-company', answer: '' },
+  ])
+})
+
+test('answersToWire then wireAnswersToIds round-trips non-empty answers', () => {
+  const original = [
+    { id: 'achievement', answer: 'Shipped X' },
+    { id: 'why-company', answer: 'Great culture' },
+  ]
+  const roundTripped = wireAnswersToIds(answersToWire(original, QUESTIONS), QUESTIONS)
+  assert.deepEqual(roundTripped, original)
+})

@@ -1,0 +1,12 @@
+
+# GSD researcher web-fetch cache (not source)
+.planning/research/.cache/
+
+# macOS noise
+.DS_Store
+
+# Design-session round-trip zips (redundant with the extracted folder we commit)
+scanready/claude design files/*.zip
+
+# vercel CLI link (root deploys with Root Directory=scanready)
+.vercel

@@ -1,0 +1,98 @@
+:root {
+  /* ── Motion — the scan is the brand ─────────────────────────
+     Micro-interactions stay on --ease-standard / --dur-fast (see shadows.css).
+     Everything below is the SANCTIONED signature motion set — the only
+     infinite loops allowed in the system. */
+  --ease-scan: cubic-bezier(0.23, 1, 0.32, 1);   /* @kind other — decisive sweep, long settle */
+  --dur-scan: 4.5s;        /* @kind other — hero document scan loop */
+  --dur-scan-parse: 2.2s;  /* @kind other — parsing/skeleton scan (faster = working) */
+  --dur-scan-stream: 3.4s; /* @kind other — letter-streaming scan */
+  --dur-convert: 11s;      /* @kind other — full EN→DE convert cycle */
+  --dur-ticker: 36s;       /* @kind other — norm ticker marquee (30s on mobile) */
+  --dur-caret: 1s;         /* @kind other — streaming caret blink */
+  --dur-pulse: 1.4s;       /* @kind other — live-status dot pulse */
+
+  /* Scan-sweep colors — green light passing over paper */
+  --scan-tint: rgba(10, 125, 99, 0.08);          /* @kind color — sweep gradient, resting */
+  --scan-tint-strong: rgba(10, 125, 99, 0.10);   /* @kind color — sweep gradient, working */
+  --scan-rule: rgba(10, 125, 99, 0.45);          /* @kind color — sweep leading rule, resting */
+  --scan-rule-strong: rgba(10, 125, 99, 0.55);   /* @kind color — sweep leading rule, working */
+
+  /* Ghost folio numeral — oversized section number sunk into the band */
+  --ink-ghost: rgba(27, 36, 48, 0.045);          /* @kind color */
+}
+
+/* ── Signature keyframes ─────────────────────────────────────── */
+
+/* One-way scan: sweeps down, rests, restarts. Parsing, streaming, hero theater. */
+@keyframes sr-scan {
+  0% { transform: translateY(-120%); }
+  55% { transform: translateY(340%); }
+  100% { transform: translateY(340%); }
+}
+
+/* Scan synced to the 11s convert cycle: holds off-screen while the EN
+   document shows, sweeps once, rests while the DE document holds. */
+@keyframes sr-scan-cycle {
+  0%, 26% { transform: translateY(-130%); }
+  48% { transform: translateY(380%); }
+  100% { transform: translateY(380%); }
+}
+
+/* Convert cycle — EN source overlay: visible first, gone after the sweep. */
+@keyframes sr-en-out {
+  0%, 30% { opacity: 1; }
+  40%, 92% { opacity: 0; }
+  99%, 100% { opacity: 1; }
+}
+
+/* Convert cycle — DE typeset layer settles in behind the sweep. */
+@keyframes sr-de-in {
+  0%, 32% { opacity: 0; transform: translateX(12px); }
+  44%, 92% { opacity: 1; transform: translateX(0); }
+  99%, 100% { opacity: 0; transform: translateX(12px); }
+}
+
+/* Convert cycle — margin annotations fade in after the document (stagger
+   with animation-delay: 0.25s steps). */
+@keyframes sr-note-in {
+  0%, 42% { opacity: 0; transform: translateY(6px); }
+  52%, 92% { opacity: 1; transform: translateY(0); }
+  99%, 100% { opacity: 0; transform: translateY(6px); }
+}
+
+/* Convert cycle — the DIN date snaps in with a small overshoot. */
+@keyframes sr-date-pop {
+  0%, 42% { opacity: 0; transform: scale(0.9); }
+  48% { opacity: 1; transform: scale(1.08); }
+  53%, 92% { opacity: 1; transform: scale(1); }
+  99%, 100% { opacity: 0; }
+}
+
+/* Norm ticker marquee — content rendered twice, track slides half. */
+@keyframes sr-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Streaming caret — hard step blink, no fade. */
+@keyframes sr-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Live-status dot. */
+@keyframes sr-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ── Accessibility ───────────────────────────────────────────
+   The signature set is decorative; it must never be the only signal.
+   Under reduced motion every loop freezes on its resting frame. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Marketing landing" description="ScanReady marketing page — hero with document mockup, features, signature band, pricing, footer" -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: var(--canvas); }
+  a { text-decoration: none; }
+  .sr-navlink:hover { color: var(--ink) !important; }
+</style>
+</helmet>
+
+<div style="background: var(--canvas); min-height: 100vh; font-family: var(--font-sans);">
+
+  <!-- Nav -->
+  <header style="position: sticky; top: 0; z-index: 10; background: rgba(251,250,247,0.85); backdrop-filter: blur(8px); border-bottom: 1px solid var(--hairline);">
+    <div style="max-width: var(--container-marketing); margin: 0 auto; padding: 0 var(--gutter); height: 64px; display: flex; align-items: center; justify-content: space-between;">
+      <img src="../../assets/logo/scanready-lockup.svg" height="24" alt="ScanReady" />
+      <nav style="display: flex; gap: 28px;">
+        <a class="sr-navlink" href="#how" style="font-size: 14px; color: var(--steel);">How it works</a>
+        <a class="sr-navlink" href="#pricing" style="font-size: 14px; color: var(--steel);">Pricing</a>
+        <a class="sr-navlink" href="#privacy" style="font-size: 14px; color: var(--steel);">Privacy</a>
+      </nav>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a class="sr-navlink" href="#" style="font-size: 14px; font-weight: 500; color: var(--ink);">Sign in</a>
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="primary" size="sm" hint-size="120px,36px">Convert your CV</x-import>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section style="border-bottom: 1px solid var(--hairline);">
+    <div style="max-width: var(--container-marketing); margin: 0 auto; padding: var(--space-hero) var(--gutter) var(--space-section); display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 64px; align-items: center;">
+      <div>
+        <div style="margin-bottom: 20px;">
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="320px,16px">For internationals applying in Germany</x-import>
+        </div>
+        <h1 style="font-family: var(--font-serif); font-size: var(--fs-hero-display); font-weight: 600; line-height: var(--lh-hero-display); letter-spacing: var(--ls-hero-display); color: var(--ink); margin: 0; max-width: 12ch;">Win the 8-second German recruiter scan.</h1>
+        <p style="font-size: var(--fs-subtitle); line-height: var(--lh-subtitle); color: var(--steel); margin: 24px 0 0; max-width: 46ch;">Paste your CV. ScanReady rewrites it into the German Lebenslauf and Anschreiben a recruiter expects — DIN-formatted, in your voice, ready to send.</p>
+        <div style="display: flex; gap: 12px; margin-top: 32px;">
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" size="lg" hint-size="220px,48px">Convert your CV — it's free</x-import>
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" size="lg" hint-size="140px,48px">See an example</x-import>
+        </div>
+        <div style="display: flex; gap: 24px; margin-top: 28px; font-size: var(--fs-body-sm); color: var(--stone);">
+          <span>Zero-retention</span>
+          <span>No account needed</span>
+          <span>DIN 5008</span>
+        </div>
+      </div>
+
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.DocumentMockup" kicker="Generated · Lebenslauf" title="Max Mustermann" hint-size="100%,300px">
+        <div style="color: var(--steel); font-family: var(--font-sans); font-size: var(--fs-body-sm); margin-bottom: 12px;">Senior Product Manager · Berlin · max@example.de</div>
+        <div style="font-family: var(--font-mono); font-size: var(--fs-eyebrow); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--eyebrow); margin-bottom: 8px;">Berufserfahrung</div>
+        Jan. 2021 – heute · Acme GmbH<br />
+        Produktstrategie und Roadmap für ein Team von zwölf Personen; Umsatz um 40&nbsp;% gesteigert.<br /><br />
+        2018 – 2020 · Beispiel AG<br />
+        Einführung eines neuen Onboarding-Flows; Aktivierung um 22&nbsp;% verbessert.
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.NormNote" hint-size="100%,44px">Date reformatted to DIN standard (Jan. 2021); "Present" → "heute".</x-import>
+      </x-import>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="how" style="max-width: var(--container-marketing); margin: 0 auto; padding: var(--space-section) var(--gutter);">
+    <div style="margin-bottom: 8px;">
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="120px,16px">How it works</x-import>
+    </div>
+    <h2 style="font-family: var(--font-serif); font-size: var(--fs-h2); font-weight: 600; line-height: var(--lh-h2); color: var(--ink); margin: 0; max-width: 18ch;">Three steps from foreign CV to German-ready application.</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;">
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Card" variant="feature" hint-size="100%,200px">
+        <div style="font-family: var(--font-serif); font-size: var(--fs-h2); color: var(--accent); line-height: 1; margin-bottom: 16px;">1</div>
+        <div style="font-size: var(--fs-h4); font-weight: 600; color: var(--ink); margin-bottom: 8px;">Paste your CV</div>
+        <p style="margin: 0; font-size: var(--fs-body-md); line-height: var(--lh-body-md); color: var(--steel);">Drop in your existing résumé and the job posting. Any language, any format.</p>
+      </x-import>
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Card" variant="feature" hint-size="100%,200px">
+        <div style="font-family: var(--font-serif); font-size: var(--fs-h2); color: var(--accent); line-height: 1; margin-bottom: 16px;">2</div>
+        <div style="font-size: var(--fs-h4); font-weight: 600; color: var(--ink); margin-bottom: 8px;">We normalize it</div>
+        <p style="margin: 0; font-size: var(--fs-body-md); line-height: var(--lh-body-md); color: var(--steel);">Dates, sections, and tone reflow to the German Lebenslauf norm — every change annotated.</p>
+      </x-import>
+      <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Card" variant="feature" hint-size="100%,200px">
+        <div style="font-family: var(--font-serif); font-size: var(--fs-h2); color: var(--accent); line-height: 1; margin-bottom: 16px;">3</div>
+        <div style="font-size: var(--fs-h4); font-weight: 600; color: var(--ink); margin-bottom: 8px;">Send with confidence</div>
+        <p style="margin: 0; font-size: var(--fs-body-md); line-height: var(--lh-body-md); color: var(--steel);">Export a print-clean PDF plus a matching Anschreiben, tuned to the posting.</p>
+      </x-import>
+    </div>
+  </section>
+
+  <!-- Signature band -->
+  <section id="privacy" style="max-width: var(--container-marketing); margin: 0 auto; padding: 0 var(--gutter) var(--space-section);">
+    <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.SignatureBand" eyebrow="Privacy" title="Zero-retention, by design." hint-size="100%,260px">Nothing is stored. Processing is stateless. What you paste stays between you and your application.</x-import>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" style="background: var(--surface-soft); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);">
+    <div style="max-width: var(--container-marketing); margin: 0 auto; padding: var(--space-section) var(--gutter); text-align: center;">
+      <div style="margin-bottom: 8px;">
+        <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="80px,16px">Pricing</x-import>
+      </div>
+      <h2 style="font-family: var(--font-serif); font-size: var(--fs-h2); font-weight: 600; color: var(--ink); margin: 0;">Free to convert. Pay only to go unlimited.</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 48px auto 0; text-align: left;">
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-lg); background: var(--canvas); border-radius: var(--radius-lg); padding: var(--space-xxl); border: 1px solid var(--hairline);">
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="80px,16px">Free</x-import>
+          <div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-serif); font-size: var(--fs-display-lg); font-weight: 600; line-height: 1; letter-spacing: var(--ls-display-lg); color: var(--ink);">€0</span></div>
+          <p style="margin: 0; font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--slate);">For a single application you want to get right.</p>
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="100%,40px" style="width:100%">Start free</x-import>
+          <div style="display: flex; flex-direction: column; gap: var(--space-sm); font-size: var(--fs-body-sm); color: var(--charcoal);">
+            <div>1 Lebenslauf conversion</div>
+            <div>DIN 5008 formatting</div>
+            <div>Norm-note annotations</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-lg); background: var(--canvas); border-radius: var(--radius-lg); padding: var(--space-xxl); border: 2px solid var(--accent); box-shadow: var(--shadow-brand-glow);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Eyebrow" hint-size="60px,16px">Pro</x-import>
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Badge" tone="discount" hint-size="60px,22px">Popular</x-import>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-serif); font-size: var(--fs-display-lg); font-weight: 600; line-height: 1; letter-spacing: var(--ls-display-lg); color: var(--ink);">€9</span><span style="font-size: var(--fs-body-sm); color: var(--steel);">/mo</span></div>
+          <p style="margin: 0; font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--slate);">For an active job search across Germany.</p>
+          <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" hint-size="100%,40px" style="width:100%">Go Pro</x-import>
+          <div style="display: flex; flex-direction: column; gap: var(--space-sm); font-size: var(--fs-body-sm); color: var(--charcoal);">
+            <div>Unlimited conversions</div>
+            <div>Anschreiben generator</div>
+            <div>Tone tuned to each posting</div>
+            <div>Zero-retention</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: var(--canvas);">
+    <div style="max-width: var(--container-marketing); margin: 0 auto; padding: var(--space-section) var(--gutter); display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 32px;">
+      <div>
+        <img src="../../assets/logo/scanready-lockup.svg" height="24" alt="ScanReady" />
+        <p style="font-size: var(--fs-body-sm); color: var(--steel); margin-top: 16px; max-width: 30ch;">The German Lebenslauf a recruiter expects — generated from the CV you already have.</p>
+      </div>
+      <div>
+        <div style="font-size: var(--fs-body-sm); font-weight: 500; color: var(--ink); margin-bottom: 14px;">Product</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">How it works</a>
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">Pricing</a>
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">Examples</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: var(--fs-body-sm); font-weight: 500; color: var(--ink); margin-bottom: 14px;">Company</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">Privacy</a>
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">Imprint</a>
+          <a class="sr-navlink" href="#" style="font-size: var(--fs-body-sm); color: var(--steel);">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top: 1px solid var(--hairline);">
+      <div style="max-width: var(--container-marketing); margin: 0 auto; padding: 20px var(--gutter); display: flex; justify-content: space-between; font-size: var(--fs-caption); color: var(--stone);">
+        <span>© 2026 ScanReady</span>
+        <span>Made for applying in Germany</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+</body>
+</html>

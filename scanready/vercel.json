@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/app/api/cover-letter/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/parse/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

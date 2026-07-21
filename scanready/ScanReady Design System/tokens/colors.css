@@ -1,0 +1,64 @@
+:root {
+  /* ── Brand & accent ───────────────────────────── */
+  --primary: #1b2430;        /* navy ink — dominant button fill, headlines */
+  --on-primary: #ffffff;
+
+  /* The single brand accent — deep editorial green (Starbucks-disciplined). */
+  --accent: #0a7d63;         /* emphasis CTA, focus ring, active dot, doc check */
+  --accent-deep: #0b6e58;    /* pressed / hover-tint of accent */
+  --accent-soft: #d2e9e1;    /* skill-chip + success fill */
+  --accent-tint: #eef6f2;    /* norm-note / annotation wash */
+
+  /* Legacy aliases — old --accent-mint* names now resolve to green. */
+  --accent-mint: var(--accent);
+  --accent-mint-deep: var(--accent-deep);
+  --accent-mint-soft: var(--accent-soft);
+
+  --eyebrow: #9a8b72;        /* taupe — mono uppercase micro-label only */
+
+  /* ── Functional (secondary) colors ────────────── */
+  --brand-tag: #3772cf;      /* tag-blue */
+  --brand-warn: #b9791a;     /* warn-amber */
+  --brand-error: #c0503c;    /* error-terracotta + the required asterisk */
+
+  /* ── Signature dark band ──────────────────────── */
+  --band-from: #1b2430;
+  --band-to: #234038;        /* faint deep-teal lean for the navy color-block */
+
+  /* ── Surfaces ─────────────────────────────────── */
+  --canvas: #fbfaf7;         /* warm near-white — page + card fill */
+  --canvas-dark: #1b2430;
+  --surface: #f0eee9;        /* paper — bands, feature panels */
+  --surface-soft: #f7f6f2;
+
+  /* ── Hairlines (warm translucent navy) ────────── */
+  --hairline: rgba(27, 36, 48, 0.12);
+  --hairline-soft: rgba(27, 36, 48, 0.08);
+  --hairline-dark: rgba(255, 255, 255, 0.10);
+
+  /* ── Text ─────────────────────────────────────── */
+  --ink: #1b2430;            /* headlines, primary text */
+  --ink-soft: #2a3340;       /* annotation / norm-note body */
+  --charcoal: #2a3340;       /* body, inline-code fg */
+  --slate: #4a5160;          /* secondary text */
+  --steel: #6f6960;          /* body / tertiary, nav, footer links (warm) */
+  --body: #6f6960;           /* alias — documentation body grey */
+  --stone: #8a857c;          /* captions */
+  --muted: #a8a39a;          /* disabled / de-emphasized */
+  --on-dark: #ffffff;
+  --on-dark-soft: rgba(255, 255, 255, 0.72);
+  --on-dark-muted: #c9c4ba;
+
+  /* ── Semantic surface aliases ─────────────────── */
+  --surface-page: var(--surface);
+  --surface-card: var(--canvas);
+  --surface-panel: var(--surface);
+  --text-heading: var(--ink);
+  --text-body: var(--steel);
+  --text-secondary: var(--slate);
+  --text-tertiary: var(--steel);
+  --text-caption: var(--stone);
+  --border-default: var(--hairline);
+  --border-soft: var(--hairline-soft);
+  --focus-ring: var(--accent);
+}

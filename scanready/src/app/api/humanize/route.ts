@@ -1,0 +1,220 @@
+import { NextRequest, NextResponse } from "next/server";
+import { anthropic, GENERATION_MODEL } from "@/lib/anthropic";
+import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { checkHumanizerEntitlement, type EntitlementCheck } from "@/lib/humanizer";
+import { checkPassEntitlement, getActivePass } from "@/lib/account";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { accountsEnabled } from "@/lib/supabase/config";
+import {
+  HUMANIZER_SYSTEM,
+  HUMANIZER_DIRECTIONS,
+  buildHumanizerUser,
+  type HumanizerDirection,
+} from "@/lib/prompts";
+import { enforceRateLimit, enforceSameOrigin, sentinelVerdict, INVALID_INPUT_SENTINEL, readJsonObject } from "@/lib/abuse-guards";
+
+export const runtime = "nodejs";
+export const maxDuration = 300;
+
+type EntitlementReason = Extract<EntitlementCheck, { ok: false }>["reason"];
+
+/**
+ * POST /api/humanize
+ *   { letterText: string, direction: 'formeller'|'moderner'|'praegnanter', paymentIntentId?: string }
+ * Two ways to earn one refinement: (a) the original anonymous PI-first path
+ * (a paid, unconsumed Humanizer+/Paket PaymentIntent, unchanged below), or
+ * (b) a signed-in account holder with a live Bewerbungsphase-Pass window
+ * (07-CONTEXT.md A1) - checked only as a fallback when (a) does not already
+ * grant, and only for a signed-in caller, so anonymous behavior is
+ * unaffected. paymentIntentId is therefore optional: a Pass holder can omit
+ * it entirely. Path (a) still marks its PI consumed only after a complete
+ * stream so failures are retryable; path (b) never marks any PI consumed - a
+ * live Pass grants unlimited refinements for its whole window, not a
+ * single-use token (T-07-03-06). If the client disconnects mid-stream,
+ * `cancel()` aborts the Anthropic stream so the for-await throws and any
+ * verified PI is left unconsumed (retryable) instead of being marked spent.
+ */
+export async function POST(req: NextRequest) {
+  const originBlock = enforceSameOrigin(req);
+  if (originBlock) return originBlock;
+  const rateBlock = await enforceRateLimit(req, "humanize");
+  if (rateBlock) return rateBlock;
+
+  const reqBody = await readJsonObject(req);
+  const letterText = reqBody?.letterText;
+  const direction = reqBody?.direction;
+  const paymentIntentIdRaw = reqBody?.paymentIntentId;
+  const paymentIntentIdValid =
+    paymentIntentIdRaw === undefined || typeof paymentIntentIdRaw === "string";
+
+  if (!letterText || typeof letterText !== "string" || !paymentIntentIdValid || typeof direction !== "string" || !Object.prototype.hasOwnProperty.call(HUMANIZER_DIRECTIONS, direction)) {
+    return NextResponse.json(
+      { error: "letterText, direction und paymentIntentId sind erforderlich." },
+      { status: 400 }
+    );
+  }
+  const paymentIntentId = typeof paymentIntentIdRaw === "string" ? paymentIntentIdRaw : undefined;
+
+  const LETTER_LIMIT = 10_000;
+  if (letterText.length > LETTER_LIMIT) {
+    return NextResponse.json(
+      { error: "Das Anschreiben ist zu lang (max. 10.000 Zeichen)." },
+      { status: 400 }
+    );
+  }
+
+  // Path (a): PI-first path, byte-for-byte the original anonymous flow. Only
+  // entered when a paymentIntentId was actually sent.
+  let entitlementGranted = false;
+  let entitlementKind: "humanizer" | "paket" | null = null;
+  let entitlementReason: EntitlementReason = "not_paid";
+  let verifiedPaymentIntentId: string | null = null;
+
+  if (paymentIntentId) {
+    if (!isStripeConfigured()) {
+      return NextResponse.json(
+        { error: "Zahlungen sind derzeit nicht verfügbar." },
+        { status: 503 }
+      );
+    }
+    let pi;
+    try {
+      pi = await getStripe().paymentIntents.retrieve(paymentIntentId);
+    } catch {
+      return NextResponse.json(
+        { error: "Zahlung konnte nicht überprüft werden. Bitte erneut versuchen." },
+        { status: 502 }
+      );
+    }
+    // Accepts both PI kinds: a standalone Humanizer+ purchase, or a
+    // Bewerbungspaket whose included refinement is still unused (spec D3).
+    const result = checkHumanizerEntitlement(pi);
+    if (result.ok) {
+      entitlementGranted = true;
+      entitlementKind = result.kind;
+      verifiedPaymentIntentId = paymentIntentId;
+    } else {
+      entitlementReason = result.reason;
+    }
+  }
+
+  // Path (b): signed-in Pass fallback. Only runs when path (a) did not
+  // already grant. Anonymous callers have no session, so they never reach
+  // this branch, and the PI-first path above stays their only path.
+  let grantedByPass = false;
+  if (!entitlementGranted && accountsEnabled()) {
+    const supabase = await getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const pass = await getActivePass(supabase, user.id);
+      grantedByPass = checkPassEntitlement(pass);
+    }
+  }
+
+  if (!entitlementGranted && !grantedByPass) {
+    const messages: Record<EntitlementReason, string> = {
+      not_paid: "Die Zahlung ist noch nicht abgeschlossen.",
+      consumed: "Diese Zahlung wurde bereits eingelöst.",
+      wrong_feature: "Ungültige Zahlungsreferenz.",
+    };
+    // reason is machine-readable: the client uses 'consumed' to fall back from
+    // a spent paket refinement to the normal payment step.
+    return NextResponse.json(
+      { error: messages[entitlementReason], reason: entitlementReason },
+      { status: 402 }
+    );
+  }
+
+  const stream = anthropic.messages.stream({
+    model: GENERATION_MODEL,
+    max_tokens: 4000,
+    thinking: { type: "adaptive" },
+    system: HUMANIZER_SYSTEM,
+    messages: [
+      { role: "user", content: buildHumanizerUser(letterText, direction as HumanizerDirection) },
+    ],
+  });
+
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      let buffer = "";
+      let gate: "pending" | "clean" | "sentinel" = "pending";
+      try {
+        for await (const event of stream) {
+          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(event.delta.text));
+              continue;
+            }
+            buffer += event.delta.text;
+            gate = sentinelVerdict(buffer, false);
+            if (gate === "sentinel") {
+              // Injection/garbage input: stop paying for tokens and pass the sentinel
+              // through as the (whole) response body: the client recognizes it and
+              // shows a specific German error. No controller.error: that produced an
+              // opaque "failed to pipe response" 500. This return is BEFORE the
+              // consume-mark below: any verified PI stays redeemable, same as any
+              // other failed-refinement path.
+              stream.controller.abort();
+              controller.enqueue(encoder.encode(INVALID_INPUT_SENTINEL));
+              controller.close();
+              return;
+            }
+            if (gate === "clean") {
+              controller.enqueue(encoder.encode(buffer));
+              buffer = "";
+            }
+          }
+        }
+        if (gate === "pending" && sentinelVerdict(buffer, true) === "clean" && buffer) {
+          controller.enqueue(encoder.encode(buffer)); // stream ended shorter than sentinel
+        }
+      } catch (err) {
+        console.error("humanize stream error", err); // never letter content
+        try {
+          controller.error(err);
+        } catch {
+          // stream already cancelled by the client: nothing to signal
+        }
+        return; // any verified PI stays unconsumed → client may retry
+      }
+      if (req.signal.aborted) {
+        // Disconnect raced with natural stream completion: the client never
+        // received the full letter, so leave any verified PI redeemable.
+        return;
+      }
+      // Mark the entitlement spent only after a full successful stream, and
+      // only when path (a) granted it: a Pass grant (path b) is a standing
+      // window, never a single-use token, so it must never touch PI
+      // metadata (T-07-03-06 - no double-spend bookkeeping needed there).
+      // Which flag depends on the PI kind: a standalone humanizer PI is
+      // fully consumed; a paket PI only spends its included refinement, the
+      // PDF export unlock (checkPaketPi) must survive this update.
+      if (verifiedPaymentIntentId) {
+        try {
+          await getStripe().paymentIntents.update(
+            verifiedPaymentIntentId,
+            entitlementKind === "paket"
+              ? { metadata: { feature: "paket", humanizer_used: "true" } }
+              : { metadata: { feature: "humanizer", consumed: "true" } }
+          );
+        } catch (err) {
+          console.error("humanize consume-mark error", err); // user got their letter; worst case a free retry window
+        }
+      }
+      controller.close();
+    },
+    cancel() {
+      // Client disconnected: stop paying Anthropic for tokens nobody receives.
+      // The abort surfaces as a throw in the for-await above → caught → PI unconsumed.
+      stream.controller.abort();
+    },
+  });
+
+  return new Response(body, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
+}

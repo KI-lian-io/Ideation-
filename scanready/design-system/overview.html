@@ -1,0 +1,112 @@
+<!-- @dsCard group="Overview" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ScanReady — Warm Editorial Broadsheet</title>
+<style>
+  :root {
+    --paper: #f0eee9; --card: #fbfaf7; --ink: #1b2430; --ink-soft: #2a3340;
+    --body: #6f6960; --eyebrow: #9a8b72; --hair: rgba(27,36,48,.12);
+    --accent: #0a7d63; --accent-deep: #0b6e58; --accent-soft: #d2e9e1; --accent-tint: #eef6f2;
+    --on-dark: #fff; --on-dark-soft: rgba(255,255,255,.72);
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Charter,Georgia,serif;
+    --serif-text: "Source Serif 4","Iowan Old Style",Georgia,serif;
+    --sans: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono: "Geist Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); padding: 40px; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .18em; color: var(--eyebrow); }
+  h1 { font-family: var(--serif); font-size: 56px; font-weight: 500; line-height: 1.05; letter-spacing: -1px; }
+  h2 { font-family: var(--serif); font-size: 28px; font-weight: 600; }
+  .sub { font-size: 18px; color: var(--body); line-height: 1.55; max-width: 60ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .sec { display: flex; flex-direction: column; gap: 16px; }
+  .hair { border: 0; border-top: 1px solid var(--hair); }
+
+  .btn { font-family: var(--sans); font-size: 14px; font-weight: 600; border-radius: 6px; padding: 10px 18px; border: 1px solid transparent; cursor: pointer; }
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-secondary { background: transparent; color: var(--ink); border-color: var(--hair); }
+
+  .card { background: var(--card); border: 1px solid var(--hair); border-radius: 12px; padding: 24px; }
+  .doc { font-family: var(--serif-text); font-size: 16px; line-height: 1.65; color: var(--ink); }
+  .chip { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 9999px; padding: 4px 12px; font-size: 14px; }
+  .note { background: var(--accent-tint); border: 1px solid var(--hair); border-radius: 8px; padding: 12px; font-size: 14px; color: var(--ink-soft); }
+  .input { background: var(--card); border: 1px solid var(--hair); border-radius: 6px; padding: 12px 16px; font-family: var(--sans); font-size: 16px; width: 100%; }
+  .input-focus { border: 2px solid var(--accent); }
+
+  .swatch { border-radius: 8px; border: 1px solid var(--hair); height: 56px; display: flex; align-items: flex-end; padding: 6px; }
+  .swatch span { font-family: var(--mono); font-size: 11px; }
+  .band { background: var(--ink); color: #fff; border-radius: 12px; padding: 40px; text-align: center; }
+  .band .lock { width: 40px; height: 40px; border-radius: 9999px; background: var(--accent); margin: 0 auto 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="sec">
+    <p class="eyebrow">ScanReady · design system</p>
+    <h1>Win the 8-second German recruiter scan.</h1>
+    <p class="sub">Warm Editorial Broadsheet — WIRED's editorial authority, warmed by Starbucks' cream-and-green discipline, on ScanReady's navy and serif. The generated document reads like print.</p>
+  </div>
+
+  <hr class="hair" />
+
+  <div class="sec">
+    <p class="eyebrow">Color</p>
+    <div class="grid">
+      <div class="swatch" style="background:#f0eee9"><span>paper</span></div>
+      <div class="swatch" style="background:#fbfaf7"><span>card</span></div>
+      <div class="swatch" style="background:#1b2430;color:#fff"><span>ink</span></div>
+      <div class="swatch" style="background:#0a7d63;color:#fff"><span>accent 600</span></div>
+      <div class="swatch" style="background:#d2e9e1"><span>accent soft</span></div>
+      <div class="swatch" style="background:#9a8b72;color:#fff"><span>eyebrow</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="eyebrow">Type — four voices</p>
+    <h2 style="font-family:var(--serif)">Display serif — Iowan</h2>
+    <p class="doc">Reading serif — Source Serif 4. This is the voice of the generated Lebenslauf and Anschreiben: the applicant's document renders like print, not form output.</p>
+    <p style="font-family:var(--sans);color:var(--body)">Inter — the interface voice for forms, navigation, and body UI prose.</p>
+    <p class="eyebrow">Geist mono — the uppercase taupe micro-label</p>
+  </div>
+
+  <div class="sec">
+    <p class="eyebrow">Buttons &amp; labels — 6px editorial corners</p>
+    <div class="row">
+      <button class="btn btn-primary">Convert to Lebenslauf</button>
+      <button class="btn btn-accent">Convert your CV — it's free</button>
+      <button class="btn btn-secondary">Back to Lebenslauf</button>
+      <span class="chip">React</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="eyebrow">Surfaces</p>
+    <div class="card doc">
+      <strong style="font-family:var(--serif)">Max Mustermann</strong><br />
+      Senior Product Manager · Berlin<br /><br />
+      Sehr geehrte Damen und Herren, hiermit bewerbe ich mich auf die ausgeschriebene Position…
+      <div class="note" style="margin-top:16px"><strong>Norm note:</strong> Date reformatted to DIN standard; "Present" → "heute".</div>
+    </div>
+    <input class="input input-focus" value="Focused field — mint activation ring" />
+  </div>
+
+  <div class="sec">
+    <p class="eyebrow">Signature — navy color-block band</p>
+    <div class="band">
+      <div class="lock"></div>
+      <h2 style="color:#fff">Zero-retention, by design.</h2>
+      <p style="color:var(--on-dark-soft);max-width:48ch;margin:8px auto 0">Nothing is stored. Processing is stateless. Your CV stays between you and your application.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

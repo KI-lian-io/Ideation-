@@ -1,0 +1,41 @@
+{
+  "name": "scanready",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "node --experimental-strip-types --test src/lib/__tests__/lebenslauf-utils.test.ts src/lib/__tests__/prompts.test.ts src/lib/__tests__/humanizer.test.ts src/lib/__tests__/abuse-guards.test.ts src/lib/__tests__/extract-cv.test.ts src/lib/__tests__/lebenslauf-editor-reorder.test.ts src/lib/__tests__/lebenslauf-uid-boundary.test.ts src/lib/__tests__/print-sheet.test.ts src/lib/__tests__/account.test.ts src/lib/__tests__/subscription.test.ts src/lib/__tests__/cv-overlap.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "@stripe/react-stripe-js": "^6.7.0",
+    "@stripe/stripe-js": "^9.9.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "next": "16.2.9",
+    "posthog-js": "^1.396.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "stripe": "^22.3.0",
+    "unpdf": "^1.6.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

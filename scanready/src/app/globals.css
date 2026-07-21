@@ -1,0 +1,631 @@
+@import "tailwindcss";
+
+/* ScanReady design system: Warm Editorial Broadsheet. Warm paper, navy ink, taupe label.
+   Seven colors, three system-font voices, one curve. No second accent, no shadows. */
+@theme {
+  --color-paper: #f0eee9; /* page background, warm off-white */
+  --color-card: #fbfaf7; /* card surfaces, almost white */
+  --color-ink: #1b2430; /* primary text, deep navy ink */
+  --color-muted: #6f6960; /* secondary text, warm grey */
+  --color-faint: rgba(27, 36, 48, 0.12); /* skeletons, faint fills */
+  --color-hair: rgba(27, 36, 48, 0.1); /* hairlines, card borders */
+  --color-eyebrow: #9a8b72; /* warm taupe, mono labels only */
+
+  /* Deep green: the single CTA / active / focus accent, four tiers (Starbucks-green-on-cream). */
+  --color-accent: #0a7d63;
+  --color-accent-deep: #0b6e58;
+  --color-accent-soft: #d2e9e1;
+  --color-accent-tint: #eef6f2;
+
+  /* Functional colors (error/warn/tag): from the exported ScanReady Design System, additive. */
+  --color-brand-error: #c0503c;
+  --color-brand-warn: #b9791a;
+  --color-brand-tag: #3772cf;
+
+  /* Text ramp additions: annotation body + secondary/caption greys, additive. */
+  --color-ink-soft: #2a3340;
+  --color-slate: #4a5160;
+  --color-stone: #8a857c;
+
+  /* Signature dark band: navy-to-teal color-block, additive. */
+  --color-band-from: #1b2430;
+  --color-band-to: #234038;
+
+  /* Elevation: flat by default, shadow is the exception (from the exported
+     ScanReady Design System, ds-update/tokens/shadows.css). --shadow-sheet is
+     the generated document card shell (library gallery, print-sheet cards);
+     --shadow-sheet-hero is the deeper variant for the one sheet above the
+     fold; --shadow-modal is for dialogs and floating menus over the scrim. */
+  --shadow-sheet: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+    rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.06) 0px 16px 32px;
+  --shadow-sheet-hero: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+    rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.10) 0px 24px 56px;
+  --shadow-modal: rgba(27, 36, 48, 0.40) 0px 24px 64px -16px;
+
+  /* Four voices: display serif · reading serif (the document output) · Inter (UI) · Geist Mono (labels). */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Charter", Georgia, serif;
+  --font-serif-text: var(--font-source-serif), "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* one curve for everything */
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Paper grain: 2–3% opacity SVG turbulence, inline data-URI, single small tile,
+     repeated. Landing page background only (never on .doc-sheet or cards, those
+     stay pristine print surfaces). Imperceptible as texture, perceptible as warmth. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+::selection {
+  background: rgba(10, 125, 99, 0.18);
+}
+
+/* Scroll reveal: hidden state applies only once JS adds .reveal-ready (see ScrollReveal.tsx).
+   Without JS, or before hydration, sections render fully visible. Content rises on enter. */
+.reveal-ready .section-animate {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.46s var(--ease-out),
+    transform 0.46s var(--ease-out);
+}
+.reveal-ready .section-animate.section-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Print-sheet document surface: the ONLY elevated surface in the tool. Used for the
+   Lebenslauf editor and the Anschreiben (streaming + result), never for chrome/cards. */
+.doc-sheet {
+  background: var(--color-card);
+  border: 1px solid var(--color-hair);
+  border-radius: 12px;
+  box-shadow:
+    0 1px 1px rgba(27, 36, 48, 0.04),
+    0 2px 4px rgba(27, 36, 48, 0.04),
+    0 6px 12px rgba(27, 36, 48, 0.05),
+    0 16px 32px rgba(27, 36, 48, 0.06);
+  transition: border-color 0.2s var(--ease-out);
+}
+/* Accessible focus style on the sheet itself (focus-within), so the borderless
+   textarea inside still communicates a clear focus state: hairline → accent. */
+.doc-sheet:focus-within {
+  border-color: var(--color-accent);
+}
+
+/* Blinking caret after streamed text: CSS steps, ~1s cycle. */
+.stream-caret {
+  display: inline-block;
+  animation: stream-caret-blink 1s steps(1) infinite;
+}
+@keyframes stream-caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Generic mount reveal: opacity + translateY, one-time (animation, not transition).
+   Used for phase-transition roots, parse-reveal sections (with --i stagger), and
+   one-off completion moments (letter header + sheet). */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.phase-enter {
+  animation: rise-in 0.2s var(--ease-out) both;
+}
+.reveal-stagger {
+  animation: rise-in 0.2s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Humanizer+ modal: overlay fade + dialog scale/fade, transform+opacity only. */
+@keyframes modal-overlay-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modal-dialog-rise {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.modal-overlay-enter {
+  animation: modal-overlay-fade 0.15s var(--ease-out) both;
+}
+.modal-dialog-enter {
+  animation: modal-dialog-rise 0.15s var(--ease-out) both;
+}
+
+/* Scan-line sweep: the brand's ONE ownable motion signature. A soft accent-green
+   band with a crisp 2px leading edge, sweeping top-to-bottom. Used by the hero
+   typesetting theater (stage 2) today; reserved for future reuse in LoadingView's
+   parse/generate states and a subtle doc-sheet hover-intent moment. Transform only. */
+.scan-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.scan-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 125, 99, 0.1) 45%,
+    rgba(10, 125, 99, 0.1) 55%,
+    transparent 100%
+  );
+  border-top: 2px solid rgba(10, 125, 99, 0.55);
+  transform: translateY(-100%);
+}
+.theater-playing .scan-sweep::after {
+  animation: scan-sweep-pass 1.2s var(--ease-out) both;
+  animation-delay: 0.4s;
+}
+@keyframes scan-sweep-pass {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(350%);
+  }
+}
+/* Looping variant for the tool's parse loading state (Typesetting Theater
+   Phase 2): same band, continuous passes while the skeleton is visible. The
+   reduced-motion block hides .scan-sweep entirely, which covers this too. */
+.scan-sweep-loop::after {
+  animation: scan-sweep-pass 1.8s var(--ease-out) infinite;
+}
+
+/* ── Hero typesetting theater ──────────────────────────────────────────────
+   A US résumé card re-typesets into the German Lebenslauf sheet in a
+   choreographed, looping sequence. Orchestrated by toggling `.theater-playing`
+   on the root node (see TypesettingTheater.tsx); IntersectionObserver starts it,
+   click/tap replays it. Transform + opacity only. Full static end-state under
+   prefers-reduced-motion (below). */
+
+/* Stage 1 → held: the source card is visible from the start; it fades down as
+   the sweep finishes and the sheet takes over (stage 3). */
+.theater-source {
+  opacity: 1;
+  transition: none;
+}
+.theater-playing .theater-source {
+  animation: theater-source-fade 0.6s var(--ease-out) both;
+  animation-delay: 1.5s;
+}
+@keyframes theater-source-fade {
+  from {
+    opacity: 1;
+    transform: rotate(-1.2deg) translateY(0);
+  }
+  to {
+    opacity: 0.22;
+    transform: rotate(-1.2deg) translateY(-4px);
+  }
+}
+
+/* The US date badge: warm red, fades with the source card lines but held
+   slightly longer so the eye tracks it into stage 3's snap. */
+.theater-source-date {
+  opacity: 1;
+}
+.theater-playing .theater-source-date {
+  animation: theater-source-fade 0.5s var(--ease-out) both;
+  animation-delay: 1.6s;
+}
+
+/* Stage 3: destination sheet lines re-set into serif, staggered via --i. Each
+   line starts slightly offset + faded, as if freshly typeset. */
+.theater-line {
+  opacity: 0;
+  transform: translateX(10px);
+}
+.theater-playing .theater-line {
+  animation: theater-line-set 0.5s var(--ease-out) both;
+  animation-delay: calc(1.9s + var(--i, 0) * 140ms);
+}
+@keyframes theater-line-set {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* The re-typeset date: snaps in mono accent-green with a small settle bounce. */
+.theater-date {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(1);
+}
+.theater-playing .theater-date {
+  animation: theater-date-settle 0.4s var(--ease-out) both;
+  animation-delay: 2.6s;
+}
+@keyframes theater-date-settle {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stage 4: DIN annotation pins fade in with hairline leader lines, staggered. */
+.theater-pin {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.theater-playing .theater-pin {
+  animation: theater-pin-in 0.45s var(--ease-out) both;
+  animation-delay: calc(3.2s + var(--i, 0) * 220ms);
+}
+@keyframes theater-pin-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Replay affordance: decorative but keyboard-operable (role="button"). */
+.theater-stage {
+  cursor: pointer;
+}
+.theater-stage:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* Masthead double-rule: broadsheet nav treatment (landing only). A 2px ink
+   rule with a 0.5px hairline sitting 3px beneath it, via box-shadow so no
+   extra DOM node is needed. */
+.masthead-rule {
+  border-bottom: 2px solid var(--color-ink);
+  box-shadow: 0 5px 0 -2.5px var(--color-hair);
+}
+
+/* Registration-mark corner ornament: decorative print detail in the footer.
+   A hairline crosshair-in-circle, aria-hidden. Pure CSS, no image request. */
+.reg-mark {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.reg-mark::before,
+.reg-mark::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+}
+.reg-mark::before {
+  left: 50%;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  transform: translateX(-50%);
+}
+.reg-mark::after {
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+/* ── Folio-style section numbers (Phase 2) ──────────────────────────────────
+   Broadsheet folio voice: a small mono number joined to the section eyebrow,
+   e.g. "01 · PATHWAYS". Decorative sequencing, so the number glyph itself is
+   aria-hidden; the eyebrow text remains the accessible label. */
+.folio-eyebrow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+}
+.folio-number {
+  color: var(--color-eyebrow);
+  opacity: 0.6;
+}
+/* On the dark trust band, inherit the surrounding white/40 tone instead of
+   the paper-surface taupe, which would contrast poorly against ink. */
+.bg-ink .folio-number {
+  color: currentColor;
+  opacity: 0.7;
+}
+
+/* ── Drop cap (Phase 2) ──────────────────────────────────────────────────────
+   First letter of the founder's note opening paragraph: display serif, sized
+   to roughly three text-lines, floated so body copy wraps around it. Ink by
+   default; scoped narrower on small screens so it never crowds the column. */
+.drop-cap::first-letter {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--color-ink);
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.86;
+  padding-right: 0.08em;
+  padding-top: 0.02em;
+}
+@media (max-width: 640px) {
+  .drop-cap::first-letter {
+    font-size: 2.6em;
+  }
+}
+
+/* ── Pull quote with hanging punctuation (Phase 2) ────────────────────────────
+   Broadsheet pull quote: large reading-serif, hairline rules above/below, the
+   opening quote mark hangs into the margin. `hanging-punctuation` is a
+   progressive enhancement (Safari); the negative text-indent + relative
+   quote-mark span is the fallback for browsers that ignore it. */
+.pull-quote {
+  position: relative;
+  hanging-punctuation: first;
+  text-indent: -0.5em;
+}
+/* Where hanging-punctuation is supported (Safari), drop the manual indent so
+   the opening quote mark doesn't hang twice. */
+@supports (hanging-punctuation: first) {
+  .pull-quote {
+    text-indent: 0;
+  }
+}
+.pull-quote-mark {
+  color: var(--color-accent);
+}
+
+/* ── Proof panel print surfaces (Phase 2) ─────────────────────────────────────
+   Static (non-animated) reuse of the hero theater's visual language for the
+   illustrative before/after card: a deliberately "wrong" sans source panel
+   and a doc-sheet destination panel with mono DIN pins + hairline leaders. */
+.proof-source {
+  transform: rotate(-1.2deg);
+}
+.proof-pin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* Drop movement (transform/animation), keep opacity & color fades that aid comprehension */
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+  }
+  .stream-caret {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Hero typesetting theater: no animation at all. Render the completed
+     end state statically: source card faded back, sheet fully typeset,
+     date already snapped, pins already visible. Must look intentional
+     and complete, not like a paused animation. */
+  .scan-sweep {
+    display: none !important;
+  }
+  .theater-source {
+    opacity: 0.22 !important;
+    transform: rotate(-1.2deg) !important;
+  }
+  .theater-source-date {
+    opacity: 0.22 !important;
+  }
+  .theater-line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .theater-date {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .theater-pin {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Print / PDF export (browser print-to-PDF, no PDF library, no server round-trip)
+   ---------------------------------------------------------------------------
+   #print-root hosts exactly one PrintLebenslauf or PrintAnschreiben at a time
+   (mounted by the export handlers in src/app/app/page.tsx). On screen it is
+   display:none + aria-hidden (never part of the visible tool UI or a11y tree).
+   On print, `body.printing-lebenslauf` / `body.printing-letter` (toggled by
+   the handlers around window.print()) flips the visibility: everything else
+   on the page is hidden, #print-root becomes the entire printed document.
+   DIN 5008 A4 margins: left 25mm (binding/hole-punch allowance), 20mm elsewhere. */
+#print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 20mm 20mm 25mm;
+  }
+
+  body.printing-lebenslauf #print-root,
+  body.printing-letter #print-root {
+    display: block;
+  }
+
+  /* Hide everything else on the page while printing. */
+  body.printing-lebenslauf > :not(#print-root),
+  body.printing-letter > :not(#print-root) {
+    display: none !important;
+  }
+
+  /* Print surface: pure black-on-white, no paper tint, no grain, no UI chrome. */
+  body.printing-lebenslauf,
+  body.printing-letter {
+    background: #fff !important;
+    background-image: none !important;
+  }
+
+  .print-sheet {
+    color: #000;
+    background: #fff;
+    font-family: var(--font-serif-text);
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .print-sheet * {
+    color: #000 !important;
+  }
+
+  .print-section {
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+  }
+
+  .print-section-heading {
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 6pt;
+    border-bottom: 0.75pt solid #000;
+    padding-bottom: 2pt;
+  }
+
+  .print-personal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16pt;
+  }
+
+  .print-personal-fields {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .print-name {
+    font-size: 16pt;
+    font-weight: 600;
+    margin-bottom: 4pt;
+  }
+
+  .print-photo {
+    flex-shrink: 0;
+    width: 30mm;
+    height: 40mm;
+    object-fit: cover;
+  }
+
+  .print-line {
+    margin: 0 0 3pt 0;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .print-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8pt;
+  }
+
+  .print-entry {
+    page-break-inside: avoid;
+  }
+
+  .print-entry-title {
+    font-weight: 600;
+  }
+
+  .print-entry-meta {
+    font-size: 10pt;
+  }
+
+  .print-bullets {
+    margin: 4pt 0 0 0;
+    padding-left: 14pt;
+  }
+
+  .print-bullets li {
+    margin-bottom: 2pt;
+    orphans: 2;
+    widows: 2;
+  }
+
+  .print-signature-block {
+    margin-top: 28pt;
+    page-break-inside: avoid;
+  }
+
+  .print-signature-gap {
+    height: 24pt;
+  }
+
+  .print-signature-rule {
+    width: 55mm;
+    border-top: 0.75pt solid #000;
+  }
+
+  .print-signature-caption {
+    font-size: 9pt;
+    margin-top: 2pt;
+  }
+
+  .print-letter-body {
+    white-space: pre-wrap;
+    orphans: 3;
+    widows: 3;
+  }
+}

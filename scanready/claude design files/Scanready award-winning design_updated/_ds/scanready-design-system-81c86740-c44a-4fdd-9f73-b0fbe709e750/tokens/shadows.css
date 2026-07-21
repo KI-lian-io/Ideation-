@@ -1,0 +1,23 @@
+:root {
+  /* ── Elevation — flat by default; shadow is rare ── */
+  --shadow-none: none;
+  --shadow-card: rgba(27, 36, 48, 0.06) 0px 4px 12px;            /* optional feature-tile lift */
+  /* The one shadowed element: the hero document mockup. */
+  --shadow-mockup: rgba(27, 36, 48, 0.10) 0px 1px 1px, rgba(27, 36, 48, 0.08) 0px 12px 32px -8px;
+  --shadow-brand-glow: rgba(10, 125, 99, 0.10) 0px 8px 24px;     /* featured pricing tier only — green */
+
+  /* The generated document sheet — layered like paper on a desk.
+     Every Lebenslauf / Anschreiben sheet in the converter gets this. */
+  --shadow-sheet: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+                  rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.06) 0px 16px 32px;
+  /* Hero-stage variant — deeper final layer for the one sheet above the fold. */
+  --shadow-sheet-hero: rgba(27, 36, 48, 0.04) 0px 1px 1px, rgba(27, 36, 48, 0.04) 0px 2px 4px,
+                       rgba(27, 36, 48, 0.05) 0px 6px 12px, rgba(27, 36, 48, 0.10) 0px 24px 56px;
+  /* Modal dialog (Humanizer+) over the scrim. */
+  --shadow-modal: rgba(27, 36, 48, 0.40) 0px 24px 64px -16px;
+
+  /* ── Motion ───────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --dur-fast: 150ms; /* @kind other */
+  --dur-base: 200ms; /* @kind other */
+}

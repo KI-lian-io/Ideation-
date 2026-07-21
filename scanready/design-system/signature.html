@@ -1,0 +1,53 @@
+<!-- @dsCard group="Signature" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ScanReady — Signature surfaces</title>
+<style>
+  :root {
+    --paper:#f0eee9; --card:#fbfaf7; --ink:#1b2430; --body:#6f6960; --eyebrow:#9a8b72;
+    --hair:rgba(27,36,48,.12); --accent:#0a7d63; --on-dark-soft:rgba(255,255,255,.72);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,Georgia,serif;
+    --serif-text:"Source Serif 4","Iowan Old Style",Georgia,serif;
+    --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"Geist Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);padding:40px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--eyebrow)}
+
+  .band{background:var(--ink);color:#fff;border-radius:12px;padding:48px;text-align:center}
+  .band .lock{width:40px;height:40px;border-radius:9999px;background:var(--accent);margin:0 auto 16px}
+  .band h2{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:8px}
+  .band p{color:var(--on-dark-soft);max-width:48ch;margin:0 auto;line-height:1.55}
+
+  .mockup{background:var(--card);border:1px solid var(--hair);border-radius:12px;
+    box-shadow:rgba(27,36,48,.10) 0 1px 1px, rgba(27,36,48,.08) 0 12px 32px -8px;padding:32px}
+  .mockup .name{font-family:var(--serif);font-size:24px;font-weight:600}
+  .mockup .doc{font-family:var(--serif-text);font-size:16px;line-height:1.65;color:var(--ink);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Signature · navy color-block band + hero document mockup</p>
+
+  <div class="band">
+    <div class="lock"></div>
+    <h2>Zero-retention, by design.</h2>
+    <p>Nothing is stored. Processing is stateless. What you paste stays between you and your application.</p>
+  </div>
+
+  <div>
+    <p class="eyebrow" style="margin-bottom:12px">hero-mockup · the one shadowed element — a document preview</p>
+    <div class="mockup">
+      <div class="name">Lebenslauf — Max Mustermann</div>
+      <div class="doc">Senior Product Manager · Berlin · max@example.de<br />
+      Berufserfahrung — Jan. 2021 – heute · Acme GmbH · Produktstrategie und Roadmap…</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

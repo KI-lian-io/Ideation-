@@ -1,0 +1,51 @@
+<!-- @dsCard group="Surfaces" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ScanReady — Surfaces</title>
+<style>
+  :root {
+    --paper:#f0eee9; --card:#fbfaf7; --ink:#1b2430; --ink-soft:#2a3340; --body:#6f6960;
+    --eyebrow:#9a8b72; --hair:rgba(27,36,48,.12); --accent-tint:#eef6f2;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,Georgia,serif;
+    --serif-text:"Source Serif 4","Iowan Old Style",Georgia,serif;
+    --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"Geist Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);padding:40px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+  .eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--eyebrow)}
+  .card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:24px}
+  .card h3{font-family:var(--sans);font-size:16px;font-weight:600;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--body);line-height:1.5}
+  .doc{font-family:var(--serif-text);font-size:16px;line-height:1.65;color:var(--ink)}
+  .doc .name{font-family:var(--serif);font-weight:600;font-size:20px}
+  .note{background:var(--accent-tint);border:1px solid var(--hair);border-radius:8px;padding:12px;font-size:14px;color:var(--ink-soft);margin-top:16px}
+  hr{border:0;border-top:1px solid var(--hair)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Surfaces · flat + warm hairlines · 12px cards</p>
+
+  <div class="card">
+    <h3>card — UI surface</h3>
+    <p>Near-white card on warm-paper canvas, separated by a hairline. Title in Inter; body in muted warm grey. No shadow.</p>
+  </div>
+
+  <div class="card doc">
+    <div class="eyebrow" style="margin-bottom:10px">card-document · reading serif</div>
+    <div class="name">Max Mustermann</div>
+    Senior Product Manager · Berlin<br /><br />
+    Sehr geehrte Damen und Herren, hiermit bewerbe ich mich auf die ausgeschriebene Position als Senior Product Manager…
+    <div class="note"><strong>Norm note:</strong> Date reformatted to DIN standard (Jan. 2021); "Present" → "heute".</div>
+  </div>
+
+  <hr />
+  <p class="eyebrow">hairline-divider — the only line; between steps and document/annotation columns</p>
+</div>
+</body>
+</html>

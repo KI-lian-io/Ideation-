@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/colors.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/typography.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/radius.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/tokens/shadows.css">
+<link rel="stylesheet" href="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/styles.css">
+<script src="_ds/scanready-design-system-81c86740-c44a-4fdd-9f73-b0fbe709e750/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #e8e5de; }
+  a { color: #0a7d63; }
+  a:hover { color: #0b6e58; }
+</style>
+</helmet>
+
+<section style="padding: 56px 64px 88px; display: flex; flex-direction: column; gap: 40px;">
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">
+      <span style="color: var(--ink); font-weight: 500;">P1 · Item 09/09</span>
+      <span>ScanReady Plus · subscription surfaces</span>
+      <span style="display: flex; gap: 12px; margin-left: auto; letter-spacing: 0.1em;">
+        <a href="01-library.dc.html" style="color: var(--stone); text-decoration: none;">01</a>
+        <a href="02-storage-gate.dc.html" style="color: var(--stone); text-decoration: none;">02</a>
+        <a href="03-pass.dc.html" style="color: var(--stone); text-decoration: none;">03</a>
+        <a href="04-preise.dc.html" style="color: var(--stone); text-decoration: none;">04</a>
+        <a href="05-save-moment.dc.html" style="color: var(--stone); text-decoration: none;">05</a>
+        <a href="06-founder-assets.dc.html" style="color: var(--stone); text-decoration: none;">06</a>
+        <a href="07-lebenslaeufe.dc.html" style="color: var(--stone); text-decoration: none;">07</a>
+        <a href="08-status.dc.html" style="color: var(--stone); text-decoration: none;">08</a>
+        <a href="09-plus.dc.html" style="color: var(--accent); font-weight: 500; text-decoration: none;">09</a>
+      </span>
+    </div>
+    <div style="font-family: var(--font-sans); font-size: 13px; color: var(--slate); max-width: 90ch;">The honest subscription: &sect;312k K&uuml;ndigungsbutton on the card, reminder before every charge. <a href="#1a">1a</a> /konto card in three states · <a href="#1b">1b</a> renewal-reminder email · <a href="#1c">1c</a> copy deck.</div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 96px; flex-wrap: wrap;">
+
+    <!-- ═══════════════ 1a · SUBSCRIPTION CARD STATES ═══════════════ -->
+    <div id="1a" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--accent); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1a</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">/konto subscription card · three states</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Active, cancelled-but-running, expired. The cancel button never hides.</span>
+      </div>
+
+      <div style="display: flex; gap: 24px; align-items: stretch;">
+
+        <!-- Active -->
+        <div data-screen-label="9a Plus active" style="width: 400px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px 26px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Ihr Abo</span>
+            <span style="display: inline-flex; align-items: center; gap: 7px; background: var(--accent-soft); color: var(--accent-deep); border-radius: 999px; padding: 4px 12px; font-family: var(--font-sans); font-size: 12px; font-weight: 500;">
+              <span style="width: 6px; height: 6px; border-radius: 999px; background: var(--accent);"></span>
+              Aktiv
+            </span>
+          </div>
+          <div style="font-family: var(--font-serif); font-size: 23px; font-weight: 600; letter-spacing: -0.3px; color: var(--ink); margin-top: 10px;">ScanReady Plus</div>
+          <div style="font-family: var(--font-sans); font-size: 13.5px; color: var(--steel); margin-top: 4px;">5,99&nbsp;&euro; pro Monat · unbegrenzter Speicher</div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px; font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--charcoal); border-top: 1px solid var(--hairline-soft); padding-top: 14px;">
+            <span>N&auml;chste Verl&auml;ngerung: <strong style="font-weight: 600;">05.08.2026</strong></span>
+            <span style="position: relative; display: flex; align-items: flex-start; gap: 7px; color: var(--slate);">
+              <span style="position: absolute; top: 0; left: -33px; width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: var(--on-dark); font-family: var(--font-mono); font-size: 10px; display: inline-flex; align-items: center; justify-content: center;">1</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6f6960" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 3px;"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+              Erinnerung kommt am 31.07.2026 per E-Mail, 5 Tage vorher.
+            </span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 18px;">
+            <div style="position: relative;">
+              <span style="position: absolute; top: 10px; left: -33px; width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: var(--on-dark); font-family: var(--font-mono); font-size: 10px; display: inline-flex; align-items: center; justify-content: center;">2</span>
+              <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="100%,40px" style="width:100%">Vertrag hier k&uuml;ndigen</x-import>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-sans); font-size: 12.5px; color: var(--steel);">
+              <span style="text-decoration: underline; text-underline-offset: 2px;">Belege</span>
+              <span style="text-decoration: underline; text-underline-offset: 2px;">Zahlungsmittel &auml;ndern</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cancelled but running -->
+        <div data-screen-label="9a Plus cancelled" style="width: 400px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px 26px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Ihr Abo</span>
+            <span style="font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); background: var(--surface); border: 1px solid var(--hairline); border-radius: 999px; padding: 3px 10px;">Gek&uuml;ndigt</span>
+          </div>
+          <div style="font-family: var(--font-serif); font-size: 23px; font-weight: 600; letter-spacing: -0.3px; color: var(--ink); margin-top: 10px;">ScanReady Plus</div>
+          <div style="position: relative; font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--steel); margin-top: 4px;">
+            <span style="position: absolute; top: 2px; left: -33px; width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: var(--on-dark); font-family: var(--font-mono); font-size: 10px; display: inline-flex; align-items: center; justify-content: center;">3</span>
+            L&auml;uft bis <strong style="font-weight: 600; color: var(--ink);">05.08.2026</strong>, danach keine Abbuchung mehr.
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px; font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--slate); border-top: 1px solid var(--hairline-soft); padding-top: 14px;">
+            <span>Bis dahin bleibt alles nutzbar. Danach: neueste Bewerbung bearbeitbar, &auml;ltere lesbar, nichts wird gel&ouml;scht.</span>
+            <span style="display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone);">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0a7d63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+              K&uuml;ndigung best&auml;tigt am 12.07.2026
+            </span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 18px;">
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="secondary" hint-size="100%,40px" style="width:100%">K&uuml;ndigung zur&uuml;cknehmen</x-import>
+            <div style="font-family: var(--font-sans); font-size: 12.5px; color: var(--steel); text-align: center;"><span style="text-decoration: underline; text-underline-offset: 2px;">Belege</span></div>
+          </div>
+        </div>
+
+        <!-- Expired -->
+        <div data-screen-label="9a Plus expired" style="width: 400px; background: var(--surface-soft); border: 1px solid var(--hairline); border-radius: 12px; padding: 24px 26px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--eyebrow);">Ihr Abo</span>
+            <span style="font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); background: var(--surface); border: 1px solid var(--hairline); border-radius: 999px; padding: 3px 10px;">Beendet am 05.08.2026</span>
+          </div>
+          <div style="font-family: var(--font-serif); font-size: 23px; font-weight: 600; letter-spacing: -0.3px; color: var(--ink); margin-top: 10px;">ScanReady Plus</div>
+          <p style="font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--steel); margin: 4px 0 0;">Ihre 14 Bewerbungen bleiben gespeichert und lesbar. Die neueste bleibt bearbeitbar.</p>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 18px;">
+            <x-import component-from-global-scope="ScanReadyDesignSystem_81c867.Button" variant="accent" hint-size="100%,40px" style="width:100%">Plus reaktivieren · 5,99&nbsp;&euro;/Monat</x-import>
+            <div style="font-family: var(--font-sans); font-size: 12.5px; color: var(--steel); text-align: center;">Oder einmalig: <span style="color: var(--accent-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 2px;">Pass, 14,99&nbsp;&euro; f&uuml;r 30 Tage</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 28px; flex-wrap: wrap; max-width: 1260px; font-family: var(--font-sans); font-size: 12.5px; line-height: 1.5; color: var(--slate);">
+        <span style="max-width: 34ch;"><span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">1</span> The reminder is a stated fact of the product, shown on the card before it ever arrives. Date is computed, always 5 days ahead.</span>
+        <span style="max-width: 34ch;"><span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">2</span> &sect;312k button labeled exactly Vertrag hier k&uuml;ndigen, full secondary button on the card itself, never a footnote link. Flow completes in under 2 minutes.</span>
+        <span style="max-width: 34ch;"><span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">3</span> Cancelled state answers the three fears in order: when it ends, what it costs (nothing), what happens to the data (nothing is deleted).</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════ 1b · RENEWAL REMINDER EMAIL ═══════════════ -->
+    <div id="1b" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1b</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Renewal-reminder email · text-first</span>
+        <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Broadsheet header, then plain paragraphs. Both outcomes one click away.</span>
+      </div>
+
+      <div style="display: flex; gap: 40px; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--slate); background: var(--canvas); border: 1px solid var(--hairline); border-radius: 6px; padding: 10px 14px; width: 600px;">
+            <span style="color: var(--stone);">Betreff:</span> Ihr ScanReady Plus verl&auml;ngert sich am 05.08.2026 (5,99&nbsp;&euro;)
+          </div>
+
+          <div data-screen-label="9b Reminder email" style="width: 600px; background: var(--canvas); border: 1px solid var(--hairline); box-shadow: 0 2px 8px rgba(27,36,48,0.10), 0 16px 48px -20px rgba(27,36,48,0.25);">
+            <!-- Broadsheet email header -->
+            <div style="padding: 24px 36px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <img src="assets/scanready-lockup.svg" height="22" alt="ScanReady" />
+                <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow);">Erinnerung · 31.07.2026</span>
+              </div>
+              <div style="height: 2px; background: var(--ink); margin-top: 16px;"></div>
+              <div style="height: 1px; background: var(--hairline); margin-top: 3px;"></div>
+            </div>
+
+            <div style="padding: 28px 36px 32px;">
+              <h2 style="font-family: var(--font-serif); font-size: 22px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.2; color: var(--ink); margin: 0;">In 5 Tagen verl&auml;ngert sich Ihr Abo.</h2>
+
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.65; color: var(--charcoal); margin: 16px 0 0;">Guten Tag Amara Okafor,</p>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.65; color: var(--charcoal); margin: 12px 0 0;">am <strong style="font-weight: 600;">05.08.2026</strong> verl&auml;ngert sich ScanReady Plus um einen Monat. Wir buchen dann <strong style="font-weight: 600;">5,99&nbsp;&euro;</strong> von Ihrem hinterlegten Zahlungsmittel ab.</p>
+              <p style="font-family: var(--font-sans); font-size: 14px; line-height: 1.65; color: var(--charcoal); margin: 12px 0 0;">Wenn Sie das Abo behalten m&ouml;chten, m&uuml;ssen Sie nichts tun.</p>
+
+              <!-- Ledger line -->
+              <div style="display: flex; flex-direction: column; gap: 5px; background: var(--surface-soft); border: 1px solid var(--hairline-soft); border-radius: 8px; padding: 14px 18px; margin: 18px 0 0;">
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; color: var(--slate);">
+                  <span>ScanReady Plus · 05.08. bis 04.09.2026</span><span>5,99&nbsp;&euro;</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; color: var(--stone);">
+                  <span>Inkl. MwSt. · monatlich k&uuml;ndbar</span><span></span>
+                </div>
+              </div>
+
+              <div style="position: relative; display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+                <span style="position: absolute; top: 10px; left: -45px; width: 18px; height: 18px; border-radius: 999px; background: var(--accent); color: var(--on-dark); font-family: var(--font-mono); font-size: 10px; display: inline-flex; align-items: center; justify-content: center;">1</span>
+                <span style="display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-sans); font-size: 14px; font-weight: 500; color: var(--ink); background: var(--canvas); border: 1px solid var(--ink); border-radius: 6px; padding: 10px 18px;">Jetzt k&uuml;ndigen, ein Klick</span>
+                <span style="font-family: var(--font-sans); font-size: 13px; color: var(--steel);">Wirkt sofort zum 05.08.2026.</span>
+              </div>
+
+              <p style="font-family: var(--font-sans); font-size: 12px; line-height: 1.6; color: var(--stone); margin: 22px 0 0; border-top: 1px solid var(--hairline-soft); padding-top: 14px;">Warum diese E-Mail? Wir erinnern vor jeder Verl&auml;ngerung, damit nichts still abgebucht wird. Das ist Absicht, kein Versehen.</p>
+            </div>
+
+            <!-- Email footer -->
+            <div style="background: var(--surface); border-top: 1px solid var(--hairline); padding: 16px 36px; display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone);">ScanReady · Berlin</span>
+              <span style="font-family: var(--font-sans); font-size: 11.5px; color: var(--steel);"><span style="text-decoration: underline; text-underline-offset: 2px;">Impressum</span> · <span style="text-decoration: underline; text-underline-offset: 2px;">Datenschutz</span> · <span style="text-decoration: underline; text-underline-offset: 2px;">Abo verwalten</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 28px; flex-wrap: wrap; max-width: 340px; font-family: var(--font-sans); font-size: 12.5px; line-height: 1.5; color: var(--slate); flex-direction: column;">
+          <span><span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">1</span> The cancel action is a real button in the email, above the fold, linking straight to /kuendigen with the session prefilled; keeping the sub requires zero action. Text-first HTML: system fonts, no images beyond the SVG lockup, dark-mode safe.</span>
+          <span>Subject line states date and amount; nothing is disguised as a newsletter. Sent 5 days before every charge, not only the first.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ 1c · COPY DECK ═══════════════ -->
+    <div id="1c" style="display: flex; flex-direction: column; gap: 16px; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; background: var(--ink); color: var(--on-dark); padding: 4px 10px; border-radius: 999px;">1c</span>
+        <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink);">Copy deck · DE / EN</span>
+      </div>
+
+      <div style="width: 900px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; padding: 28px 32px;">
+        <div style="display: grid; grid-template-columns: 190px 1fr 1fr; font-family: var(--font-sans); font-size: 13px; line-height: 1.5;">
+          <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--hairline);">Key</div>
+          <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow); padding: 8px 12px; border-bottom: 1px solid var(--hairline);">DE</div>
+          <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow); padding: 8px 0 8px 12px; border-bottom: 1px solid var(--hairline);">EN</div>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 10px 12px 10px 0; border-bottom: 1px solid var(--hairline-soft);">plus.cancel.button</div>
+          <div style="color: var(--charcoal); padding: 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Vertrag hier k&uuml;ndigen</div>
+          <div style="color: var(--charcoal); padding: 10px 0 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Cancel contract here</div>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 10px 12px 10px 0; border-bottom: 1px solid var(--hairline-soft);">plus.cancelled.body</div>
+          <div style="color: var(--charcoal); padding: 10px 12px; border-bottom: 1px solid var(--hairline-soft);">L&auml;uft bis 05.08.2026, danach keine Abbuchung mehr. Nichts wird gel&ouml;scht.</div>
+          <div style="color: var(--charcoal); padding: 10px 0 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Runs until 05.08.2026, no further charges after that. Nothing gets deleted.</div>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 10px 12px 10px 0; border-bottom: 1px solid var(--hairline-soft);">plus.email.subject</div>
+          <div style="color: var(--charcoal); padding: 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Ihr ScanReady Plus verl&auml;ngert sich am 05.08.2026 (5,99&nbsp;&euro;)</div>
+          <div style="color: var(--charcoal); padding: 10px 0 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Your ScanReady Plus renews on 05.08.2026 (5.99&nbsp;&euro;)</div>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 10px 12px 10px 0; border-bottom: 1px solid var(--hairline-soft);">plus.email.keep</div>
+          <div style="color: var(--charcoal); padding: 10px 12px; border-bottom: 1px solid var(--hairline-soft);">Wenn Sie das Abo behalten m&ouml;chten, m&uuml;ssen Sie nichts tun.</div>
+          <div style="color: var(--charcoal); padding: 10px 0 10px 12px; border-bottom: 1px solid var(--hairline-soft);">If you want to keep the subscription, there is nothing to do.</div>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--stone); padding: 10px 12px 10px 0;">plus.email.why</div>
+          <div style="color: var(--charcoal); padding: 10px 12px;">Warum diese E-Mail? Wir erinnern vor jeder Verl&auml;ngerung, damit nichts still abgebucht wird. Das ist Absicht, kein Versehen.</div>
+          <div style="color: var(--charcoal); padding: 10px 0 10px 12px;">Why this email? We remind you before every renewal so nothing is charged silently. That is by design, not by accident.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+</body>
+</html>
