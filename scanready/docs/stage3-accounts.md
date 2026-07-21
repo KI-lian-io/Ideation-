@@ -65,44 +65,42 @@ Status as of 2026-07-06 (live founder session):
       NULL` on an existing `pass_30d` row now succeeds. Security advisors:
       still only the same two pre-existing WARNs, zero new findings.
 
-- [ ] Migration 0004_library_phase_b PENDING (phase 08 plan 08-01): file
-      written per the 0001-0003 conventions, NOT yet applied to project
-      `thgmhbzimnjcaoqyyiyp`. BLOCKED 2026-07-17: the Frankfurt project is
-      PAUSED (free-tier auto-pause after ~7 days idle; DNS for
-      thgmhbzimnjcaoqyyiyp.supabase.co no longer resolves, management API
-      still lists the project). FOUNDER ACTION: restore the project in the
-      Supabase dashboard (one click, supabase.com/dashboard -> project ->
-      Restore), then the apply + advisor + probe runbook below can run via
-      MCP. Until applied, the Phase B UI code is env-gated inert and its
-      local tests do not touch the live DB, but the phase MUST NOT be
-      marked verified/complete. Adds: `application_packages.status text`
-      (nullable) + CHECK `status is null or status in ('entwurf',
-      'beworben', 'interview', 'absage', 'zusage')`; SECURITY DEFINER RPC
-      `set_package_status(package_id uuid, new_status text)` (ownership check
-      via `auth.uid()` only, updates only the status column, deliberately
-      bypasses the read_only write lock because status is metadata not
-      document content, grant-hardened the same way as
-      `delete_own_account()`: revoked from public/anon, granted only to
-      authenticated); `application_packages.cv_id` drop NOT NULL + FK
-      `application_packages_cv_id_fkey` re-created as `on delete set null`
-      (deleting a CV no longer cascade-deletes its packages, per the
-      0002/0003 lesson that any new constraint must tolerate the implicit
-      UPDATE an FK cascade fires); `subscriptions.cancel_at_period_end
-      boolean not null default false`. To apply: `mcp__supabase__apply_migration`
-      for project `thgmhbzimnjcaoqyyiyp` with the full file contents, then
-      `mcp__supabase__get_advisors` (type security) confirming zero new
-      findings (only the two known pre-existing WARNs should remain:
-      `delete_own_account` SECURITY DEFINER RPC and the auth
-      leaked-password dashboard toggle). Live-verification probes still to
-      run once applied: `application_packages.status` column + the
-      `application_packages_status_check` constraint exist; `set_package_status`
-      exists and is granted only to authenticated; the cv_id FK has
-      `confdeltype = 'n'` (SET NULL) and cv_id is nullable;
-      `subscriptions.cancel_at_period_end` exists with default false; an
-      `application_packages` row survives (cv_id becomes null) when its
-      referenced `cvs` row is deleted; `delete_own_account()` still succeeds
-      end to end. This entry will be updated from pending to applied with
-      date, advisor result, and probe results once Task 2 of 08-01 runs.
+- [x] Migration 0004_library_phase_b applied (2026-07-20, phase 08 plan
+      08-01): applied via `mcp__supabase__apply_migration` to project
+      `thgmhbzimnjcaoqyyiyp` (success:true) after the founder restored the
+      paused project. Restore note for the record: right after the restore
+      the database came up EMPTY (platform schemas only, zero public
+      tables, zero auth users) because Supabase restores compute first and
+      the backup lands asynchronously a few minutes later; waiting, not
+      rebuilding, was the correct move, and the full pre-pause state
+      (0001-0003 objects, founder auth user) returned on its own. Adds:
+      `application_packages.status text` (nullable) + CHECK
+      `status is null or status in ('entwurf', 'beworben', 'interview',
+      'absage', 'zusage')`; SECURITY DEFINER RPC
+      `set_package_status(package_id uuid, new_status text)` (ownership
+      check via `auth.uid()` only, updates only the status column,
+      deliberately bypasses the read_only write lock because status is
+      metadata not document content, grant-hardened like
+      `delete_own_account()`); `application_packages.cv_id` NOT NULL
+      dropped + FK re-created as `on delete set null` (deleting a CV no
+      longer cascade-deletes its packages);
+      `subscriptions.cancel_at_period_end boolean not null default false`.
+      Live verification confirmed all of it: status column + check
+      constraint exist; `set_package_status` exists with EXECUTE granted
+      only to `authenticated` (zero grants to anon/PUBLIC); the cv_id FK
+      has `confdeltype = 'n'` (SET NULL) and cv_id is nullable;
+      `cancel_at_period_end` exists with default false. Behavioral probes
+      (rolled back, zero residue confirmed): the status CHECK accepts
+      'beworben' and rejects an invalid key; a package row SURVIVES
+      deletion of its `cvs` row with cv_id set to null ("Bewerbungen
+      behalten ihre Kopie" holds at the DB layer). Security advisors:
+      the two known pre-existing WARNs remain, plus ONE new EXPECTED WARN:
+      `set_package_status` is flagged by the same
+      authenticated-security-definer lint as `delete_own_account`. This is
+      intentional and safe by construction (authenticated-only grant +
+      in-body `auth.uid()` ownership check + single-column update + status
+      value validation); accepted as a documented advisor exception, same
+      as delete_own_account.
 
 Follow-ups found during the 2026-07-06 E2E (not fixed by this doc edit):
 - KNOWN ISSUE: `saveApplicationPackage` inserts the `cvs` row before the
